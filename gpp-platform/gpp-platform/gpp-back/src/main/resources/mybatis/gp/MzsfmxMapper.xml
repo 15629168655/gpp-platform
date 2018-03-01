@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MzsfmxMapper">
+	<!-- 门诊收费明细表 -->
+	
+	<!--表名 -->
+	<sql id="tableName">
+		TB_HIS_MZ_FEE_DETAIL
+	</sql>
+	
+	
+	<!-- 新增-->
+	<insert id="save" parameterType="pd">
+		insert into <include refid="tableName"></include>
+		(
+			ID,SFMXID,YLJGDM,JZLSH,JFKSMC,KH,KLX,CFIDH,FPH,SJDH,
+			MXFYLB,STFSJ,MXXMBM,MXXMBMYB,MXXMMC,MXXMDW,MXXMDJ,MXXMSL,MXXMJE,XGBZ,
+			PERSONID,YLYL1,YLYL2,TFBZ
+		) values (
+			#{ID,jdbcType=VARCHAR},
+			#{SFMXID,jdbcType=VARCHAR},
+			#{YLJGDM,jdbcType=VARCHAR},
+			#{JZLSH,jdbcType=VARCHAR},
+			#{JFKSMC,jdbcType=VARCHAR},
+			#{KH,jdbcType=VARCHAR},
+			#{KLX,jdbcType=VARCHAR},
+			#{CFIDH,jdbcType=VARCHAR},
+			#{FPH,jdbcType=VARCHAR},
+			#{SJDH,jdbcType=VARCHAR},
+			
+			#{MXFYLB,jdbcType=VARCHAR},
+			#{STFSJ},
+			#{MXXMBM,jdbcType=VARCHAR},
+			#{MXXMBMYB,jdbcType=VARCHAR},
+			#{MXXMMC,jdbcType=VARCHAR},
+			#{MXXMDW,jdbcType=VARCHAR},
+			#{MXXMDJ},
+			#{MXXMSL},
+			#{MXXMJE},
+			#{XGBZ},
+			
+			#{PERSONID},
+			#{YLYL1,jdbcType=VARCHAR},
+			#{YLYL2,jdbcType=VARCHAR},
+			#{TFBZ,jdbcType=VARCHAR}
+		)
+	</insert>
+	
+	
+</mapper>

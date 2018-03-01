@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="SydjMapper">
+	<!--表名 -->
+	<!-- 输液登记表 -->
+	<sql id="tableName">
+		GPP_INFUSION_REGISTRATION
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+	  ID,
+	  YPMC,
+	  DRUG_ID,
+	  DOSE,
+	  CHANNEL,
+	  DROP_SPEED,
+	  EXECUTION_TIME,
+	  END_TIME,
+	  ZXR_ID,
+	  ZXR_NAME,
+	  ORG_CODE,
+	  MZJZLSH,
+	  PATIENT_ID,
+	  PATIENT_NAME,
+	  REMARK,
+	  CREATE_TIME,
+	  MODIFY_TIME,
+	  INPUT_ID,
+	  INPUT_NAME,
+	  STATE,
+	  ZXR_CODE
+	</sql>
+	
+	<!-- 新增字段 -->
+	<sql id="FieldSave">
+	  ID,
+	  YPMC,
+	  DRUG_ID,
+	  DOSE,
+	  CHANNEL,
+	  DROP_SPEED,
+	  EXECUTION_TIME,
+	  END_TIME,
+	  ZXR_ID,
+	  ZXR_NAME,
+	  ORG_CODE,
+	  MZJZLSH,
+	  PATIENT_ID,
+	  PATIENT_NAME,
+	  REMARK,
+	  CREATE_TIME,
+	  MODIFY_TIME,
+	  INPUT_ID,
+	  INPUT_NAME,
+	  STATE,
+	  ZXR_CODE
+	</sql>
+	
+	<!-- 新增字段值 -->
+	<sql id="FieldValue">
+	  #{ID,jdbcType=VARCHAR},
+	  #{YPMC,jdbcType=VARCHAR},
+	  #{DRUG_ID,jdbcType=VARCHAR},
+	  #{DOSE,jdbcType=VARCHAR},
+	  #{CHANNEL,jdbcType=VARCHAR},				 
+	  #{DROP_SPEED,jdbcType=VARCHAR},
+	  to_date(#{EXECUTION_TIME},'yyyy-mm-dd hh24:mi:ss'),
+	  to_date(#{END_TIME},'yyyy-mm-dd hh24:mi:ss'),
+	  #{ZXR_ID,jdbcType=VARCHAR},
+	  #{ZXR_NAME,jdbcType=VARCHAR},
+	  #{ORG_CODE,jdbcType=VARCHAR},
+	  #{MZJZLSH,jdbcType=VARCHAR},
+	  #{PATIENT_ID,jdbcType=VARCHAR},
+	  #{PATIENT_NAME,jdbcType=VARCHAR},
+	  #{REMARK,jdbcType=VARCHAR},
+	  sysdate,
+	  sysdate,
+	  #{INPUT_ID,jdbcType=VARCHAR},
+	  #{INPUT_NAME,jdbcType=VARCHAR},
+	  #{STATE,jdbcType=NUMERIC},
+	  #{ZXR_CODE,jdbcType=VARCHAR}
+	</sql>
+	
+	<!-- 列表 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select 
+			<include refid="Field"></include> 
+		from 
+			<include refid="tableName"></include> 
+		<where>
+				STATE = #{pd.STATE,jdbcType=NUMERIC}
+			<if test="pd.ORG_CODE != null and pd.ORG_CODE != ''"> <!-- ORG_CODE  -->
+				and ORG_CODE = #{pd.ORG_CODE}
+			</if>
+			<if test="pd.keywords != null and pd.keywords!= ''"><!-- 关键词检索 -->
+			and
+			(
+				YPMC LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+			or
+				PATIENT_NAME = #{pd.keywords}
+			)
+				
+		</if>
+			<if test="pd.GMT_START!=null and pd.GMT_START!=''">
+				and EXECUTION_TIME &gt;= to_date(#{pd.GMT_START},'yyyy-mm-dd')
+			</if>
+			<if test="pd.GMT_END!=null and pd.GMT_END!=''"><!-- 执行时间检索 -->
+				and to_char(EXECUTION_TIME,'yyyymmdd') &lt;= to_char(to_date(#{pd.GMT_END},'yyyy-mm-dd'),'yyyymmdd')
+			</if>
+		</where>
+	</select>
+	
+	<!-- 新增-->
+	<insert id="save" parameterType="pd">
+		insert into 
+	<include refid="tableName"></include>
+		(
+	<include refid="FieldSave"></include>
+		) values (
+	<include refid="FieldValue"></include>
+		)
+	</insert>
+	
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+			<include refid="Field"></include>
+		from 
+			<include refid="tableName"></include>
+		where 
+			id = #{id,jdbcType=VARCHAR}
+	</select>
+	
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+		update  <include refid="tableName"></include>
+		<set>
+			 ypmc					= #{YPMC,jdbcType=VARCHAR},
+			 drug_id				= #{DRUG_ID,jdbcType=VARCHAR},
+			 dose					= #{DOSE,jdbcType=VARCHAR},
+			 channel				= #{CHANNEL,jdbcType=VARCHAR},
+			 drop_speed				= #{DROP_SPEED,jdbcType=VARCHAR},
+			 execution_time			= to_date(#{EXECUTION_TIME},'yyyy-mm-dd hh24:mi:ss'),
+			 end_time				= to_date(#{END_TIME},'yyyy-mm-dd hh24:mi:ss'),
+			 zxr_id					= #{ZXR_ID,jdbcType=VARCHAR},
+			 zxr_name				= #{ZXR_NAME,jdbcType=VARCHAR},
+			 mzjzlsh				= #{MZJZLSH,jdbcType=VARCHAR},
+			 patient_id				= #{PATIENT_ID,jdbcType=VARCHAR},
+			 patient_name			= #{PATIENT_NAME,jdbcType=VARCHAR},
+			 remark					= #{REMARK,jdbcType=VARCHAR},
+			 modify_time			= sysdate
+        </set>
+		where 
+			id = #{ID,jdbcType=VARCHAR}
+	</update>
+	
+	<!-- 删除用户 （协议状态改为9，删除状态）-->
+	<update id="delete" parameterType="pd">
+		update  <include refid="tableName"></include>
+		<set>
+		    state = #{state},MODIFY_TIME=sysdate
+        </set>
+		where 
+			id = #{id}
+	</update>
+	
+	<!-- APP 分页查询 -->
+	<select id="queryPage" parameterType="pd" resultType="pd">
+				SELECT *
+				  FROM ( SELECT ROWNUM AS rowno, t.*
+				          FROM GPP_INFUSION_REGISTRATION t
+			where 
+				STATE = '0'
+			<if test="KEYWORDS != null and KEYWORDS!= ''"><!-- 关键词检索 -->
+				and
+				(
+					YPMC LIKE CONCAT(CONCAT('%', #{KEYWORDS}),'%')
+				or
+					PATIENT_NAME = #{KEYWORDS}
+				)
+			</if>
+			<if test="GMT_START!=null and GMT_START!=''">
+				and CREATE_TIME &gt;= to_date(#{GMT_START},'yyyy-mm-dd')
+			</if>
+			<if test="GMT_END!=null and GMT_END!=''"><!-- 协议结束时间检索 -->
+				and CREATE_TIME &lt;= to_date(#{GMT_END},'yyyy-mm-dd')
+			</if>
+				           ) table_alias
+				 WHERE table_alias.rowno BETWEEN #{pageStart} and #{pageEnd}
+	</select>	
+</mapper>

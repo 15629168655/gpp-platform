@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="IndexDiseaseAdviceMapper">
+	<!--表名指标问卷组合表  -->
+	<sql id="tableName">
+		GPP_INDEX_DIS_RELATION
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		ID,
+		RESIDENT_QUESTIONNAIRE_ID,
+		INDEX_RESULT_ID,
+		DISEASECODE_ID,
+		DISEASECODE_NAME,
+		RELATION_ORDER
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{ID, jdbcType=VARCHAR},
+		#{RESIDENT_QUESTIONNAIRE_ID, jdbcType=VARCHAR},
+		#{INDEX_RESULT_ID, jdbcType=VARCHAR},
+		#{DISEASECODE_ID, jdbcType=VARCHAR},
+		#{DISEASECODE_NAME, jdbcType=VARCHAR},
+		#{RELATION_ORDER, jdbcType=NUMERIC}
+	</sql>
+	<!-- 查询全部 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select
+			<include refid="Field"></include>
+		from 
+			<include refid="tableName"></include>
+		where
+			1=1 
+			<if test="pd.RESIDENT_QUESTIONNAIRE_ID != null and pd.RESIDENT_QUESTIONNAIRE_ID !=''">
+				and RESIDENT_QUESTIONNAIRE_ID = #{pd.RESIDENT_QUESTIONNAIRE_ID, jdbcType=VARCHAR}
+			</if>
+			<if test="pd.INDEX_RESULT_ID != null and pd.INDEX_RESULT_ID !=''">
+				and INDEX_RESULT_ID &lt;&gt; #{pd.INDEX_RESULT_ID, jdbcType=VARCHAR}
+			</if>
+	</select>
+	<!-- 查询全部 -->
+	<select id="datalistCreate" parameterType="page" resultType="pd">
+		select
+			<include refid="Field"></include>
+		from 
+			<include refid="tableName"></include>
+		where
+			1=1 
+			<if test="pd.RESIDENT_QUESTIONNAIRE_ID != null and pd.RESIDENT_QUESTIONNAIRE_ID !=''">
+				and RESIDENT_QUESTIONNAIRE_ID = #{pd.RESIDENT_QUESTIONNAIRE_ID, jdbcType=VARCHAR}
+			</if>
+			<if test="pd.INDEX_RESULT_ID != null and pd.INDEX_RESULT_ID !=''">
+				and INDEX_RESULT_ID = #{pd.INDEX_RESULT_ID, jdbcType=VARCHAR}
+			</if>
+	</select>
+	<!-- 查看详情 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+			<include refid="Field"></include>
+		from 
+			<include refid="tableName"></include>
+		where 
+			ID = #{ID,jdbcType=VARCHAR}
+	</select>
+	<!-- 编辑 -->
+	<update id="edit" parameterType="pd">
+		update
+			<include refid="tableName"></include>
+		set 
+			ID=#{ID, jdbcType=VARCHAR},
+			RESIDENT_QUESTIONNAIRE_ID=#{RESIDENT_QUESTIONNAIRE_ID, jdbcType=VARCHAR},
+			INDEX_RESULT_ID=#{INDEX_RESULT_ID, jdbcType=VARCHAR},
+			DISEASECODE_ID=#{DISEASECODE_ID, jdbcType=VARCHAR},
+			DISEASECODE_NAME=#{DISEASECODE_NAME, jdbcType=VARCHAR},
+			RELATION_ORDER=#{RELATION_ORDER, jdbcType=NUMERIC}	
+		where
+			ID=#{ID, jdbcType=VARCHAR}
+	</update>
+	<!-- 删除 -->
+	<delete id="delete" parameterType="pd">
+		delete 
+		from
+			<include refid="tableName"></include>
+		where
+			ID=#{ID, jdbcType=VARCHAR}
+	</delete>
+	<!-- 批量删除 -->
+	<delete id="deleteAll" parameterType="String">
+		delete from
+		<include refid="tableName"></include>
+		where 
+			ID in
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                 #{item}
+		</foreach>
+	</delete>
+	<!-- 增加-->
+	<insert id="save" parameterType="pd">
+		insert into 
+	<include refid="tableName"></include>
+	<trim prefix="(" suffix=")" suffixOverrides="," >
+		<if test="RESIDENT_QUESTIONNAIRE_ID != null" >RESIDENT_QUESTIONNAIRE_ID,</if>
+		<if test="INDEX_RESULT_ID != null" >INDEX_RESULT_ID,</if>
+		<if test="DISEASECODE_ID != null" >DISEASECODE_ID,</if>
+		<if test="DISEASECODE_NAME != null" >DISEASECODE_NAME,</if>
+		<if test="RELATION_ORDER != null" >RELATION_ORDER,</if>
+		ID
+       </trim>
+            VALUES
+     <trim prefix="(" suffix=")" suffixOverrides="," >
+     	<if test="RESIDENT_QUESTIONNAIRE_ID != null" >#{RESIDENT_QUESTIONNAIRE_ID, jdbcType=VARCHAR},</if>
+		<if test="INDEX_RESULT_ID != null" >#{INDEX_RESULT_ID, jdbcType=VARCHAR},</if>
+		<if test="DISEASECODE_ID != null" >#{DISEASECODE_ID, jdbcType=VARCHAR},</if>
+		<if test="DISEASECODE_NAME != null" >#{DISEASECODE_NAME, jdbcType=VARCHAR},</if>
+		<if test="RELATION_ORDER != null" >#{RELATION_ORDER, jdbcType=NUMERIC},</if>
+        #{ID, jdbcType=VARCHAR}
+      </trim>
+	</insert>
+	<!-- 更新-->
+	<update id="renew" parameterType="pd">
+		update
+			<include refid="tableName"></include>
+		set 
+			<if test="RESIDENT_QUESTIONNAIRE_ID != null and RESIDENT_QUESTIONNAIRE_ID != ''">
+				RESIDENT_QUESTIONNAIRE_ID=#{RESIDENT_QUESTIONNAIRE_ID, jdbcType=VARCHAR},
+			</if>
+			<if test="INDEX_RESULT_ID != null and INDEX_RESULT_ID != ''">
+				INDEX_RESULT_ID=#{INDEX_RESULT_ID, jdbcType=VARCHAR},
+			</if>
+			<if test="DISEASECODE_ID != null and DISEASECODE_ID != ''">
+				DISEASECODE_ID=#{DISEASECODE_ID, jdbcType=VARCHAR},
+			</if>
+			<if test="DISEASECODE_NAME != null and DISEASECODE_NAME != ''">
+				DISEASECODE_NAME=#{DISEASECODE_NAME, jdbcType=VARCHAR},
+			</if>
+			<if test="RELATION_ORDER != null and RELATION_ORDER != ''">
+				RELATION_ORDER=#{RELATION_ORDER, jdbcType=NUMERIC}	
+			</if>
+		    ID=#{ID, jdbcType=VARCHAR}
+		where
+			ID=#{ID, jdbcType=VARCHAR}
+	</update>	
+	
+
+</mapper>

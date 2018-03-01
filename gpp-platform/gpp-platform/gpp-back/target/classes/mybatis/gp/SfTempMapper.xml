@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="SfTempMapper">
+	<!--表名 -->
+	<!-- 随访记录表 -->
+	<sql id="tableName">
+		GPP_FLOW_TEMP
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+	 	GUID,
+	 	NAME,
+	 	PROVIDER_ID,
+	 	PROVIDER_NAME,
+	 	SFLX,
+	 	ISTEMP,
+	 	CREATE_TIME,
+	 	STATUS,
+	 	DELETE_TIME
+	</sql>
+	
+	<!-- 新增字段 -->
+	<sql id="FieldSave">
+	  	GUID,
+	 	NAME,
+	 	PROVIDER_ID,
+	 	PROVIDER_NAME,
+	 	SFLX,
+	 	ISTEMP,
+	 	CREATE_TIME,
+	 	STATUS
+	</sql>
+
+	<!-- 新增字段值 -->
+	<sql id="FieldValue">
+	  #{GUID,jdbcType=VARCHAR},
+	  #{NAME,jdbcType=VARCHAR},
+	  #{PROVIDER_ID,jdbcType=VARCHAR},
+	  #{PROVIDER_NAME,jdbcType=VARCHAR},
+	  #{SFLX,jdbcType=VARCHAR},				 
+	  #{ISTEMP,jdbcType=VARCHAR},
+	  to_date(#{CREATE_TIME},'yyyy-mm-dd hh24:mi:ss'),
+	  #{STATUS,jdbcType=VARCHAR}
+	</sql>
+	
+	<!-- APP查询接口 -->
+	<select id="queryPage" parameterType="pd" resultType="pd">
+				SELECT *
+				  FROM ( SELECT ROWNUM AS rowno, t.*
+				          FROM <include refid="tableName"></include> t   
+			<where>
+				1=1 and STATUS&lt;&gt;9 and PROVIDER_ID = #{PROVIDER_ID}
+				<if test="KEYWORDS != null and KEYWORDS != ''"><!-- 关键词检索 -->
+					and
+					(
+						NAME LIKE CONCAT('%',CONCAT(#{KEYWORDS,jdbcType=VARCHAR},'%'))
+					)
+				</if>
+			</where>
+			) table_alias
+			 WHERE table_alias.rowno BETWEEN #{pageStart} and #{pageEnd}
+	</select>
+	
+	<!-- 通过GUID查询随访模版 -->
+	<select id="findByGUID" parameterType="pd" resultType="pd">
+		SELECT * FROM <include refid="tableName"></include> 
+		WHERE STATUS&lt;&gt;9 and GUID=#{GUID}
+	</select>
+
+	<!-- 通过TEMP_ID查询随访模版明细 -->
+	<select id="findDetailByTEMP_ID" parameterType="pd" resultType="pd">
+		SELECT COLUMN_ID,COLUMN_NAME FROM GPP_FLOW_TEMP_DETAIL
+		WHERE TEMP_ID=#{GUID}
+	</select>
+
+	<!-- 新增-->
+	<insert id="saveTemp" parameterType="pd">
+		insert into 
+	<include refid="tableName"></include>
+		(
+	<include refid="FieldSave"></include>
+		) values (
+	<include refid="FieldValue"></include>
+		)
+	</insert>
+
+	<!-- 新增模版明细-->
+	<insert id="saveTempDetail" parameterType="pd">
+		insert into GPP_FLOW_TEMP_DETAIL(
+			GUID,
+			TEMP_ID,
+			COLUMN_ID,
+			COLUMN_NAME
+		) values (
+			#{GUID,jdbcType=VARCHAR},
+			#{TEMP_ID,jdbcType=VARCHAR},
+			#{COLUMN_ID,jdbcType=VARCHAR},
+			#{COLUMN_NAME,jdbcType=VARCHAR}
+		)
+	</insert>
+	
+	<!-- 修改随访模版 -->
+	<update id="editTemp">
+		update <include refid="tableName"></include> 
+		<set>
+			NAME = #{NAME,jdbcType=VARCHAR},
+			SFLX = #{SFLX,jdbcType=VARCHAR},
+		</set>
+		<where>
+			GUID = #{GUID}
+		</where> 
+	</update>
+	
+	<!-- 删除随访模版 -->
+	<update id="deleteTemp">
+		update <include refid="tableName"></include> 
+		<set>
+			STATUS = #{STATUS},
+			DELETE_TIME = sysdate
+		</set>
+		<where>
+			GUID = #{GUID}
+		</where>
+	</update>
+	
+	<!-- 根据TEMP_ID删除随访模版明细 -->
+	<delete id="deteteDetailByTEMP_ID">
+		delete from GPP_FLOW_TEMP_DETAIL
+		<where>
+			TEMP_ID = #{GUID}
+		</where>
+	</delete>
+	
+</mapper>

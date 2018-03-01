@@ -1,0 +1,447 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="JmxxMapper">
+	<!--表名 -->
+	<sql id="tableName">
+		TB_USER_AGENT
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+	  USER_AGENT_ID,
+	  HEALTH_ACCOUNT,
+	  TELEPHONE,
+	  EMAIL,
+	  PASSWORD,
+	  OLDPASS,
+	  USER_NAME,
+	  NICK_NAME,
+	  IMAGE_URL,
+	  SEX,
+	  ID_NUMBER,
+	  BIRTHDAY_TIME,
+	  LOCAL_ADDRESS,
+	  ADDRESS,
+	  POSTCODE,
+	  IS_COMPLETE,
+	  IS_INDEPENDENCE,
+	  USER_CREATE_TIME,
+	  REFERRAL_CODE,
+	  QR_CODE_URL,
+	  IS_LOCK,
+	  OPERATOR_ID,
+	  OPERATOR_TIME,
+	  RELEASE_TIME,
+	  PROCESSING_STATUS,
+	  SOURCE_FROM,
+	  SHARE_AMOUNT,
+	  STATE,
+	  QQACCOUNT,
+	  WXACCOUNT,
+	  SINAACCOUNT,
+	  AREA,
+	  AREA_ID,
+	  OPEN_ID,
+	  OPEN_ID_TYPE,
+	  UUID,
+	  APPID,
+	  HEIGHT,
+	  WEIGHT,
+	  HISTORY_ALLERGIC,
+	  HISTORY_OPERATION,
+	  COMPID,
+	  COM_AGENTID,
+	  YXID,
+	  YXPASS,
+	  GROUP_ID,
+	  REMARK,
+	  DOCTOR_OPERATOR_ID,
+	  DOCTOR_OPERATOR_TIME,
+	  IS_SIGN,
+	  SIGN_APPLY_TIME,
+	  MI_CARD,
+	  ZDRQ
+	</sql>
+	
+	<!-- 自增长序列，映射用户id -->
+	<sql id='TABLE_SEQUENCE'>tb_user_sequence.nextval</sql>
+	
+	<!-- 新增居民字段 -->
+	<sql id="Field1">
+	  USER_AGENT_ID,
+	  HEALTH_ACCOUNT,
+	  TELEPHONE,
+	  EMAIL,
+	  PASSWORD,
+	  OLDPASS,
+	  USER_NAME,
+	  NICK_NAME,
+	  IMAGE_URL,
+	  SEX,
+	  ID_NUMBER,
+	  
+	  BIRTHDAY_TIME,
+	  LOCAL_ADDRESS,
+	  ADDRESS,
+	  
+	  POSTCODE,
+	  IS_COMPLETE,
+	  IS_INDEPENDENCE,
+	  USER_CREATE_TIME,
+	  REFERRAL_CODE,
+	  QR_CODE_URL,
+	  IS_LOCK,
+	  OPERATOR_ID,
+	  OPERATOR_TIME,
+	  RELEASE_TIME,
+	  PROCESSING_STATUS,
+	  SOURCE_FROM,
+	  SHARE_AMOUNT,
+	  STATE,
+	  QQACCOUNT,
+	  WXACCOUNT,
+	  SINAACCOUNT,
+	  AREA,
+	  AREA_ID,
+	  OPEN_ID,
+	  OPEN_ID_TYPE,
+	  UUID,
+	  APPID,
+	  HEIGHT,
+	  WEIGHT,
+	  HISTORY_ALLERGIC,
+	  HISTORY_OPERATION,
+	  COMPID,
+	  COM_AGENTID,
+	  YXID,
+	  YXPASS,
+	  GROUP_ID,
+	  REMARK,
+	  DOCTOR_OPERATOR_ID,
+	  DOCTOR_OPERATOR_TIME,
+	  IS_SIGN,
+	  SIGN_APPLY_TIME,
+	  MI_CARD,
+	  ZDRQ
+	</sql>
+	
+	<!-- 新增居民字段值 -->
+	<sql id="FieldValue">
+		<include refid="TABLE_SEQUENCE" />,
+		#{HEALTH_ACCOUNT,jdbcType=NUMERIC},
+		#{TELEPHONE,jdbcType=VARCHAR},
+		#{EMAIL,jdbcType=VARCHAR},
+		#{PASSWORD,jdbcType=VARCHAR},
+		#{OLDPASS,jdbcType=VARCHAR},
+		#{USER_NAME,jdbcType=VARCHAR},
+		#{NICK_NAME,jdbcType=VARCHAR},
+		#{IMAGE_URL,jdbcType=VARCHAR},
+		#{SEX,jdbcType=NUMERIC},
+		#{ID_NUMBER,jdbcType=VARCHAR},
+		
+		to_date(#{BIRTHDAY_TIME},'yyyy-MM-dd'),
+		#{LOCAL_ADDRESS,jdbcType=VARCHAR},
+		#{ADDRESS,jdbcType=VARCHAR},
+		
+		#{POSTCODE,jdbcType=VARCHAR},
+		#{IS_COMPLETE,jdbcType=NUMERIC},
+		#{IS_INDEPENDENCE,jdbcType=NUMERIC},
+		sysdate,
+		
+		#{REFERRAL_CODE,jdbcType=VARCHAR},
+		#{QR_CODE_URL,jdbcType=VARCHAR},
+		#{IS_LOCK,jdbcType=NUMERIC},
+		#{OPERATOR_ID,jdbcType=NUMERIC},
+		to_date(#{OPERATOR_TIME},'yyyy-mm-dd'),
+		to_date(#{RELEASE_TIME},'yyyy-mm-dd'),
+		#{PROCESSING_STATUS,jdbcType=NUMERIC},
+		#{SOURCE_FROM,jdbcType=VARCHAR},
+		#{SHARE_AMOUNT,jdbcType=NUMERIC},
+		#{STATE,jdbcType=NUMERIC},
+		#{QQACCOUNT,jdbcType=VARCHAR},
+		#{WXACCOUNT,jdbcType=VARCHAR},
+		#{SINAACCOUNT,jdbcType=VARCHAR},
+		#{AREA,jdbcType=VARCHAR},
+		#{AREA_ID,jdbcType=VARCHAR},
+		#{OPEN_ID,jdbcType=VARCHAR},
+		#{OPEN_ID_TYPE,jdbcType=NUMERIC},
+		#{UUID,jdbcType=VARCHAR},
+		#{APPID,jdbcType=VARCHAR},
+		#{HEIGHT,jdbcType=NUMERIC},
+		#{WEIGHT,jdbcType=NUMERIC},
+		#{HISTORY_ALLERGIC,jdbcType=VARCHAR},
+		#{HISTORY_OPERATION,jdbcType=VARCHAR},
+		#{COMPID,jdbcType=VARCHAR},
+		#{COM_AGENTID,jdbcType=VARCHAR},
+		#{YXID,jdbcType=VARCHAR},
+		#{YXPASS,jdbcType=VARCHAR},
+		#{GROUP_ID,jdbcType=VARCHAR},
+		#{REMARK,jdbcType=VARCHAR},
+		#{DOCTOR_OPERATOR_ID,jdbcType=NUMERIC},
+		to_date(#{DOCTOR_OPERATOR_TIME},'yyyy-mm-dd'),
+		#{IS_SIGN,jdbcType=NUMERIC},
+		to_date(#{SIGN_APPLY_TIME},'yyyy-mm-dd'),
+		#{MI_CARD,jdbcType=VARCHAR},
+		#{ZDRQ,jdbcType=VARCHAR}
+	</sql>
+	
+	<!-- 辖区所有居民 -->
+	<select id="jmxxlistPage" parameterType="page" resultType="pd">
+		select 
+			<include refid="Field"></include> 
+		from 
+			<include refid="tableName"></include> 
+		<where>
+				STATE &lt;&gt; #{pd.STATE,jdbcType=NUMERIC}			<!-- 状态  -->
+			<if test="pd.user_name != null and pd.user_name != ''"> <!-- 姓名关键词检索  -->
+				and user_name LIKE CONCAT(CONCAT('%', #{pd.user_name}),'%')
+			</if>
+			<if test="pd.mi_card != null and pd.mi_card != ''"> <!-- 医保卡号 -->
+				and mi_card LIKE CONCAT(CONCAT('%', #{pd.mi_card}),'%')
+			</if>
+			<if test="pd.id_number != null and pd.id_number != ''"> <!-- 身份证号  -->
+				and id_number LIKE CONCAT(CONCAT('%', #{pd.id_number}),'%')
+			</if>
+			<if test="pd.sign_apply_time != null and pd.sign_apply_time != ''"> <!-- 签约时间 -->
+				and sign_apply_time = to_date(#{pd.sign_apply_time},'yyyy-MM-dd')
+			</if>
+			<if test="pd.is_sign != null and pd.is_sign != ''"> <!-- 签约状态 -->
+				and is_sign = #{pd.is_sign} 
+			</if>
+			<if test="pd.processing_status != null and pd.processing_status != ''"> <!-- 加急状态 -->
+				and processing_status = #{pd.processing_status} 
+			</if>
+			<if test="pd.zdrq != null and pd.zdrq != ''"> <!-- 重点人群 -->
+				and zdrq = #{pd.zdrq} 
+			</if>
+			ORDER BY USER_CREATE_TIME DESC
+		</where>
+	</select>
+	
+	<!-- 根据医保卡号查询是否有记录 -->
+	<select id="jmxxByMi_card" parameterType="pd" resultType="pd">
+		select 
+			<include refid="Field"></include> 
+		from 
+			<include refid="tableName"></include> 
+		<where>
+			 MI_CARD = #{MI_CARD,jdbcType=VARCHAR}
+		</where>
+	</select>
+	
+	<!-- 根据身份证号查询是否有记录 -->
+	<select id="jmxxByIdcard" parameterType="pd" resultType="pd">
+		select 
+			<include refid="Field"></include> 
+		from 
+			<include refid="tableName"></include> 
+		<where>
+			 ID_NUMBER = #{ID_NUMBER,jdbcType=VARCHAR}
+		</where>
+	</select>
+	
+	<!-- 新增居民 -->
+	<insert id="saveU" parameterType="pd">
+		insert into <include refid="tableName"></include> (
+			<include refid="Field1"></include>
+		) values (
+			<include refid="FieldValue"></include>
+		)
+	</insert>
+	
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+			<include refid="Field"></include>
+		from 
+			<include refid="tableName"></include>
+		where 
+			USER_AGENT_ID = #{USER_AGENT_ID,jdbcType=NUMERIC}
+	</select>
+	<!-- 修改 -->
+	<update id="editJmxxSign" parameterType="pd">
+	    	update  <include refid="tableName"></include>
+		<set>
+		    	IS_SIGN					=#{IS_SIGN,jdbcType=NUMERIC}, 
+        </set>
+		where 
+			USER_AGENT_ID = #{USER_AGENT_ID,jdbcType=NUMERIC}
+	</update>
+	<!-- 修改 -->
+	<update id="editJmxx" parameterType="pd">
+		update  <include refid="tableName"></include>
+		<set>
+		    USER_NAME				= #{USER_NAME,jdbcType=VARCHAR},
+		    SEX						= #{SEX,jdbcType=NUMERIC},
+			HEALTH_ACCOUNT			= #{HEALTH_ACCOUNT,jdbcType=NUMERIC},
+            ID_NUMBER				= #{ID_NUMBER,jdbcType=VARCHAR},
+            MI_CARD					= #{MI_CARD,jdbcType=VARCHAR},
+            BIRTHDAY_TIME			= to_date(#{BIRTHDAY_TIME},'yyyy-mm-dd'),
+            TELEPHONE				= #{TELEPHONE},
+            ADDRESS					= #{ADDRESS},
+            POSTCODE				= #{POSTCODE},
+            SIGN_APPLY_TIME			= to_date(#{SIGN_APPLY_TIME},'yyyy-mm-dd'),  <!-- 申请签约时间 -->
+			APPID			        =#{APPID,jdbcType=VARCHAR},
+			IS_COMPLETE				=#{IS_COMPLETE,jdbcType=NUMERIC},
+			IS_INDEPENDENCE			=#{IS_INDEPENDENCE,jdbcType=NUMERIC},
+			PROCESSING_STATUS		=#{PROCESSING_STATUS,jdbcType=NUMERIC},
+			QQACCOUNT				=#{QQACCOUNT,jdbcType=VARCHAR},
+			WXACCOUNT				=#{WXACCOUNT,jdbcType=VARCHAR},
+			SINAACCOUNT				=#{SINAACCOUNT,jdbcType=VARCHAR},
+			EMAIL					=#{EMAIL,jdbcType=VARCHAR},
+			HEIGHT					=#{HEIGHT,jdbcType=NUMERIC},
+			WEIGHT					=#{WEIGHT,jdbcType=NUMERIC},
+			HISTORY_ALLERGIC		=#{HISTORY_ALLERGIC,jdbcType=VARCHAR},
+			HISTORY_OPERATION		=#{HISTORY_OPERATION,jdbcType=VARCHAR},
+			
+			PASSWORD				=#{PASSWORD,jdbcType=VARCHAR},
+			OLDPASS					=#{OLDPASS,jdbcType=VARCHAR},
+			NICK_NAME				=#{NICK_NAME,jdbcType=VARCHAR},
+			IMAGE_URL				=#{IMAGE_URL,jdbcType=VARCHAR},
+			LOCAL_ADDRESS			=#{LOCAL_ADDRESS,jdbcType=VARCHAR},
+			REFERRAL_CODE			=#{REFERRAL_CODE,jdbcType=VARCHAR},
+			QR_CODE_URL				=#{QR_CODE_URL,jdbcType=VARCHAR},
+			IS_LOCK					=#{IS_LOCK,jdbcType=NUMERIC},
+			OPERATOR_ID				=#{OPERATOR_ID,jdbcType=NUMERIC},
+			OPERATOR_TIME			= to_date(#{OPERATOR_TIME},'yyyy-mm-dd'),
+			RELEASE_TIME			= to_date(#{RELEASE_TIME},'yyyy-mm-dd'),
+			SOURCE_FROM				=#{SOURCE_FROM,jdbcType=VARCHAR},
+			SHARE_AMOUNT			=#{SHARE_AMOUNT,jdbcType=NUMERIC},
+			STATE					=#{STATE,jdbcType=NUMERIC},
+			AREA					=#{AREA,jdbcType=VARCHAR},
+			AREA_ID					=#{AREA_ID,jdbcType=VARCHAR},
+			OPEN_ID					=#{OPEN_ID,jdbcType=VARCHAR},
+			OPEN_ID_TYPE			=#{OPEN_ID_TYPE,jdbcType=NUMERIC},
+			UUID					=#{UUID,jdbcType=VARCHAR},
+			COMPID					=#{COMPID,jdbcType=VARCHAR},
+			COM_AGENTID				=#{COM_AGENTID,jdbcType=VARCHAR},
+			YXID					=#{YXID,jdbcType=VARCHAR},
+			YXPASS					=#{YXPASS,jdbcType=VARCHAR},
+			GROUP_ID				=#{GROUP_ID,jdbcType=VARCHAR},
+			REMARK					=#{REMARK,jdbcType=VARCHAR},
+			DOCTOR_OPERATOR_ID		=#{DOCTOR_OPERATOR_ID,jdbcType=NUMERIC},
+			DOCTOR_OPERATOR_TIME	= to_date(#{DOCTOR_OPERATOR_TIME},'yyyy-mm-dd'),
+			IS_SIGN					=#{IS_SIGN,jdbcType=NUMERIC},
+			ZDRQ					=#{ZDRQ,jdbcType=VARCHAR}
+			
+        </set>
+		where 
+			USER_AGENT_ID = #{USER_AGENT_ID,jdbcType=NUMERIC}
+	</update>
+	
+	<!-- 删除用户 （协议状态改为2，删除状态）-->
+	<update id="deleteJmxx" parameterType="pd">
+		update  <include refid="tableName"></include>
+		<set>
+		    STATE = #{STATE,jdbcType=NUMERIC}
+        </set>
+		where 
+			USER_AGENT_ID = #{USER_AGENT_ID,jdbcType=NUMERIC}
+	</update>
+	
+	<!-- 列出所有居民 -->
+	<select id="listAllJmxxs" parameterType="pd" resultType="pd" >
+		select
+		user_agent_id,user_name
+		from
+		<include refid="tableName"></include>
+	</select>
+	
+	
+	<!-- APP居民 注册 -->
+	<insert id="saveForApp" parameterType="pd">
+		insert into <include refid="tableName"></include> (
+			USER_AGENT_ID,PASSWORD,HEALTH_ACCOUNT,TELEPHONE,
+			USER_CREATE_TIME,STATE,IS_SIGN
+		) values (
+			TB_USER_SEQUENCE.nextVal,#{PASSWORD},HEALTH_ACCOUNT.nextVal,#{TELEPHONE},
+			sysdate,#{STATE},#{IS_SIGN}
+		)
+	</insert>
+	<update id="editPW" parameterType="pd">
+		update  <include refid="tableName"></include>
+		<set>
+		    PASSWORD = #{PASSWORD}
+        </set>
+		where 
+			USER_AGENT_ID = #{USER_AGENT_ID}
+			
+	</update>
+	<!-- 验证手机号 -->
+	<select id="findByTel" parameterType="pd" resultType="pd">
+		select HEALTH_ACCOUNT,TELEPHONE,EMAIL,USER_NAME,IMAGE_URL,SEX,
+		ID_NUMBER,BIRTHDAY_TIME,ADDRESS
+		from 
+			<include refid="tableName"></include>
+		where 
+			TELEPHONE = #{TELEPHONE}
+	</select>
+	<!-- 根据用户id查询基础信息 -->
+	<select id="findUserInfoById" parameterType="pd" resultType="pd">
+		select USER_AGENT_ID,HEALTH_ACCOUNT,TELEPHONE,EMAIL,USER_NAME,IMAGE_URL,SEX,
+		ID_NUMBER,BIRTHDAY_TIME,ADDRESS
+		from 
+			<include refid="tableName"></include>
+		where 
+			USER_AGENT_ID = #{USER_AGENT_ID}
+	</select>
+	<!-- 居民登陆 -->
+	<select id="findByLoginInfo" parameterType="pd" resultType="pd">
+		select USER_AGENT_ID,HEALTH_ACCOUNT,TELEPHONE,USER_NAME from 
+			<include refid="tableName"></include>
+		where 
+			TELEPHONE = #{TELEPHONE} 
+		<if test="PASSWORD!=null and PASSWORD!=''">
+		    and 
+			 PASSWORD = #{PASSWORD}
+		</if>	
+			
+	</select>
+	<update id="editForApp" parameterType="pd">
+		update  <include refid="tableName"></include>
+		<trim prefix="SET" suffixOverrides="," >
+				<if test="USER_NAME != null" > 
+					USER_NAME =#{USER_NAME},
+				</if>
+				<if test="IMAGE_URL != null" > 
+					IMAGE_URL = #{IMAGE_URL},
+				</if>
+				<if test="SEX != null" > 
+					SEX = #{SEX},
+				</if>
+				<if test="ID_NUMBER != null" > 
+					ID_NUMBER = #{ID_NUMBER},
+				</if>
+				<if test="BIRTHDAY_TIME != null" > 
+					BIRTHDAY_TIME = to_date(#{BIRTHDAY_TIME},'yyyy-MM-dd'),
+				</if>
+				<if test="ADDRESS != null" > 
+					ADDRESS = #{ADDRESS},
+				</if>
+				<if test="EMAIL != null" > 
+					EMAIL = #{EMAIL},
+				</if>
+				<if test="NEW_TELEPHONE !=null and NEW_TELEPHONE!=''" > 
+					TELEPHONE = #{NEW_TELEPHONE},
+				</if>
+		</trim>	
+		where USER_AGENT_ID = #{USER_AGENT_ID}
+	</update>	
+	<!-- 辖区所有居民 -->
+	<select id="jmxxlistforApp" parameterType="pd" resultType="pd">
+			SELECT *
+				  FROM ( SELECT ROWNUM AS rowno,
+			USER_AGENT_ID, USER_NAME,TELEPHONE,EMAIL,NICK_NAME,SEX,ID_NUMBER,MI_CARD,IS_SIGN
+		FROM  
+			<include refid="tableName"></include> 
+		<where> 
+			<if test="KEYWORDS != null and KEYWORDS != ''"> <!-- 姓名关键词检索  -->
+				 ( USER_NAME LIKE CONCAT(CONCAT('%',#{KEYWORDS}),'%')
+				 or   MI_CARD LIKE CONCAT(CONCAT('%',#{KEYWORDS}),'%') 
+				 or   ID_NUMBER LIKE CONCAT(CONCAT('%',#{KEYWORDS}),'%') )
+			</if>
+		</where>
+		ORDER BY USER_CREATE_TIME DESC  ) table_alias
+				 WHERE table_alias.rowno BETWEEN #{pageStart} and #{pageEnd}
+	</select>
+</mapper>

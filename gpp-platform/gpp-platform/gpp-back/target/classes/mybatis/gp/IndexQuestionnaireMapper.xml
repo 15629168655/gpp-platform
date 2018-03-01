@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="IndexQuestionnaireMapper">
+	<!--表名指标问卷表-->
+	<sql id="tableName">
+		GPP_INDEX_QUESTIONNAIRE
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		ID,
+		QUESTIONNAIRE_CODE,
+		QUESTIONNAIRE_NAME,
+		PY_CODE,
+		CHRONIC_DISEASE_TYPE,
+		QUESTIONNAIRE_ORDER,
+		COMPANY,
+		DEPARTMENT,
+		FIT_SEX,
+		QUESTIONNAIRE_STATE,
+		CREAT_TIME,
+		EDIT_TIME
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{ID, jdbcType=VARCHAR},
+		#{QUESTIONNAIRE_CODE, jdbcType=VARCHAR},
+		#{QUESTIONNAIRE_NAME, jdbcType=VARCHAR},
+		#{PY_CODE, jdbcType=VARCHAR},
+		#{CHRONIC_DISEASE_TYPE, jdbcType=VARCHAR},
+		#{QUESTIONNAIRE_ORDER, jdbcType=NUMERIC},
+		#{COMPANY, jdbcType=VARCHAR},
+		#{DEPARTMENT, jdbcType=VARCHAR},
+		#{FIT_SEX, jdbcType=VARCHAR},
+		#{QUESTIONNAIRE_STATE, jdbcType=VARCHAR},
+		to_date(#{CREAT_TIME},'yyyy-mm-dd HH24:mi:ss'),
+		to_date(#{EDIT_TIME},'yyyy-mm-dd HH24:mi:ss')
+	</sql>
+	<!-- 查询全部 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select <include refid="Field"></include> from
+		<include refid="tableName"></include>
+		where 1=1 and QUESTIONNAIRE_STATE=#{pd.QUESTIONNAIRE_STATE, jdbcType=VARCHAR}
+        <if test="pd.keywords != null and pd.keywords !=''">
+        	and(
+        		 QUESTIONNAIRE_NAME LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				 or
+				 PY_CODE LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				 or 
+				 DEPARTMENT LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%') 
+        	)
+        </if>
+        order by QUESTIONNAIRE_ORDER desc
+	</select>
+	<!-- 查看详情 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+			<include refid="Field"></include>
+		from 
+			<include refid="tableName"></include>
+		where 
+			ID = #{ID,jdbcType=VARCHAR}
+	</select>
+	<!-- 编辑 -->
+	<update id="edit" parameterType="pd">
+		update
+			<include refid="tableName"></include>
+		set 
+			ID=#{ID, jdbcType=VARCHAR},
+			QUESTIONNAIRE_CODE=#{QUESTIONNAIRE_CODE, jdbcType=VARCHAR},
+			QUESTIONNAIRE_NAME=#{QUESTIONNAIRE_NAME, jdbcType=VARCHAR},
+			PY_CODE=#{PY_CODE, jdbcType=VARCHAR},
+			CHRONIC_DISEASE_TYPE=#{CHRONIC_DISEASE_TYPE, jdbcType=VARCHAR},
+			QUESTIONNAIRE_ORDER=#{QUESTIONNAIRE_ORDER, jdbcType=NUMERIC},
+			COMPANY=#{COMPANY, jdbcType=VARCHAR},
+			DEPARTMENT=#{DEPARTMENT, jdbcType=VARCHAR},
+			FIT_SEX=#{FIT_SEX, jdbcType=VARCHAR},
+			QUESTIONNAIRE_STATE=#{QUESTIONNAIRE_STATE, jdbcType=VARCHAR},
+			CREAT_TIME=to_date(#{CREAT_TIME},'yyyy-mm-dd HH24:mi:ss'),
+			EDIT_TIME=to_date(#{EDIT_TIME},'yyyy-mm-dd HH24:mi:ss')
+		where
+			ID=#{ID, jdbcType=VARCHAR}
+	</update>
+	<!-- 删除 -->
+	<update id="delete" parameterType="pd">
+		update
+			<include refid="tableName"></include>
+		set
+			EDIT_TIME=to_date(#{EDIT_TIME},'yyyy-mm-dd HH24:mi:ss'),
+			QUESTIONNAIRE_STATE=#{QUESTIONNAIRE_STATE, jdbcType=VARCHAR}
+		where
+			ID=#{ID, jdbcType=VARCHAR}
+	</update>
+	<!-- 批量删除 -->
+	<delete id="deleteAll" parameterType="pd">
+		update
+		<include refid="tableName"></include>
+		set 
+			EDIT_TIME=to_date(#{EDIT_TIME},'yyyy-mm-dd HH24:mi:ss'),
+			QUESTIONNAIRE_STATE=#{QUESTIONNAIRE_STATE, jdbcType=VARCHAR}
+		where 
+			ID in
+		${IDS}
+	</delete>
+	<!-- 增加-->
+	<insert id="save" parameterType="pd">
+		insert into 
+	<include refid="tableName"></include>
+	<trim prefix="(" suffix=")" suffixOverrides="," >
+		<if test="QUESTIONNAIRE_CODE != null" >QUESTIONNAIRE_CODE,</if>
+		<if test="QUESTIONNAIRE_NAME != null" >QUESTIONNAIRE_NAME,</if>
+		<if test="PY_CODE != null" >PY_CODE,</if>
+		<if test="CHRONIC_DISEASE_TYPE != null" >CHRONIC_DISEASE_TYPE,</if>
+		<if test="QUESTIONNAIRE_ORDER != null" >QUESTIONNAIRE_ORDER,</if>
+		<if test="COMPANY != null" >COMPANY,</if>
+		<if test="DEPARTMENT != null" >DEPARTMENT,</if>
+		<if test="FIT_SEX != null" >FIT_SEX,</if>
+		<if test="QUESTIONNAIRE_STATE != null" >QUESTIONNAIRE_STATE,</if>
+		<if test="CREAT_TIME != null" >CREAT_TIME,</if>
+		<if test="EDIT_TIME != null" >EDIT_TIME,</if>
+		ID
+       </trim>
+            VALUES
+     <trim prefix="(" suffix=")" suffixOverrides="," >
+     	<if test="QUESTIONNAIRE_CODE != null" >#{QUESTIONNAIRE_CODE, jdbcType=VARCHAR},</if>
+		<if test="QUESTIONNAIRE_NAME != null" >#{QUESTIONNAIRE_NAME, jdbcType=VARCHAR},</if>
+		<if test="PY_CODE != null" >#{PY_CODE, jdbcType=VARCHAR},</if>
+		<if test="CHRONIC_DISEASE_TYPE != null" >#{CHRONIC_DISEASE_TYPE, jdbcType=VARCHAR},</if>
+		<if test="QUESTIONNAIRE_ORDER != null" >#{QUESTIONNAIRE_ORDER, jdbcType=NUMERIC},</if>
+		<if test="COMPANY != null" >#{COMPANY, jdbcType=VARCHAR},</if>
+		<if test="DEPARTMENT != null" >#{DEPARTMENT, jdbcType=VARCHAR},</if>
+		<if test="FIT_SEX != null" >#{FIT_SEX, jdbcType=VARCHAR},</if>
+		<if test="QUESTIONNAIRE_STATE != null" >#{QUESTIONNAIRE_STATE, jdbcType=VARCHAR},</if>
+		<if test="CREAT_TIME != null" >to_date(#{CREAT_TIME},'yyyy-mm-dd HH24:mi:ss'),</if>
+		<if test="EDIT_TIME != null" >to_date(#{EDIT_TIME},'yyyy-mm-dd HH24:mi:ss'),</if>
+        #{ID, jdbcType=VARCHAR}
+      </trim>
+	</insert>
+	<update id="renew" parameterType="pd">
+		update
+			<include refid="tableName"></include>
+		set 
+			<if test="QUESTIONNAIRE_CODE != null and QUESTIONNAIRE_CODE != ''">
+				QUESTIONNAIRE_CODE=#{QUESTIONNAIRE_CODE, jdbcType=VARCHAR},
+			</if>
+			<if test="QUESTIONNAIRE_NAME != null and QUESTIONNAIRE_NAME != ''">
+				QUESTIONNAIRE_NAME=#{QUESTIONNAIRE_NAME, jdbcType=VARCHAR},
+			</if>
+			<if test="PY_CODE != null and PY_CODE != ''">
+				PY_CODE=#{PY_CODE, jdbcType=VARCHAR},
+			</if>	
+			<if test="CHRONIC_DISEASE_TYPE != null and CHRONIC_DISEASE_TYPE != ''">
+				CHRONIC_DISEASE_TYPE=#{CHRONIC_DISEASE_TYPE, jdbcType=VARCHAR},
+			</if>
+			<if test="QUESTIONNAIRE_ORDER != null and QUESTIONNAIRE_ORDER != ''">
+				QUESTIONNAIRE_ORDER=#{QUESTIONNAIRE_ORDER, jdbcType=NUMERIC},
+			</if>
+			<if test="COMPANY != null and COMPANY != ''">
+				COMPANY=#{COMPANY, jdbcType=VARCHAR},
+			</if>
+			<if test="DEPARTMENT != null and DEPARTMENT != ''">
+				DEPARTMENT=#{DEPARTMENT, jdbcType=VARCHAR},
+			</if>
+			<if test="QUESTIONNAIRE_STATE != null and QUESTIONNAIRE_STATE != ''">
+				QUESTIONNAIRE_STATE=#{QUESTIONNAIRE_STATE, jdbcType=VARCHAR},
+			</if>
+			<if test="FIT_SEX != null and FIT_SEX != ''">
+		    	FIT_SEX=#{FIT_SEX, jdbcType=VARCHAR},
+		    </if>
+		    <if test="CERAT_TIME != null and CERAT_TIME != ''">
+		    	CREAT_TIME=to_date(#{CREAT_TIME},'yyyy-mm-dd HH24:mi:ss'),
+		    </if>
+		    <if test="EDIT_TIME != null and EDIT_TIME != ''">
+		    	EDIT_TIME=to_date(#{EDIT_TIME},'yyyy-mm-dd HH24:mi:ss'),
+		    </if>
+		    ID=#{ID, jdbcType=VARCHAR}
+		where
+			ID=#{ID, jdbcType=VARCHAR}
+	</update>	
+	<!-- 查看详情 -->
+	<select id="findBySId" parameterType="pd" resultType="pd">
+		select 
+			<include refid="Field"></include>
+		from 
+			<include refid="tableName"></include>
+		where 
+			ID = #{SID,jdbcType=VARCHAR}
+	</select>
+
+</mapper>

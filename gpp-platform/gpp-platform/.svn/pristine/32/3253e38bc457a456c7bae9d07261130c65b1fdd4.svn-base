@@ -1,0 +1,2606 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CismainMapper">
+<!-- 表名 -->
+<!-- 住院就诊记录表 -->
+	<sql id="tableName">
+		TB_CIS_MAIN
+	</sql>
+	
+
+	<!-- 查询全部 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select * from
+		<include refid="tableName"></include>
+		where 1=1
+		<if test="pd.YLJGDM != null and pd.YLJGDM!= ''"> <!-- 医疗机构代码 -->
+			and YLJGDM = #{pd.YLJGDM}
+		</if>
+		<if test="pd.SFZ != null and pd.SFZ!= ''"><!-- 身份证 -->
+			and	SFZ = #{pd.SFZ} 
+		</if>
+		<if test="pd.XM != null and pd.XM!= ''"> <!-- 患者姓名 -->
+			and XM = #{pd.XM}
+		</if>
+		<if test="pd.PERSONID != null and pd.PERSONID != ''"> <!-- 院内患者唯一ID号 -->
+			and PERSONID = #{pd.PERSONID}
+		</if>
+		<if test="pd.JZLSH != null and pd.JZLSH != ''"><!-- 就诊流水号-->
+			and JZLSH=#{pd.JZLSH} 
+		</if>
+		<if test="pd.KLX != null and pd.KLX != ''"> <!-- 患者卡类型 -->
+			and KLX = #{pd.KLX}
+		</if>
+		<if test="pd.KH != null and pd.KH != ''"> <!-- 患者卡号 -->
+			and KH = #{pd.KH}
+		</if>
+		<if test="pd.id != null and pd.id != ''">
+		and  ID_NUMBER = #{pd.id} order by RYSJ<!-- 患者身份证号 -->
+		</if>
+	</select>
+	
+	<!-- 查看详情 -->
+	<select id="findByJzlsh" parameterType="pd" resultType="pd">
+		select * from 
+			<include refid="tableName"></include>
+		where 
+			<if test="ID != null and ID!= ''"> <!-- 主键-->
+			ID = #{ID,jdbcType=VARCHAR}
+			</if>
+			AND
+			<if test="JZLSH != null and JZLSH!= ''"> <!-- 就诊流水号-->
+			JZLSH = #{JZLSH,jdbcType=VARCHAR}
+			</if>
+			AND
+			<if test="YLJGDM != null and YLJGDM!= ''"> <!-- 医疗机构代码 -->
+			YLJGDM = #{YLJGDM,jdbcType=VARCHAR}
+			</if>
+	</select>
+	
+	<insert id ="batchSave" parameterType="java.util.List" useGeneratedKeys="false">
+	  insert into TB_CIS_MAIN
+       (ID,
+        JZLSH,
+        YLJGDM,
+        RYSJ,
+        RYLX,
+        KH,
+        KLX,
+        JKKH,
+        ZYCS,
+        BAH,
+        CH,
+        RYBQ,
+        CYBQ,
+        XM,
+        XB,
+        CSNY,
+        XSECSTZ,
+        XSERYTZ,
+        HYZK,
+        MZ,
+        GJ,
+        JG,
+        CSD,
+        SFZ,
+        LXDH,
+        GZDW,
+        GZDWDH,
+        GZDWYB,
+        ZYBM,
+        JZD,
+        XZZDH,
+        XZZYB,
+        HKDZ,
+        HKDH,
+        HKYB,
+        DQBM,
+        QXBM,
+        JDBM,
+        LXRXM,
+        LXRGX,
+        LXRDZ,
+        LXRDH,
+        LXRTXDZ,
+        RYKSBM,
+        ZKKSBM1,
+        ZKKSBM2,
+        ZKKSBM3,
+        SZBQ,
+        CYSJ,
+        CYKSBM,
+        SJZYTS,
+        RYQK,
+        RYQWYZZ,
+        QZRQ,
+        YYGRMC,
+        YYGRJG,
+        MZCYZD,
+        RYCYZD,
+        SQSHZD,
+        LCBLZD,
+        FSBLZD,
+        SSZD,
+        SSZDBM,
+        YWGM,
+        HBSAG_JG,
+        HCVAB_JG,
+        HIVAB_JG,
+        QJCS,
+        CGCS,
+        SFCXWJN,
+        SSDYL,
+        XX,
+        HXBSXL,
+        XXBSXL,
+        XJSXL,
+        QXSXL,
+        QTSXL,
+        SXFY,
+        CRBBG,
+        ZLBG,
+        XSEBG,
+        SWBG,
+        QTBG,
+        SZ,
+        SZQX,
+        SZQXDW,
+        SJBL,
+        SJ,
+        RSMDSC,
+        XSEJBSC,
+        CHCYL,
+        XSE_XB,
+        XSE_TZ,
+        ZRYSGH,
+        ZRYSXM,
+        ZZYSGH,
+        ZZYSXM,
+        ZYYSGH,
+        ZYYSXM,
+        HSZGH,
+        HSZXM,
+        ZRHSGH,
+        ZRHSXM,
+        JXYSGH,
+        JXYSXM,
+        SXYSGH,
+        SXYSXM,
+        BMYGH,
+        BMYXM,
+        BAZL,
+        ZKYSGH,
+        ZKYSXM,
+        ZKHSGH,
+        ZKHSZM,
+        ZKRQ,
+        BLH,
+        SWGBYY,
+        SWSJ,
+        MZYSGH,
+        MZYSXM,
+        SYFY,
+        SFKYBA,
+        LYFS,
+        NJSYYMC,
+        ZZYJH_31,
+        RYQHMSJ,
+        RYHHMSJ,
+        ZYF,
+        ZLF,
+        ZHF,
+        HLF,
+        SSF,
+        CLF,
+        MZF,
+        JCF,
+        HYF,
+        XYF,
+        ZCYF,
+        ZCAF,
+        QTF,
+        ZFY,
+        ZFJE,
+        YLFWF,
+        ZLCZF,
+        BLZDF,
+        SYSZDF,
+        YXXZDF,
+        LCZDXMF,
+        FSSZLXMF,
+        LCWLZLF,
+        SSZLF,
+        KFF,
+        ZYZLF,
+        KJYWFY,
+        XF,
+        BDBZPF,
+        QDBZPF,
+        NXYZZPF,
+        XBYZZPF,
+        JCYYCLF,
+        ZLYYCLF,
+        SSYYCLF,
+        QTF_1,
+        KZRXM,
+        KZRGH,
+        FZRYSXM,
+        FZRYSGH,
+        ZLLB,
+        SSLCLJ,
+        ISJGZYZJ,
+        ISZYZLSB,
+        ISZYZLJS,
+        ISBZSH,
+        ZYBZLZF,
+        ZYBZLZHZF,
+        ZYZDF,
+        ZYWZF,
+        ZYGSF,
+        ZCYJFF,
+        ZYTNZLF,
+        ZYGCZLF,
+        ZYTSZLF,
+        ZYQTF,
+        ZYTSTPF,
+        ZYZJF,
+        BZ,
+        MJ,
+        XGBZ,
+        YLFYLYLB,
+        PERSONID,
+        YLYL1,
+        YLYL2)
+	  <foreach open="(" close=")" collection="list" item="item" index="index" separator="union">
+			select
+			#{item.ID,jdbcType=VARCHAR},
+			#{item.JZLSH,jdbcType=VARCHAR},
+			#{item.YLJGDM,jdbcType=VARCHAR},
+			TO_DATE(#{item.RYSJ,jdbcType=DATE},'yyyy-mm-dd HH24:mi:ss'),
+			#{item.RYLX,jdbcType=VARCHAR},
+			#{item.KH,jdbcType=VARCHAR},
+			#{item.KLX,jdbcType=VARCHAR},
+			<choose>
+				 <when test="item.containsKey('JKKH')">
+				 	#{item.JKKH,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			#{item.ZYCS,jdbcType=NUMERIC},
+			#{item.BAH,jdbcType=VARCHAR},
+			#{item.CH,jdbcType=VARCHAR},
+			#{item.RYBQ,jdbcType=VARCHAR},
+			#{item.CYBQ,jdbcType=VARCHAR},
+			#{item.XM,jdbcType=VARCHAR},
+			#{item.XB,jdbcType=VARCHAR},
+			#{item.CSNY,jdbcType=VARCHAR},
+			<choose>
+				 <when test="item.containsKey('XSECSTZ')">
+				 	#{item.XSECSTZ,jdbcType=NUMERIC}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('XSERYTZ')">
+				 	#{item.XSERYTZ,jdbcType=NUMERIC}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 #{item.HYZK,jdbcType=VARCHAR},
+			 <choose>
+				 <when test="item.containsKey('MZ')">
+				 	#{item.MZ,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('GJ')">
+				 	#{item.GJ,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('JG')">
+				 	#{item.JG,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('CSD')">
+				 	#{item.CSD,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('SFZ')">
+				 	#{item.SFZ,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('LXDH')">
+				 	#{item.LXDH,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('GZDW')">
+				 	#{item.GZDW,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('GZDWDH')">
+				 	#{item.GZDWDH,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('GZDWYB')">
+				 	#{item.GZDWYB,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('ZYBM')">
+				 	#{item.ZYBM,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('JZD')">
+				 	#{item.JZD,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('XZZDH')">
+				 	#{item.XZZDH,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('XZZYB')">
+				 	#{item.XZZYB,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('HKDZ')">
+				 	#{item.HKDZ,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('HKDH')">
+				 	#{item.HKDH,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('HKYB')">
+				 	#{item.HKYB,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('DQBM')">
+				 	#{item.DQBM,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('QXBM')">
+				 	#{item.QXBM,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('JDBM')">
+				 	#{item.JDBM,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('LXRXM')">
+				 	#{item.LXRXM,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('LXRGX')">
+				 	#{item.LXRGX,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('LXRDZ')">
+				 	#{item.LXRDZ,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('LXRDH')">
+				 	#{item.LXRDH,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('LXRTXDZ')">
+				 	#{item.LXRTXDZ,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('RYKSBM')">
+				 	#{item.RYKSBM,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('ZKKSBM1')">
+				 	#{item.ZKKSBM1,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('ZKKSBM2')">
+				 	#{item.ZKKSBM2,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('ZKKSBM3')">
+				 	#{item.ZKKSBM3,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('SZBQ')">
+				 	#{item.SZBQ,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 TO_DATE(#{item.CYSJ,jdbcType=DATE},'yyyy-mm-dd HH24:mi:ss'),
+			 #{item.CYKSBM,jdbcType=VARCHAR},
+			 #{item.SJZYTS,jdbcType=NUMERIC},
+			 #{item.RYQK,jdbcType=VARCHAR},
+			 <choose>
+				 <when test="item.containsKey('RYQWYZZ')">
+				 	#{item.RYQWYZZ,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('QZRQ')">
+				 	#{item.QZRQ,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('YYGRMC')">
+				 	#{item.YYGRMC,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('YYGRJG')">
+				 	#{item.YYGRJG,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 #{item.MZCYZD,jdbcType=VARCHAR},
+			 #{item.RYCYZD,jdbcType=VARCHAR},
+			 #{item.SQSHZD,jdbcType=VARCHAR},
+			 <choose>
+				 <when test="item.containsKey('LCBLZD')">
+				 	#{item.LCBLZD,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('FSBLZD')">
+				 	#{item.FSBLZD,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('SSZD')">
+				 	#{item.SSZD,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('SSZDBM')">
+				 	#{item.SSZDBM,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('YWGM')">
+				 	#{item.YWGM,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('HBSAG_JG')">
+				 	#{item.HBSAG_JG,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('HCVAB_JG')">
+				 	#{item.HCVAB_JG,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('HIVAB_JG')">
+				 	#{item.HIVAB_JG,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 #{item.QJCS,jdbcType=NUMERIC},
+			 #{item.CGCS,jdbcType=NUMERIC},
+			  <choose>
+				 <when test="item.containsKey('SFCXWJN')">
+				 	#{item.SFCXWJN,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('SSDYL')">
+				 	#{item.SSDYL,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('XX')">
+				 	#{item.XX,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('HXBSXL')">
+				 	#{item.HXBSXL,jdbcType=NUMERIC}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('XXBSXL')">
+				 	#{item.XXBSXL,jdbcType=NUMERIC}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('XJSXL')">
+				 	#{item.XJSXL,jdbcType=NUMERIC}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('QXSXL')">
+				 	#{item.QXSXL,jdbcType=NUMERIC}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('QTSXL')">
+				 	#{item.QTSXL,jdbcType=NUMERIC}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('SXFY')">
+				 	#{item.SXFY,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('CRBBG')">
+				 	#{item.CRBBG,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('ZLBG')">
+				 	#{item.ZLBG,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('XSEBG')">
+				 	#{item.XSEBG,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('SWBG')">
+				 	#{item.SWBG,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('QTBG')">
+				 	#{item.QTBG,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('SZ')">
+				 	#{item.SZ,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('SZQX')">
+				 	#{item.SZQX,jdbcType=NUMERIC}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('SZQXDW')">
+				 	#{item.SZQXDW,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('SJBL')">
+				 	#{item.SJBL,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('SJ')">
+				 	#{item.SJ,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('RSMDSC')">
+				 	#{item.RSMDSC,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('XSEJBSC')">
+				 	#{item.XSEJBSC,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('CHCYL')">
+				 	#{item.CHCYL,jdbcType=NUMERIC}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('XSE_XB')">
+				 	#{item.XSE_XB,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('XSE_TZ')">
+				 	#{item.XSE_TZ,jdbcType=NUMERIC}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 #{item.ZRYSGH,jdbcType=VARCHAR},
+			 #{item.ZRYSXM,jdbcType=VARCHAR},
+			 #{item.ZZYSGH,jdbcType=VARCHAR},
+			 #{item.ZZYSXM,jdbcType=VARCHAR},
+			 #{item.ZYYSGH,jdbcType=VARCHAR},
+			 #{item.ZYYSXM,jdbcType=VARCHAR},
+			 <choose>
+				 <when test="item.containsKey('HSZGH')">
+				 	#{item.HSZGH,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('HSZXM')">
+				 	#{item.HSZXM,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('ZRHSGH')">
+				 	#{item.ZRHSGH,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('ZRHSXM')">
+				 	#{item.ZRHSXM,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('JXYSGH')">
+				 	#{item.JXYSGH,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('JXYSXM')">
+				 	#{item.JXYSXM,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('SXYSGH')">
+				 	#{item.SXYSGH,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('SXYSXM')">
+				 	#{item.SXYSXM,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('BMYGH')">
+				 	#{item.BMYGH,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('BMYXM')">
+				 	#{item.BMYXM,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 #{item.BAZL,jdbcType=VARCHAR},
+			 #{item.ZKYSGH,jdbcType=VARCHAR},
+			 #{item.ZKYSXM,jdbcType=VARCHAR},
+			 <choose>
+				 <when test="item.containsKey('ZKHSGH')">
+				 	#{item.ZKHSGH,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('ZKHSZM')">
+				 	#{item.ZKHSZM,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('ZKRQ')">
+				 	TO_DATE(#{item.ZKRQ,jdbcType=DATE},'yyyy-mm-dd HH24:mi:ss')
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('BLH')">
+				 	#{item.BLH,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('SWGBYY')">
+				 	#{item.SWGBYY,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('SWSJ')">
+				 	TO_DATE(#{item.SWSJ,jdbcType=DATE},'yyyy-mm-dd HH24:mi:ss')
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 #{item.MZYSGH,jdbcType=VARCHAR},
+			 #{item.MZYSXM,jdbcType=VARCHAR},
+			 <choose>
+				 <when test="item.containsKey('SYFY')">
+				 	#{item.SYFY,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('SFKYBA')">
+				 	#{item.SFKYBA,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 #{item.LYFS,jdbcType=VARCHAR},
+			 <choose>
+				 <when test="item.containsKey('NJSYYMC')">
+				 	#{item.NJSYYMC,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('ZZYJH_31')">
+				 	#{item.ZZYJH_31,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('RYQHMSJ')">
+				 	#{item.RYQHMSJ,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('RYHHMSJ')">
+				 	#{item.RYHHMSJ,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 #{item.ZYF,jdbcType=NUMERIC},
+			 #{item.ZLF,jdbcType=NUMERIC},
+			 #{item.ZHF,jdbcType=NUMERIC},
+			 #{item.HLF,jdbcType=NUMERIC},
+			 #{item.SSF,jdbcType=NUMERIC},
+			 #{item.CLF,jdbcType=NUMERIC},
+			 #{item.MZF,jdbcType=NUMERIC},
+			 #{item.JCF,jdbcType=NUMERIC},
+			 #{item.HYF,jdbcType=NUMERIC},
+			 #{item.XYF,jdbcType=NUMERIC},
+			 #{item.ZCYF,jdbcType=NUMERIC},
+			 #{item.ZCAF,jdbcType=NUMERIC},
+			 #{item.QTF,jdbcType=NUMERIC},
+			 <choose>
+				 <when test="item.containsKey('ZFY')">
+				 	#{item.ZFY,jdbcType=NUMERIC}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('ZFJE')">
+				 	#{item.ZFJE,jdbcType=NUMERIC}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('YLFWF')">
+				 	#{item.YLFWF,jdbcType=NUMERIC}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('ZLCZF')">
+				 	#{item.ZLCZF,jdbcType=NUMERIC}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('BLZDF')">
+				 	#{item.BLZDF,jdbcType=NUMERIC}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('SYSZDF')">
+				 	#{item.SYSZDF,jdbcType=NUMERIC}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('YXXZDF')">
+				 	#{item.YXXZDF,jdbcType=NUMERIC}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('LCZDXMF')">
+				 	#{item.LCZDXMF,jdbcType=NUMERIC}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('FSSZLXMF')">
+				 	#{item.FSSZLXMF,jdbcType=NUMERIC}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('LCWLZLF')">
+				 	#{item.LCWLZLF,jdbcType=NUMERIC}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('SSZLF')">
+				 	#{item.SSZLF,jdbcType=NUMERIC}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('KFF')">
+				 	#{item.KFF,jdbcType=NUMERIC}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('ZYZLF')">
+				 	#{item.ZYZLF,jdbcType=NUMERIC}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('KJYWFY')">
+				 	#{item.KJYWFY,jdbcType=NUMERIC}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('XF')">
+				 	#{item.XF,jdbcType=NUMERIC}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('BDBZPF')">
+				 	#{item.BDBZPF,jdbcType=NUMERIC}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('QDBZPF')">
+				 	#{item.QDBZPF,jdbcType=NUMERIC}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('NXYZZPF')">
+				 	#{item.NXYZZPF,jdbcType=NUMERIC}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('XBYZZPF')">
+				 	#{item.XBYZZPF,jdbcType=NUMERIC}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('JCYYCLF')">
+				 	#{item.JCYYCLF,jdbcType=NUMERIC}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('ZLYYCLF')">
+				 	#{item.ZLYYCLF,jdbcType=NUMERIC}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('SSYYCLF')">
+				 	#{item.SSYYCLF,jdbcType=NUMERIC}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('QTF_1')">
+				 	#{item.QTF_1,jdbcType=NUMERIC}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 #{item.KZRXM,jdbcType=VARCHAR},
+			 #{item.KZRGH,jdbcType=VARCHAR},
+			 <choose>
+				 <when test="item.containsKey('FZRYSXM')">
+				 	#{item.FZRYSXM,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('FZRYSGH')">
+				 	#{item.FZRYSGH,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('ZLLB')">
+				 	#{item.ZLLB,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('SSLCLJ')">
+				 	#{item.SSLCLJ,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('ISJGZYZJ')">
+				 	#{item.ISJGZYZJ,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('ISZYZLSB')">
+				 	#{item.ISZYZLSB,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('ISZYZLJS')">
+				 	#{item.ISZYZLJS,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('ISBZSH')">
+				 	#{item.ISBZSH,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('ZYBZLZF')">
+				 	#{item.ZYBZLZF,jdbcType=NUMERIC}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('ZYBZLZHZF')">
+				 	#{item.ZYBZLZHZF,jdbcType=NUMERIC}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('ZYZDF')">
+				 	#{item.ZYZDF,jdbcType=NUMERIC}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('ZYWZF')">
+				 	#{item.ZYWZF,jdbcType=NUMERIC}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('ZYGSF')">
+				 	#{item.ZYGSF,jdbcType=NUMERIC}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('ZCYJFF')">
+				 	#{item.ZCYJFF,jdbcType=NUMERIC}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('ZYTNZLF')">
+				 	#{item.ZYTNZLF,jdbcType=NUMERIC}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('ZYGCZLF')">
+				 	#{item.ZYGCZLF,jdbcType=NUMERIC}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('ZYTSZLF')">
+				 	#{item.ZYTSZLF,jdbcType=NUMERIC}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('ZYQTF')">
+				 	#{item.ZYQTF,jdbcType=NUMERIC}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('ZYTSTPF')">
+				 	#{item.ZYTSTPF,jdbcType=NUMERIC}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('ZYZJF')">
+				 	#{item.ZYZJF,jdbcType=NUMERIC}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('BZ')">
+				 	#{item.BZ,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('MJ')">
+				 	#{item.MJ,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 #{item.XGBZ,jdbcType=NUMERIC},
+			 <choose>
+				 <when test="item.containsKey('YLFYLYLB')">
+				 	#{item.YLFYLYLB,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 #{item.PERSONID,jdbcType=VARCHAR},
+			  <choose>
+				 <when test="item.containsKey('YLYL1')">
+				 	#{item.YLYL1,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('YLYL2')">
+				 	#{item.YLYL2,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>
+			from dual 
+		</foreach>
+	</insert>
+	  
+	  
+	  
+  <insert id="save"  parameterType="pd">
+    insert into TB_CIS_MAIN
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="ID != null" >
+        ID,
+      </if>
+      <if test="JZLSH != null" >
+        JZLSH,
+      </if>
+      <if test="YLJGDM != null" >
+        YLJGDM,
+      </if>
+      <if test="RYSJ != null" >
+        RYSJ,
+      </if>
+      <if test="RYLX != null" >
+        RYLX,
+      </if>
+      <if test="KH != null" >
+        KH,
+      </if>
+      <if test="KLX != null" >
+        KLX,
+      </if>
+      <if test="JKKH != null" >
+        JKKH,
+      </if>
+      <if test="ZYCS != null" >
+        ZYCS,
+      </if>
+      <if test="BAH != null" >
+        BAH,
+      </if>
+      <if test="CH != null" >
+        CH,
+      </if>
+      <if test="RYBQ != null" >
+        RYBQ,
+      </if>
+      <if test="CYBQ != null" >
+        CYBQ,
+      </if>
+      <if test="XM != null" >
+        XM,
+      </if>
+      <if test="XB != null" >
+        XB,
+      </if>
+      <if test="CSNY != null" >
+        CSNY,
+      </if>
+      <if test="XSECSTZ != null" >
+        XSECSTZ,
+      </if>
+      <if test="XSERYTZ != null" >
+        XSERYTZ,
+      </if>
+      <if test="HYZK != null" >
+        HYZK,
+      </if>
+      <if test="MZ != null" >
+        MZ,
+      </if>
+      <if test="GJ != null" >
+        GJ,
+      </if>
+      <if test="JG != null" >
+        JG,
+      </if>
+      <if test="CSD != null" >
+        CSD,
+      </if>
+      <if test="SFZ != null" >
+        SFZ,
+      </if>
+      <if test="LXDH != null" >
+        LXDH,
+      </if>
+      <if test="GZDW != null" >
+        GZDW,
+      </if>
+      <if test="GZDWDH != null" >
+        GZDWDH,
+      </if>
+      <if test="GZDWYB != null" >
+        GZDWYB,
+      </if>
+      <if test="ZYBM != null" >
+        ZYBM,
+      </if>
+      <if test="JZD != null" >
+        JZD,
+      </if>
+      <if test="XZZDH != null" >
+        XZZDH,
+      </if>
+      <if test="XZZYB != null" >
+        XZZYB,
+      </if>
+      <if test="HKDZ != null" >
+        HKDZ,
+      </if>
+      <if test="HKDH != null" >
+        HKDH,
+      </if>
+      <if test="HKYB != null" >
+        HKYB,
+      </if>
+      <if test="DQBM != null" >
+        DQBM,
+      </if>
+      <if test="QXBM != null" >
+        QXBM,
+      </if>
+      <if test="JDBM != null" >
+        JDBM,
+      </if>
+      <if test="LXRXM != null" >
+        LXRXM,
+      </if>
+      <if test="LXRGX != null" >
+        LXRGX,
+      </if>
+      <if test="LXRDZ != null" >
+        LXRDZ,
+      </if>
+      <if test="LXRDH != null" >
+        LXRDH,
+      </if>
+      <if test="LXRTXDZ != null" >
+        LXRTXDZ,
+      </if>
+      <if test="RYKSBM != null" >
+        RYKSBM,
+      </if>
+      <if test="ZKKSBM1 != null" >
+        ZKKSBM1,
+      </if>
+      <if test="ZKKSBM2 != null" >
+        ZKKSBM2,
+      </if>
+      <if test="ZKKSBM3 != null" >
+        ZKKSBM3,
+      </if>
+      <if test="SZBQ != null" >
+        SZBQ,
+      </if>
+      <if test="CYSJ != null" >
+        CYSJ,
+      </if>
+      <if test="CYKSBM != null" >
+        CYKSBM,
+      </if>
+      <if test="SJZYTS != null" >
+        SJZYTS,
+      </if>
+      <if test="RYQK != null" >
+        RYQK,
+      </if>
+      <if test="RYQWYZZ != null" >
+        RYQWYZZ,
+      </if>
+      <if test="QZRQ != null" >
+        QZRQ,
+      </if>
+      <if test="YYGRMC != null" >
+        YYGRMC,
+      </if>
+      <if test="YYGRJG != null" >
+        YYGRJG,
+      </if>
+      <if test="MZCYZD != null" >
+        MZCYZD,
+      </if>
+      <if test="RYCYZD != null" >
+        RYCYZD,
+      </if>
+      <if test="SQSHZD != null" >
+        SQSHZD,
+      </if>
+      <if test="LCBLZD != null" >
+        LCBLZD,
+      </if>
+      <if test="FSBLZD != null" >
+        FSBLZD,
+      </if>
+      <if test="SSZD != null" >
+        SSZD,
+      </if>
+      <if test="SSZDBM != null" >
+        SSZDBM,
+      </if>
+      <if test="YWGM != null" >
+        YWGM,
+      </if>
+      <if test="HBSAGJG != null" >
+        HBSAG_JG,
+      </if>
+      <if test="HCVABJG != null" >
+        HCVAB_JG,
+      </if>
+      <if test="HIVABJG != null" >
+        HIVAB_JG,
+      </if>
+      <if test="QJCS != null" >
+        QJCS,
+      </if>
+      <if test="CGCS != null" >
+        CGCS,
+      </if>
+      <if test="SFCXWJN != null" >
+        SFCXWJN,
+      </if>
+      <if test="SSDYL != null" >
+        SSDYL,
+      </if>
+      <if test="XX != null" >
+        XX,
+      </if>
+      <if test="HXBSXL != null" >
+        HXBSXL,
+      </if>
+      <if test="XXBSXL != null" >
+        XXBSXL,
+      </if>
+      <if test="XJSXL != null" >
+        XJSXL,
+      </if>
+      <if test="QXSXL != null" >
+        QXSXL,
+      </if>
+      <if test="QTSXL != null" >
+        QTSXL,
+      </if>
+      <if test="SXFY != null" >
+        SXFY,
+      </if>
+      <if test="CRBBG != null" >
+        CRBBG,
+      </if>
+      <if test="ZLBG != null" >
+        ZLBG,
+      </if>
+      <if test="XSEBG != null" >
+        XSEBG,
+      </if>
+      <if test="SWBG != null" >
+        SWBG,
+      </if>
+      <if test="QTBG != null" >
+        QTBG,
+      </if>
+      <if test="SZ != null" >
+        SZ,
+      </if>
+      <if test="SZQX != null" >
+        SZQX,
+      </if>
+      <if test="SZQXDW != null" >
+        SZQXDW,
+      </if>
+      <if test="SJBL != null" >
+        SJBL,
+      </if>
+      <if test="SJ != null" >
+        SJ,
+      </if>
+      <if test="RSMDSC != null" >
+        RSMDSC,
+      </if>
+      <if test="XSEJBSC != null" >
+        XSEJBSC,
+      </if>
+      <if test="CHCYL != null" >
+        CHCYL,
+      </if>
+      <if test="XSEXB != null" >
+        XSE_XB,
+      </if>
+      <if test="XSETZ != null" >
+        XSE_TZ,
+      </if>
+      <if test="ZRYSGH != null" >
+        ZRYSGH,
+      </if>
+      <if test="ZRYSXM != null" >
+        ZRYSXM,
+      </if>
+      <if test="ZZYSGH != null" >
+        ZZYSGH,
+      </if>
+      <if test="ZZYSXM != null" >
+        ZZYSXM,
+      </if>
+      <if test="ZYYSGH != null" >
+        ZYYSGH,
+      </if>
+      <if test="ZYYSXM != null" >
+        ZYYSXM,
+      </if>
+      <if test="HSZGH != null" >
+        HSZGH,
+      </if>
+      <if test="HSZXM != null" >
+        HSZXM,
+      </if>
+      <if test="ZRHSGH != null" >
+        ZRHSGH,
+      </if>
+      <if test="ZRHSXM != null" >
+        ZRHSXM,
+      </if>
+      <if test="JXYSGH != null" >
+        JXYSGH,
+      </if>
+      <if test="JXYSXM != null" >
+        JXYSXM,
+      </if>
+      <if test="SXYSGH != null" >
+        SXYSGH,
+      </if>
+      <if test="SXYSXM != null" >
+        SXYSXM,
+      </if>
+      <if test="BMYGH != null" >
+        BMYGH,
+      </if>
+      <if test="BMYXM != null" >
+        BMYXM,
+      </if>
+      <if test="BAZL != null" >
+        BAZL,
+      </if>
+      <if test="ZKYSGH != null" >
+        ZKYSGH,
+      </if>
+      <if test="ZKYSXM != null" >
+        ZKYSXM,
+      </if>
+      <if test="ZKHSGH != null" >
+        ZKHSGH,
+      </if>
+      <if test="ZKHSZM != null" >
+        ZKHSZM,
+      </if>
+      <if test="ZKRQ != null" >
+        ZKRQ,
+      </if>
+      <if test="BLH != null" >
+        BLH,
+      </if>
+      <if test="SWGBYY != null" >
+        SWGBYY,
+      </if>
+      <if test="SWSJ != null" >
+        SWSJ,
+      </if>
+      <if test="MZYSGH != null" >
+        MZYSGH,
+      </if>
+      <if test="MZYSXM != null" >
+        MZYSXM,
+      </if>
+      <if test="SYFY != null" >
+        SYFY,
+      </if>
+      <if test="SFKYBA != null" >
+        SFKYBA,
+      </if>
+      <if test="LYFS != null" >
+        LYFS,
+      </if>
+      <if test="NJSYYMC != null" >
+        NJSYYMC,
+      </if>
+      <if test="ZZYJH31 != null" >
+        ZZYJH_31,
+      </if>
+      <if test="RYQHMSJ != null" >
+        RYQHMSJ,
+      </if>
+      <if test="RYHHMSJ != null" >
+        RYHHMSJ,
+      </if>
+      <if test="ZYF != null" >
+        ZYF,
+      </if>
+      <if test="ZLF != null" >
+        ZLF,
+      </if>
+      <if test="ZHF != null" >
+        ZHF,
+      </if>
+      <if test="HLF != null" >
+        HLF,
+      </if>
+      <if test="SSF != null" >
+        SSF,
+      </if>
+      <if test="CLF != null" >
+        CLF,
+      </if>
+      <if test="MZF != null" >
+        MZF,
+      </if>
+      <if test="JCF != null" >
+        JCF,
+      </if>
+      <if test="HYF != null" >
+        HYF,
+      </if>
+      <if test="XYF != null" >
+        XYF,
+      </if>
+      <if test="ZCYF != null" >
+        ZCYF,
+      </if>
+      <if test="ZCAF != null" >
+        ZCAF,
+      </if>
+      <if test="QTF != null" >
+        QTF,
+      </if>
+      <if test="ZFY != null" >
+        ZFY,
+      </if>
+      <if test="ZFJE != null" >
+        ZFJE,
+      </if>
+      <if test="YLFWF != null" >
+        YLFWF,
+      </if>
+      <if test="ZLCZF != null" >
+        ZLCZF,
+      </if>
+      <if test="BLZDF != null" >
+        BLZDF,
+      </if>
+      <if test="SYSZDF != null" >
+        SYSZDF,
+      </if>
+      <if test="YXXZDF != null" >
+        YXXZDF,
+      </if>
+      <if test="LCZDXMF != null" >
+        LCZDXMF,
+      </if>
+      <if test="FSSZLXMF != null" >
+        FSSZLXMF,
+      </if>
+      <if test="LCWLZLF != null" >
+        LCWLZLF,
+      </if>
+      <if test="SSZLF != null" >
+        SSZLF,
+      </if>
+      <if test="KFF != null" >
+        KFF,
+      </if>
+      <if test="ZYZLF != null" >
+        ZYZLF,
+      </if>
+      <if test="KJYWFY != null" >
+        KJYWFY,
+      </if>
+      <if test="XF != null" >
+        XF,
+      </if>
+      <if test="BDBZPF != null" >
+        BDBZPF,
+      </if>
+      <if test="QDBZPF != null" >
+        QDBZPF,
+      </if>
+      <if test="NXYZZPF != null" >
+        NXYZZPF,
+      </if>
+      <if test="XBYZZPF != null" >
+        XBYZZPF,
+      </if>
+      <if test="JCYYCLF != null" >
+        JCYYCLF,
+      </if>
+      <if test="ZLYYCLF != null" >
+        ZLYYCLF,
+      </if>
+      <if test="SSYYCLF != null" >
+        SSYYCLF,
+      </if>
+      <if test="QTF1 != null" >
+        QTF_1,
+      </if>
+      <if test="KZRXM != null" >
+        KZRXM,
+      </if>
+      <if test="KZRGH != null" >
+        KZRGH,
+      </if>
+      <if test="FZRYSXM != null" >
+        FZRYSXM,
+      </if>
+      <if test="FZRYSGH != null" >
+        FZRYSGH,
+      </if>
+      <if test="ZLLB != null" >
+        ZLLB,
+      </if>
+      <if test="SSLCLJ != null" >
+        SSLCLJ,
+      </if>
+      <if test="ISJGZYZJ != null" >
+        ISJGZYZJ,
+      </if>
+      <if test="ISZYZLSB != null" >
+        ISZYZLSB,
+      </if>
+      <if test="ISZYZLJS != null" >
+        ISZYZLJS,
+      </if>
+      <if test="ISBZSH != null" >
+        ISBZSH,
+      </if>
+      <if test="ZYBZLZF != null" >
+        ZYBZLZF,
+      </if>
+      <if test="ZYBZLZHZF != null" >
+        ZYBZLZHZF,
+      </if>
+      <if test="ZYZDF != null" >
+        ZYZDF,
+      </if>
+      <if test="ZYWZF != null" >
+        ZYWZF,
+      </if>
+      <if test="ZYGSF != null" >
+        ZYGSF,
+      </if>
+      <if test="ZCYJFF != null" >
+        ZCYJFF,
+      </if>
+      <if test="ZYTNZLF != null" >
+        ZYTNZLF,
+      </if>
+      <if test="ZYGCZLF != null" >
+        ZYGCZLF,
+      </if>
+      <if test="ZYTSZLF != null" >
+        ZYTSZLF,
+      </if>
+      <if test="ZYQTF != null" >
+        ZYQTF,
+      </if>
+      <if test="ZYTSTPF != null" >
+        ZYTSTPF,
+      </if>
+      <if test="ZYZJF != null" >
+        ZYZJF,
+      </if>
+      <if test="BZ != null" >
+        BZ,
+      </if>
+      <if test="MJ != null" >
+        MJ,
+      </if>
+      <if test="XGBZ != null" >
+        XGBZ,
+      </if>
+      <if test="YLFYLYLB != null" >
+        YLFYLYLB,
+      </if>
+      <if test="PERSONID != null" >
+        PERSONID,
+      </if>
+      <if test="YLYL1 != null" >
+        YLYL1,
+      </if>
+       <if test="YLYL2 != null" >
+        YLYL2,
+      </if>
+    </trim>
+    values
+    <trim prefix=" (" suffix=")" suffixOverrides="," >
+      <if test="ID != null" >
+        #{ID,jdbcType=VARCHAR},
+      </if>
+      <if test="JZLSH != null" >
+        #{JZLSH,jdbcType=VARCHAR},
+      </if>
+      <if test="YLJGDM != null" >
+        #{YLJGDM,jdbcType=VARCHAR},
+      </if>
+      <if test="RYSJ != null" >
+        TO_DATE(#{RYSJ,jdbcType=DATE},'yyyy-mm-dd HH24:mi:ss'),
+      </if>
+      <if test="RYLX != null" >
+        #{RYLX,jdbcType=VARCHAR},
+      </if>
+      <if test="KH != null" >
+        #{KH,jdbcType=VARCHAR},
+      </if>
+      <if test="KLX != null" >
+        #{KLX,jdbcType=VARCHAR},
+      </if>
+      <if test="JKKH != null" >
+        #{JKKH,jdbcType=VARCHAR},
+      </if>
+      <if test="ZYCS != null" >
+        #{ZYCS,jdbcType=NUMERIC},
+      </if>
+      <if test="BAH != null" >
+        #{BAH,jdbcType=VARCHAR},
+      </if>
+      <if test="CH != null" >
+        #{CH,jdbcType=VARCHAR},
+      </if>
+      <if test="RYBQ != null" >
+        #{RYBQ,jdbcType=VARCHAR},
+      </if>
+      <if test="CYBQ != null" >
+        #{CYBQ,jdbcType=VARCHAR},
+      </if>
+      <if test="XM != null" >
+        #{XM,jdbcType=VARCHAR},
+      </if>
+      <if test="XB != null" >
+        #{XB,jdbcType=VARCHAR},
+      </if>
+      <if test="CSNY != null" >
+        #{CSNY,jdbcType=VARCHAR},
+      </if>
+      <if test="XSECSTZ != null" >
+        #{XSECSTZ,jdbcType=NUMERIC},
+      </if>
+      <if test="XSERYTZ != null" >
+        #{XSERYTZ,jdbcType=NUMERIC},
+      </if>
+      <if test="HYZK != null" >
+        #{HYZK,jdbcType=VARCHAR},
+      </if>
+      <if test="MZ != null" >
+        #{MZ,jdbcType=VARCHAR},
+      </if>
+      <if test="GJ != null" >
+        #{GJ,jdbcType=VARCHAR},
+      </if>
+      <if test="JG != null" >
+        #{JG,jdbcType=VARCHAR},
+      </if>
+      <if test="CSD != null" >
+        #{CSD,jdbcType=VARCHAR},
+      </if>
+      <if test="SFZ != null" >
+        #{SFZ,jdbcType=VARCHAR},
+      </if>
+      <if test="LXDH != null" >
+        #{LXDH,jdbcType=VARCHAR},
+      </if>
+      <if test="GZDW != null" >
+        #{GZDW,jdbcType=VARCHAR},
+      </if>
+      <if test="GZDWDH != null" >
+        #{GZDWDH,jdbcType=VARCHAR},
+      </if>
+      <if test="GZDWYB != null" >
+        #{GZDWYB,jdbcType=VARCHAR},
+      </if>
+      <if test="ZYBM != null" >
+        #{ZYBM,jdbcType=VARCHAR},
+      </if>
+      <if test="JZD != null" >
+        #{JZD,jdbcType=VARCHAR},
+      </if>
+      <if test="XZZDH != null" >
+        #{XZZDH,jdbcType=VARCHAR},
+      </if>
+      <if test="XZZYB != null" >
+        #{XZZYB,jdbcType=VARCHAR},
+      </if>
+      <if test="HKDZ != null" >
+        #{HKDZ,jdbcType=VARCHAR},
+      </if>
+      <if test="HKDH != null" >
+        #{HKDH,jdbcType=VARCHAR},
+      </if>
+      <if test="HKYB != null" >
+        #{HKYB,jdbcType=VARCHAR},
+      </if>
+      <if test="DQBM != null" >
+        #{DQBM,jdbcType=VARCHAR},
+      </if>
+      <if test="QXBM != null" >
+        #{QXBM,jdbcType=VARCHAR},
+      </if>
+      <if test="JDBM != null" >
+        #{JDBM,jdbcType=VARCHAR},
+      </if>
+      <if test="LXRXM != null" >
+        #{LXRXM,jdbcType=VARCHAR},
+      </if>
+      <if test="LXRGX != null" >
+        #{LXRGX,jdbcType=VARCHAR},
+      </if>
+      <if test="LXRDZ != null" >
+        #{LXRDZ,jdbcType=VARCHAR},
+      </if>
+      <if test="LXRDH != null" >
+        #{LXRDH,jdbcType=VARCHAR},
+      </if>
+      <if test="LXRTXDZ != null" >
+        #{LXRTXDZ,jdbcType=VARCHAR},
+      </if>
+      <if test="RYKSBM != null" >
+        #{RYKSBM,jdbcType=VARCHAR},
+      </if>
+      <if test="ZKKSBM1 != null" >
+        #{ZKKSBM1,jdbcType=VARCHAR},
+      </if>
+      <if test="ZKKSBM2 != null" >
+        #{ZKKSBM2,jdbcType=VARCHAR},
+      </if>
+      <if test="ZKKSBM3 != null" >
+        #{ZKKSBM3,jdbcType=VARCHAR},
+      </if>
+      <if test="SZBQ != null" >
+        #{SZBQ,jdbcType=VARCHAR},
+      </if>
+      <if test="CYSJ != null" >
+        TO_DATE(#{CYSJ,jdbcType=DATE},'yyyy-mm-dd HH24:mi:ss'),
+      </if>
+      <if test="CYKSBM != null" >
+        #{CYKSBM,jdbcType=VARCHAR},
+      </if>
+      <if test="SJZYTS != null" >
+        #{SJZYTS,jdbcType=NUMERIC},
+      </if>
+      <if test="RYQK != null" >
+        #{RYQK,jdbcType=VARCHAR},
+      </if>
+      <if test="RYQWYZZ != null" >
+        #{RYQWYZZ,jdbcType=VARCHAR},
+      </if>
+      <if test="QZRQ != null" >
+        #{QZRQ,jdbcType=VARCHAR},
+      </if>
+      <if test="YYGRMC != null" >
+        #{YYGRMC,jdbcType=VARCHAR},
+      </if>
+      <if test="YYGRJG != null" >
+        #{YYGRJG,jdbcType=VARCHAR},
+      </if>
+      <if test="MZCYZD != null" >
+        #{MZCYZD,jdbcType=VARCHAR},
+      </if>
+      <if test="RYCYZD != null" >
+        #{RYCYZD,jdbcType=VARCHAR},
+      </if>
+      <if test="SQSHZD != null" >
+        #{SQSHZD,jdbcType=VARCHAR},
+      </if>
+      <if test="LCBLZD != null" >
+        #{LCBLZD,jdbcType=VARCHAR},
+      </if>
+      <if test="FSBLZD != null" >
+        #{FSBLZD,jdbcType=VARCHAR},
+      </if>
+      <if test="SSZD != null" >
+        #{SSZD,jdbcType=VARCHAR},
+      </if>
+      <if test="SSZDBM != null" >
+        #{SSZDBM,jdbcType=VARCHAR},
+      </if>
+      <if test="YWGM != null" >
+        #{YWGM,jdbcType=VARCHAR},
+      </if>
+      <if test="HBSAGJG != null" >
+        #{HBSAGJG,jdbcType=VARCHAR},
+      </if>
+      <if test="HCVABJG != null" >
+        #{HCVABJG,jdbcType=VARCHAR},
+      </if>
+      <if test="HIVABJG != null" >
+        #{HIVABJG,jdbcType=VARCHAR},
+      </if>
+      <if test="QJCS != null" >
+        #{QJCS,jdbcType=NUMERIC},
+      </if>
+      <if test="CGCS != null" >
+        #{CGCS,jdbcType=NUMERIC},
+      </if>
+      <if test="SFCXWJN != null" >
+        #{SFCXWJN,jdbcType=VARCHAR},
+      </if>
+      <if test="SSDYL != null" >
+        #{SSDYL,jdbcType=VARCHAR},
+      </if>
+      <if test="XX != null" >
+        #{XX,jdbcType=VARCHAR},
+      </if>
+      <if test="HXBSXL != null" >
+        #{HXBSXL,jdbcType=NUMERIC},
+      </if>
+      <if test="XXBSXL != null" >
+        #{XXBSXL,jdbcType=NUMERIC},
+      </if>
+      <if test="XJSXL != null" >
+        #{XJSXL,jdbcType=NUMERIC},
+      </if>
+      <if test="QXSXL != null" >
+        #{QXSXL,jdbcType=NUMERIC},
+      </if>
+      <if test="QTSXL != null" >
+        #{QTSXL,jdbcType=NUMERIC},
+      </if>
+      <if test="SXFY != null" >
+        #{SXFY,jdbcType=VARCHAR},
+      </if>
+      <if test="CRBBG != null" >
+        #{CRBBG,jdbcType=VARCHAR},
+      </if>
+      <if test="ZLBG != null" >
+        #{ZLBG,jdbcType=VARCHAR},
+      </if>
+      <if test="XSEBG != null" >
+        #{XSEBG,jdbcType=VARCHAR},
+      </if>
+      <if test="SWBG != null" >
+        #{SWBG,jdbcType=VARCHAR},
+      </if>
+      <if test="QTBG != null" >
+        #{QTBG,jdbcType=VARCHAR},
+      </if>
+      <if test="SZ != null" >
+        #{SZ,jdbcType=VARCHAR},
+      </if>
+      <if test="SZQX != null" >
+        #{SZQX,jdbcType=NUMERIC},
+      </if>
+      <if test="SZQXDW != null" >
+        #{SZQXDW,jdbcType=VARCHAR},
+      </if>
+      <if test="SJBL != null" >
+        #{SJBL,jdbcType=VARCHAR},
+      </if>
+      <if test="SJ != null" >
+        #{SJ,jdbcType=VARCHAR},
+      </if>
+      <if test="RSMDSC != null" >
+        #{RSMDSC,jdbcType=VARCHAR},
+      </if>
+      <if test="XSEJBSC != null" >
+        #{XSEJBSC,jdbcType=VARCHAR},
+      </if>
+      <if test="CHCYL != null" >
+        #{CHCYL,jdbcType=NUMERIC},
+      </if>
+      <if test="XSEXB != null" >
+        #{XSEXB,jdbcType=VARCHAR},
+      </if>
+      <if test="XSETZ != null" >
+        #{XSETZ,jdbcType=NUMERIC},
+      </if>
+      <if test="ZRYSGH != null" >
+        #{ZRYSGH,jdbcType=VARCHAR},
+      </if>
+      <if test="ZRYSXM != null" >
+        #{ZRYSXM,jdbcType=VARCHAR},
+      </if>
+      <if test="ZZYSGH != null" >
+        #{ZZYSGH,jdbcType=VARCHAR},
+      </if>
+      <if test="ZZYSXM != null" >
+        #{ZZYSXM,jdbcType=VARCHAR},
+      </if>
+      <if test="ZYYSGH != null" >
+        #{ZYYSGH,jdbcType=VARCHAR},
+      </if>
+      <if test="ZYYSXM != null" >
+        #{ZYYSXM,jdbcType=VARCHAR},
+      </if>
+      <if test="HSZGH != null" >
+        #{HSZGH,jdbcType=VARCHAR},
+      </if>
+      <if test="HSZXM != null" >
+        #{HSZXM,jdbcType=VARCHAR},
+      </if>
+      <if test="ZRHSGH != null" >
+        #{ZRHSGH,jdbcType=VARCHAR},
+      </if>
+      <if test="ZRHSXM != null" >
+        #{ZRHSXM,jdbcType=VARCHAR},
+      </if>
+      <if test="JXYSGH != null" >
+        #{JXYSGH,jdbcType=VARCHAR},
+      </if>
+      <if test="JXYSXM != null" >
+        #{JXYSXM,jdbcType=VARCHAR},
+      </if>
+      <if test="SXYSGH != null" >
+        #{SXYSGH,jdbcType=VARCHAR},
+      </if>
+      <if test="SXYSXM != null" >
+        #{SXYSXM,jdbcType=VARCHAR},
+      </if>
+      <if test="BMYGH != null" >
+        #{BMYGH,jdbcType=VARCHAR},
+      </if>
+      <if test="BMYXM != null" >
+        #{BMYXM,jdbcType=VARCHAR},
+      </if>
+      <if test="BAZL != null" >
+        #{BAZL,jdbcType=VARCHAR},
+      </if>
+      <if test="ZKYSGH != null" >
+        #{ZKYSGH,jdbcType=VARCHAR},
+      </if>
+      <if test="ZKYSXM != null" >
+        #{ZKYSXM,jdbcType=VARCHAR},
+      </if>
+      <if test="ZKHSGH != null" >
+        #{ZKHSGH,jdbcType=VARCHAR},
+      </if>
+      <if test="ZKHSZM != null" >
+        #{ZKHSZM,jdbcType=VARCHAR},
+      </if>
+      <if test="ZKRQ != null" >
+        TO_DATE(#{ZKRQ,jdbcType=DATE},'yyyy-mm-dd HH24:mi:ss'),
+      </if>
+      <if test="BLH != null" >
+        #{BLH,jdbcType=VARCHAR},
+      </if>
+      <if test="SWGBYY != null" >
+        #{SWGBYY,jdbcType=VARCHAR},
+      </if>
+      <if test="SWSJ != null" >
+        TO_DATE(#{SWSJ,jdbcType=DATE},'yyyy-mm-dd HH24:mi:ss'),
+      </if>
+      <if test="MZYSGH != null" >
+        #{MZYSGH,jdbcType=VARCHAR},
+      </if>
+      <if test="MZYSXM != null" >
+        #{MZYSXM,jdbcType=VARCHAR},
+      </if>
+      <if test="SYFY != null" >
+        #{SYFY,jdbcType=VARCHAR},
+      </if>
+      <if test="SFKYBA != null" >
+        #{SFKYBA,jdbcType=VARCHAR},
+      </if>
+      <if test="LYFS != null" >
+        #{LYFS,jdbcType=VARCHAR},
+      </if>
+      <if test="NJSYYMC != null" >
+        #{NJSYYMC,jdbcType=VARCHAR},
+      </if>
+      <if test="ZZYJH31 != null" >
+        #{ZZYJH31,jdbcType=VARCHAR},
+      </if>
+      <if test="RYQHMSJ != null" >
+        #{RYQHMSJ,jdbcType=VARCHAR},
+      </if>
+      <if test="RYHHMSJ != null" >
+        #{RYHHMSJ,jdbcType=VARCHAR},
+      </if>
+      <if test="ZYF != null" >
+        #{ZYF,jdbcType=NUMERIC},
+      </if>
+      <if test="ZLF != null" >
+        #{ZLF,jdbcType=NUMERIC},
+      </if>
+      <if test="ZHF != null" >
+        #{ZHF,jdbcType=NUMERIC},
+      </if>
+      <if test="HLF != null" >
+        #{HLF,jdbcType=NUMERIC},
+      </if>
+      <if test="SSF != null" >
+        #{SSF,jdbcType=NUMERIC},
+      </if>
+      <if test="CLF != null" >
+        #{CLF,jdbcType=NUMERIC},
+      </if>
+      <if test="MZF != null" >
+        #{MZF,jdbcType=NUMERIC},
+      </if>
+      <if test="JCF != null" >
+        #{JCF,jdbcType=NUMERIC},
+      </if>
+      <if test="HYF != null" >
+        #{HYF,jdbcType=NUMERIC},
+      </if>
+      <if test="XYF != null" >
+        #{XYF,jdbcType=NUMERIC},
+      </if>
+      <if test="ZCYF != null" >
+        #{ZCYF,jdbcType=NUMERIC},
+      </if>
+      <if test="ZCAF != null" >
+        #{ZCAF,jdbcType=NUMERIC},
+      </if>
+      <if test="QTF != null" >
+        #{QTF,jdbcType=NUMERIC},
+      </if>
+      <if test="ZFY != null" >
+        #{ZFY,jdbcType=NUMERIC},
+      </if>
+      <if test="ZFJE != null" >
+        #{ZFJE,jdbcType=NUMERIC},
+      </if>
+      <if test="YLFWF != null" >
+        #{YLFWF,jdbcType=NUMERIC},
+      </if>
+      <if test="ZLCZF != null" >
+        #{ZLCZF,jdbcType=NUMERIC},
+      </if>
+      <if test="BLZDF != null" >
+        #{BLZDF,jdbcType=NUMERIC},
+      </if>
+      <if test="SYSZDF != null" >
+        #{SYSZDF,jdbcType=NUMERIC},
+      </if>
+      <if test="YXXZDF != null" >
+        #{YXXZDF,jdbcType=NUMERIC},
+      </if>
+      <if test="LCZDXMF != null" >
+        #{LCZDXMF,jdbcType=NUMERIC},
+      </if>
+      <if test="FSSZLXMF != null" >
+        #{FSSZLXMF,jdbcType=NUMERIC},
+      </if>
+      <if test="LCWLZLF != null" >
+        #{LCWLZLF,jdbcType=NUMERIC},
+      </if>
+      <if test="SSZLF != null" >
+        #{SSZLF,jdbcType=NUMERIC},
+      </if>
+      <if test="KFF != null" >
+        #{KFF,jdbcType=NUMERIC},
+      </if>
+      <if test="ZYZLF != null" >
+        #{ZYZLF,jdbcType=NUMERIC},
+      </if>
+      <if test="KJYWFY != null" >
+        #{KJYWFY,jdbcType=NUMERIC},
+      </if>
+      <if test="XF != null" >
+        #{XF,jdbcType=NUMERIC},
+      </if>
+      <if test="BDBZPF != null" >
+        #{BDBZPF,jdbcType=NUMERIC},
+      </if>
+      <if test="QDBZPF != null" >
+        #{QDBZPF,jdbcType=NUMERIC},
+      </if>
+      <if test="NXYZZPF != null" >
+        #{NXYZZPF,jdbcType=NUMERIC},
+      </if>
+      <if test="XBYZZPF != null" >
+        #{XBYZZPF,jdbcType=NUMERIC},
+      </if>
+      <if test="JCYYCLF != null" >
+        #{JCYYCLF,jdbcType=NUMERIC},
+      </if>
+      <if test="ZLYYCLF != null" >
+        #{ZLYYCLF,jdbcType=NUMERIC},
+      </if>
+      <if test="SSYYCLF != null" >
+        #{SSYYCLF,jdbcType=NUMERIC},
+      </if>
+      <if test="QTF1 != null" >
+        #{QTF1,jdbcType=NUMERIC},
+      </if>
+      <if test="KZRXM != null" >
+        #{KZRXM,jdbcType=VARCHAR},
+      </if>
+      <if test="KZRGH != null" >
+        #{KZRGH,jdbcType=VARCHAR},
+      </if>
+      <if test="FZRYSXM != null" >
+        #{FZRYSXM,jdbcType=VARCHAR},
+      </if>
+      <if test="FZRYSGH != null" >
+        #{FZRYSGH,jdbcType=VARCHAR},
+      </if>
+      <if test="ZLLB != null" >
+        #{ZLLB,jdbcType=VARCHAR},
+      </if>
+      <if test="SSLCLJ != null" >
+        #{SSLCLJ,jdbcType=VARCHAR},
+      </if>
+      <if test="ISJGZYZJ != null" >
+        #{ISJGZYZJ,jdbcType=VARCHAR},
+      </if>
+      <if test="ISZYZLSB != null" >
+        #{ISZYZLSB,jdbcType=VARCHAR},
+      </if>
+      <if test="ISZYZLJS != null" >
+        #{ISZYZLJS,jdbcType=VARCHAR},
+      </if>
+      <if test="ISBZSH != null" >
+        #{ISBZSH,jdbcType=VARCHAR},
+      </if>
+      <if test="ZYBZLZF != null" >
+        #{ZYBZLZF,jdbcType=NUMERIC},
+      </if>
+      <if test="ZYBZLZHZF != null" >
+        #{ZYBZLZHZF,jdbcType=NUMERIC},
+      </if>
+      <if test="ZYZDF != null" >
+        #{ZYZDF,jdbcType=NUMERIC},
+      </if>
+      <if test="ZYWZF != null" >
+        #{ZYWZF,jdbcType=NUMERIC},
+      </if>
+      <if test="ZYGSF != null" >
+        #{ZYGSF,jdbcType=NUMERIC},
+      </if>
+      <if test="ZCYJFF != null" >
+        #{ZCYJFF,jdbcType=NUMERIC},
+      </if>
+      <if test="ZYTNZLF != null" >
+        #{ZYTNZLF,jdbcType=NUMERIC},
+      </if>
+      <if test="ZYGCZLF != null" >
+        #{ZYGCZLF,jdbcType=NUMERIC},
+      </if>
+      <if test="ZYTSZLF != null" >
+        #{ZYTSZLF,jdbcType=NUMERIC},
+      </if>
+      <if test="ZYQTF != null" >
+        #{ZYQTF,jdbcType=NUMERIC},
+      </if>
+      <if test="ZYTSTPF != null" >
+        #{ZYTSTPF,jdbcType=NUMERIC},
+      </if>
+      <if test="ZYZJF != null" >
+        #{ZYZJF,jdbcType=NUMERIC},
+      </if>
+      <if test="BZ != null" >
+        #{BZ,jdbcType=VARCHAR},
+      </if>
+      <if test="MJ != null" >
+        #{MJ,jdbcType=VARCHAR},
+      </if>
+      <if test="XGBZ != null" >
+        #{XGBZ,jdbcType=NUMERIC},
+      </if>
+      <if test="YLFYLYLB != null" >
+        #{YLFYLYLB,jdbcType=VARCHAR},
+      </if>
+      <if test="PERSONID != null" >
+        #{PERSONID,jdbcType=VARCHAR},
+      </if>
+      <if test="YLYL1 != null" >
+        #{YLYL1,jdbcType=VARCHAR},
+      </if>
+      <if test="YLYL2 != null" >
+        #{YLYL2,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+	
+	<select id="findByYLJGDM" parameterType="pd" resultType="pd">
+				SELECT *
+				  FROM ( SELECT ROWNUM AS rowno, t.*
+				          FROM TB_CIS_MAIN t
+			where 1=1
+			<if test="YLJGDM != null and YLJGDM != ''"> 
+				and  YLJGDM LIKE CONCAT(CONCAT('%', #{YLJGDM}),'%')
+			</if>
+			<if test="XM != null and XM != ''"> 
+				and  XM LIKE CONCAT(CONCAT('%', #{XM}),'%')
+			</if>
+			<if test="SFZ != null and SFZ != ''"> 
+				and  SFZ LIKE CONCAT(CONCAT('%', #{SFZ}),'%')
+			</if>
+			<if test="PERSONID != null and PERSONID != ''"> 
+				and  PERSONID LIKE CONCAT(CONCAT('%', #{PERSONID}),'%')
+			</if>
+			<if test="JZLSH != null and JZLSH != ''"> 
+				and  JZLSH LIKE CONCAT(CONCAT('%', #{JZLSH}),'%')
+			</if>
+				           ) table_alias
+				 WHERE table_alias.rowno BETWEEN #{pageStart} and #{pageEnd}
+	</select>
+	
+		
+</mapper>

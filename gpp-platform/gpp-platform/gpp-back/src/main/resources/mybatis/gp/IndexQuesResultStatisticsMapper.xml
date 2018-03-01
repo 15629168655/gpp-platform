@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="IndexQuesResultStatisticsMapper">
+	<!--筛查人数统计-->
+	<select id="PeopleMount" parameterType="pd" resultType="pd">
+			select NND, count(*) as MOUNT from(
+		select
+		case
+        when AGE &lt;= 17 then &apos;17岁以下&apos;
+		when AGE &gt;= 18 and AGE &lt;=29 then &apos;18-29岁&apos;
+		when AGE &gt;=30 and AGE &lt;=39 then &apos;30-39岁&apos;
+		when AGE &gt;=40 and AGE &lt;=49 then &apos;40-59岁&apos;
+		when AGE &gt;=50 and AGE &lt;=59 then &apos;50-59岁&apos;
+		when AGE &gt;=60 and AGE &lt;=69 then &apos;60-69岁&apos;
+		when AGE &gt;=70 and AGE &lt;=79 then &apos;70-79岁&apos; else &apos;80岁以上&apos;
+		end
+		  NND,SEX from 
+		(
+				SELECT 
+					floor(months_between(SYSDATE, BIRTHDAY_TIME)/ 12) AS AGE,SEX
+				from 
+					TB_USER_AGENT where SEX = #{ID, jdbcType=VARCHAR} and USER_AGENT_ID in (SELECT RESIDENT_ID from GPP_INDEX_RESIDENT_QUES where IS_FINISH = #{IS_POSITIVE, jdbcType=VARCHAR}
+						<if test="SCREENING_DATE_START != null and SCREENING_DATE_START !=''">
+							and EDIT_TIME &gt; to_date(#{SCREENING_DATE_START},'yyyy-mm-dd')
+						</if>
+						<if test="SCREENING_DATE_END != null and SCREENING_DATE_END !=''">
+							and EDIT_TIME &lt; to_date(#{SCREENING_DATE_END},'yyyy-mm-dd')
+						</if>
+					)
+		)
+		) where 1 = 1 
+		 <if test="NND!= null and NND != ''">
+		        and NND in  ${NND}
+		 </if>
+		  group by NND
+	</select>
+	<!--  查询医生的工作量-->
+	<select id="viewDoctorWorkLoad" parameterType="pd" resultType="pd">
+		SELECT 
+			count(*)AS WORK_LOAD,QUESTIONNAIRE_PEOPLE 
+		from 
+			GPP_INDEX_RESIDENT_QUES 
+		where
+			1=1
+			<if test="SCREENING_DATE_START != null and SCREENING_DATE_START !=''">
+				and EDIT_TIME &gt; to_date(#{SCREENING_DATE_START},'yyyy-mm-dd')
+			</if>
+			<if test="SCREENING_DATE_END != null and SCREENING_DATE_END !=''">
+				and EDIT_TIME &lt; to_date(#{SCREENING_DATE_END},'yyyy-mm-dd')
+			</if>
+			<if test=" QUESTIONNAIRE_PEOPLE != null and QUESTIONNAIRE_PEOPLE != ''">
+		        and QUESTIONNAIRE_PEOPLE in  ${QUESTIONNAIRE_PEOPLE}
+		 	</if>
+		 	<if test=" QUESTIONNAIRE_PEOPLE != null and QUESTIONNAIRE_PEOPLE != ''">
+		        and QUESTIONNAIRE_PEOPLE in  ${QUESTIONNAIRE_PEOPLE}
+		 	</if>
+		GROUP BY 
+			QUESTIONNAIRE_PEOPLE, QUESTIONNAIRE_DEPARTMENT
+	</select>
+	<!-- 显示医生的工作详情 -->
+	<select id="findByDoctor" parameterType="page" resultType="pd">
+		SELECT 
+			*
+		from 
+			GPP_INDEX_RESIDENT_QUES 
+		where
+			QUESTIONNAIRE_PEOPLE = #{pd.QUESTIONNAIRE_PEOPLE, jdbcType=VARCHAR}
+	</select>
+	<!-- 疾病统计 -->
+	<select id="diseaseMount" parameterType="page" resultType="pd">
+		select
+			count(*) as DISEASE_COUNT,DISEASECODE_ID
+		from 
+			(
+				select  
+					"SUBSTR"(DESCRIBE, 0, 32)  DISEASECODE_ID,RESIDENT_QUESTIONNAIRE_ID 
+				 from 
+				 	GPP_INDEX_RESIDENT_Q_RESULT
+				 where 
+				 	IS_POSITIVE = #{pd.IS_POSITIVE, jdbcType=VARCHAR}
+				 	<if test="pd.SCREENING_DATE_START != null and pd.SCREENING_DATE_START !=''">
+						and EDIT_TIME &gt; to_date(#{pd.SCREENING_DATE_START},'yyyy-mm-dd')
+					</if>
+					<if test="pd.SCREENING_DATE_END != null and pd.SCREENING_DATE_END !=''">
+						and EDIT_TIME &lt; to_date(#{pd.SCREENING_DATE_END},'yyyy-mm-dd')
+					</if>
+	 		) 
+		where 
+			1=1
+			<if test="pd.DISEASECODE_ID != null and pd.DISEASECODE_ID != ''">
+		        and DISEASECODE_ID in  ${pd.DISEASECODE_ID}
+		 	</if>
+		group by 
+			DISEASECODE_ID 
+	</select>
+	<!-- 获得疾病详情 -->
+	<select id="findByDisease" parameterType="page" resultType="pd">
+		select 
+			* 
+		from 
+			TB_USER_AGENT 
+		where 
+			USER_AGENT_ID 
+		in 
+			(select 
+				RESIDENT_ID
+			from 
+			GPP_INDEX_RESIDENT_QUES
+			where 
+				 ID
+			in 
+				(
+					select 
+						RESIDENT_QUESTIONNAIRE_ID 
+					from 
+						GPP_INDEX_RESIDENT_Q_RESULT
+					where 
+					"SUBSTR"(DESCRIBE, 0, 32) = #{pd.DISEASECODE_ID, jdbcType=VARCHAR}
+				)
+			) 
+	</select>
+</mapper>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="AgreementRenewMapper">
+	
+	<!--表名 -->
+	<sql id="tableName">
+		GPP_AGREEMENT_RENEW
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		ID,
+  		AGREEMENT_NAME,
+  		APPLICANT_CODE,
+  		TEAM_ID,
+  		GEN_PRACTITIONER_ID,
+  		GEN_PRACTITIONER_NAME,
+  		GEN_PRACTITIONER_PHONE,
+  		ORG_CODE,        
+  		REGION_CODE,
+  		GMT_START,
+  		GMT_END,
+  		GMT_SIGNED,
+  		MEMBER_ID,
+  		MEMBER_NAME,
+  		MI_CARD,
+  		ID_CARD,
+  		MEMBER_PHONE,
+  		ADDRESS,
+  		FILE_URL,
+  		GMT_MODIFIED,
+  		SERVICE_PACK,
+  		FILE_ID
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{ID},
+  		#{AGREEMENT_NAME},
+  		#{APPLICANT_CODE},      
+  		#{TEAM_ID,jdbcType=VARCHAR},
+  		#{GEN_PRACTITIONER_ID,jdbcType=VARCHAR},
+  		#{GEN_PRACTITIONER_NAME,jdbcType=VARCHAR},
+  		#{GEN_PRACTITIONER_PHONE,jdbcType=VARCHAR},
+  		#{ORG_CODE,jdbcType=VARCHAR},
+  		#{REGION_CODE,jdbcType=VARCHAR},
+  		to_date(#{GMT_START,jdbcType=DATE},'YYYY-MM-DD HH24:MI:SS'),
+  		to_date(#{GMT_END,jdbcType=DATE},'YYYY-MM-DD HH24:MI:SS'),
+  		to_date(#{GMT_SIGNED,jdbcType=DATE},'YYYY-MM-DD HH24:MI:SS'),
+  		#{MEMBER_ID,jdbcType=VARCHAR},
+  		#{MEMBER_NAME,jdbcType=VARCHAR},
+  		#{MI_CARD,jdbcType=VARCHAR},
+  		#{ID_CARD,jdbcType=VARCHAR},
+  		#{MEMBER_PHONE,jdbcType=VARCHAR},
+  		#{ADDRESS,jdbcType=VARCHAR},
+  		#{FILE_URL,jdbcType=VARCHAR},
+  		#{FILE_ID,jdbcType=VARCHAR},
+  		to_date(#{GMT_MODIFIED,jdbcType=DATE},'YYYY-MM-DD HH24:MI:SS'),
+  		#{SERVICE_PACK,jdbcType=VARCHAR}
+	</sql>
+	
+	<!-- 新增-->
+	<insert id="save" parameterType="pd">
+		insert into 
+	<include refid="tableName"></include>
+		(
+	<include refid="Field"></include>
+		) values (
+	<include refid="FieldValue"></include>
+		)
+	</insert>
+	
+	<!-- 通过id获取数据 -->
+	<select id="findByRenewId" parameterType="pd" resultType="pd">
+		select 
+			<include refid="Field"></include>
+		from 
+			<include refid="tableName"></include>
+		where 
+			ID = #{ID}
+	</select>
+	
+</mapper>

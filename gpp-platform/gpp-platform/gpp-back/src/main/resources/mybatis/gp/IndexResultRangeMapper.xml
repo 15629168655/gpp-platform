@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="IndexResultRangeMapper">
+	<!--表名 指标管理结果范围表 -->
+	<sql id="tableName">
+		GPP_INDEX_RESULT_RANGE
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		ID,
+		INDEX_ID,
+		RANGE_NAME,
+		IS_LIMIT_AGE,
+		AGE_UP,
+		AGE_DOWN,
+		FIT_SEX,
+		RESULT_UP,
+		RESULT_DOWN,
+		LOW_CONTENT,
+		LOW_COLOUR,
+		LOW_DISEASE_ID,
+		HIG_CONTENT,
+		HIG_COLOUR,
+		HIG_DISEASE_ID,
+		RESULT_RANGE_STATE,
+		CREAT_TIME,
+		EDIT_TIME
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{ID, jdbcType=VARCHAR},
+		#{INDEX_ID, jdbcType=VARCHAR},
+		#{RANGE_NAME, jdbcType=VARCHAR},
+		#{IS_LIMIT_AGE, jdbcType=VARCHAR},
+		#{AGE_UP, jdbcType=NUMERIC},
+		#{AGE_DOWN, jdbcType=NUMERIC},
+		#{FIT_SEX, jdbcType=VARCHAR},
+		#{RESULT_UP, jdbcType=VARCHAR},
+		#{RESULT_DOWN, jdbcType=VARCHAR},
+		#{LOW_CONTENT, jdbcType=VARCHAR},
+		#{LOW_COLOUR, jdbcType=NUMERIC},
+		#{LOW_DISEASE_ID, jdbcType=VARCHAR},
+		#{HIG_CONTENT, jdbcType=VARCHAR},
+		#{HIG_COLOUR, jdbcType=NUMERIC},
+		#{HIG_DISEASE_ID, jdbcType=VARCHAR},
+		#{RESULT_RANGE_STATE, jdbcType=VARCHAR},
+		to_date(#{CERAT_TIME},'yyyy-mm-dd HH24:mi:ss'),
+		to_date(#{EDIT_TIME},'yyyy-mm-dd HH24:mi:ss')
+	</sql>
+	<!-- 查询全部 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select <include refid="Field"></include> from
+		<include refid="tableName"></include>
+		where 1=1 and RESULT_RANGE_STATE=#{pd.RESULT_RANGE_STATE, jdbcType=VARCHAR}
+		<if test="pd.INDEX_ID != null and pd.INDEX_ID !=''">
+			and INDEX_ID=#{pd.INDEX_ID, jdbcType=VARCHAR}
+		</if>
+        <if test="pd.keywords != null and pd.keywords !=''">
+        	and(
+        		 AGE_UP LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				 or
+				 FIT_SEX LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				 or 
+				 HIG_CONTENT LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%') 
+        	)
+        </if>
+        order by EDIT_TIME desc
+	</select>
+	<!-- 查看详情 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+			<include refid="Field"></include>
+		from 
+			<include refid="tableName"></include>
+		where 
+			ID = #{ID,jdbcType=VARCHAR}
+	</select>
+	<!-- 编辑 -->
+	<update id="edit" parameterType="pd">
+		update
+			<include refid="tableName"></include>
+		set 
+			ID=#{ID, jdbcType=VARCHAR},
+			INDEX_ID=#{INDEX_ID, jdbcType=VARCHAR},
+			RANGE_NAME=#{RANGE_NAME, jdbcType=VARCHAR},
+			IS_LIMIT_AGE=#{IS_LIMIT_AGE, jdbcType=VARCHAR},
+			AGE_UP=#{AGE_UP, jdbcType=NUMERIC},
+			AGE_DOWN=#{AGE_DOWN, jdbcType=NUMERIC},
+			FIT_SEX=#{FIT_SEX, jdbcType=VARCHAR},
+			RESULT_UP=#{RESULT_UP, jdbcType=VARCHAR},
+			RESULT_DOWN=#{RESULT_DOWN, jdbcType=VARCHAR},
+			LOW_CONTENT=#{LOW_CONTENT, jdbcType=VARCHAR},
+			LOW_COLOUR=#{LOW_COLOUR, jdbcType=NUMERIC},
+			LOW_DISEASE_ID=#{LOW_DISEASE_ID, jdbcType=VARCHAR},
+			HIG_CONTENT=#{HIG_CONTENT, jdbcType=VARCHAR},
+			HIG_COLOUR=#{HIG_COLOUR, jdbcType=NUMERIC},
+			HIG_DISEASE_ID=#{HIG_DISEASE_ID, jdbcType=VARCHAR},
+			RESULT_RANGE_STATE=#{RESULT_RANGE_STATE, jdbcType=VARCHAR},
+			CREAT_TIME=to_date(#{CREAT_TIME},'yyyy-mm-dd HH24:mi:ss'),
+			EDIT_TIME=to_date(#{EDIT_TIME},'yyyy-mm-dd HH24:mi:ss')
+		where
+			ID=#{ID, jdbcType=VARCHAR}
+	</update>
+	<!-- 删除 -->
+	<update id="delete" parameterType="pd">
+		update
+			<include refid="tableName"></include>
+		set
+			EDIT_TIME=to_date(#{EDIT_TIME},'yyyy-mm-dd HH24:mi:ss')
+			RESULT_RANGE_STATE=#{RESULT_RANGE_STATE, jdbcType=VARCHAR}
+		where
+			ID=#{ID, jdbcType=VARCHAR}
+	</update>
+	<!-- 批量删除 -->
+	<update id="deleteAll" parameterType="pd">
+		update
+			<include refid="tableName"></include>
+		set
+			EDIT_TIME=to_date(#{EDIT_TIME},'yyyy-mm-dd HH24:mi:ss')
+			RESULT_RANGE_STATE=#{RESULT_RANGE_STATE, jdbcType=VARCHAR}
+		where
+			ID in
+				${IDS}
+	</update>
+	<!-- 增加-->
+	<insert id="save" parameterType="pd">
+		insert into 
+	<include refid="tableName"></include>
+	<trim prefix="(" suffix=")" suffixOverrides="," >
+		<if test="INDEX_ID != null" >INDEX_ID,</if>
+		<if test="RANGE_NAME != null" >RANGE_NAME,</if>
+		<if test="IS_LIMIT_AGE != null" >IS_LIMIT_AGE,</if>
+		<if test="AGE_UP != null" >AGE_UP,</if>
+		<if test="AGE_DOWN != null" >AGE_DOWN,</if>
+		<if test="FIT_SEX != null" >FIT_SEX,</if>
+		<if test="RESULT_UP != null" >RESULT_UP,</if>
+		<if test="RESULT_DOWN != null" >RESULT_DOWN,</if>
+		<if test="LOW_CONTENT != null" >LOW_CONTENT,</if>
+		<if test="LOW_COLOUR != null" >LOW_COLOUR,</if>
+		<if test="LOW_DISEASE_ID != null" >LOW_DISEASE_ID,</if>
+		<if test="HIG_CONTENT != null" >HIG_CONTENT,</if>
+		<if test="HIG_COLOUR != null" >HIG_COLOUR,</if>
+		<if test="HIG_DISEASE_ID != null" >HIG_DISEASE_ID,</if>
+		<if test="RESULT_RANGE_STATE != null" >RESULT_RANGE_STATE,</if>
+		<if test="CREAT_TIME != null" >CREAT_TIME,</if>
+		<if test="EDIT_TIME != null" >EDIT_TIME,</if>
+		ID
+       </trim>
+            VALUES
+     <trim prefix="(" suffix=")" suffixOverrides="," >
+		<if test="INDEX_ID != null" >#{INDEX_ID, jdbcType=VARCHAR},</if>
+		<if test="RANGE_NAME != null" >#{RANGE_NAME, jdbcType=VARCHAR},</if>
+		<if test="IS_LIMIT_AGE != null" >#{IS_LIMIT_AGE, jdbcType=VARCHAR},</if>
+		<if test="AGE_UP != null" >#{AGE_UP, jdbcType=NUMERIC},</if>
+		<if test="AGE_DOWN != null" >#{AGE_DOWN, jdbcType=NUMERIC},</if>
+		<if test="FIT_SEX != null" >#{FIT_SEX, jdbcType=VARCHAR},</if>
+		<if test="RESULT_UP != null" >#{RESULT_UP, jdbcType=VARCHAR},</if>
+		<if test="RESULT_DOWN != null" >#{RESULT_DOWN, jdbcType=VARCHAR},</if>
+		<if test="LOW_CONTENT != null" >#{LOW_CONTENT, jdbcType=VARCHAR},</if>
+		<if test="LOW_COLOUR != null" >#{LOW_COLOUR, jdbcType=NUMERIC},</if>
+		<if test="LOW_DISEASE_ID != null" >#{LOW_DISEASE_ID, jdbcType=VARCHAR},</if>
+		<if test="HIG_CONTENT != null" >#{HIG_CONTENT, jdbcType=VARCHAR},</if>
+		<if test="HIG_COLOUR != null" >#{HIG_COLOUR, jdbcType=NUMERIC},</if>
+		<if test="HIG_DISEASE_ID != null" >#{HIG_DISEASE_ID, jdbcType=VARCHAR},</if>
+		<if test="RESULT_RANGE_STATE != null" >#{RESULT_RANGE_STATE, jdbcType=VARCHAR},</if>
+		<if test="CREAT_TIME != null" >to_date(#{CREAT_TIME},'yyyy-mm-dd HH24:mi:ss'),</if>
+		<if test="EDIT_TIME != null" >to_date(#{EDIT_TIME},'yyyy-mm-dd HH24:mi:ss'),</if>
+        #{ID,jdbcType=VARCHAR}
+      </trim>
+	</insert>
+	<update id="renew" parameterType="pd">
+		update
+			<include refid="tableName"></include>
+		set 
+			<if test="INDEX_ID != null and INDEX_ID != ''">
+				INDEX_ID=#{INDEX_ID, jdbcType=VARCHAR},
+			</if>
+			<if test="RANGE_NAME != null and INDEX_ID != ''">
+				RANGE_NAME=#{RANGE_NAME, jdbcType=VARCHAR},
+			</if>
+			<if test="IS_LIMIT_AGE != null and IS_LIMIT_AGE != ''">
+				IS_LIMIT_AGE=#{IS_LIMIT_AGE, jdbcType=VARCHAR},
+			</if>
+			<if test="AGE_UP != null and AGE_UP != ''">
+				AGE_UP=#{AGE_UP, jdbcType=NUMERIC},
+			</if>	
+			<if test="AGE_DOWN != null and AGE_DOWN != ''">
+				AGE_DOWN=#{AGE_DOWN, jdbcType=NUMERIC},
+			</if>
+			<if test="FIT_SEX != null and FIT_SEX != ''">
+				FIT_SEX=#{FIT_SEX, jdbcType=VARCHAR},
+			</if>
+			<if test="RESULT_UP != null and RESULT_UP != ''">
+				RESULT_UP=#{RESULT_UP, jdbcType=VARCHAR},
+			</if>
+			<if test="RESULT_DOWN != null and RESULT_DOWN != ''">
+		    	RESULT_DOWN=#{RESULT_DOWN, jdbcType=VARCHAR},
+		    </if>
+		    <if test="LOW_CONTENT != null and LOW_CONTENT != ''">
+		    	LOW_CONTENT=#{LOW_CONTENT, jdbcType=VARCHAR},
+		    </if>
+		    <if test="LOW_COLOUR != null and LOW_COLOUR != ''">
+		    	LOW_COLOUR=#{LOW_COLOUR, jdbcType=NUMERIC},
+		    </if>
+		     <if test="LOW_DISEASE_ID != null and LOW_DISEASE_ID != ''">
+		    	LOW_DISEASE_ID=#{LOW_DISEASE_ID, jdbcType=VARCHAR},
+		    </if>
+		     <if test="HIG_CONTENT != null and HIG_CONTENT != ''">
+		    	HIG_CONTENT=#{HIG_CONTENT, jdbcType=VARCHAR},
+		    </if>
+		     <if test="HIG_COLOUR != null and HIG_COLOUR != ''">
+		    	HIG_COLOUR=#{HIG_COLOUR, jdbcType=NUMERIC},
+		    </if>
+		     <if test="HIG_DISEASE_ID != null and HIG_DISEASE_ID != ''">
+		    	HIG_DISEASE_ID=#{HIG_DISEASE_ID, jdbcType=VARCHAR},
+		    </if>
+		     <if test="RESULT_RANGE_STATE != null and RESULT_RANGE_STATE != ''">
+		    	RESULT_RANGE_STATE=#{RESULT_RANGE_STATE, jdbcType=VARCHAR},
+		    </if>
+		    <if test="CERAT_TIME != null and CERAT_TIME != ''">
+		    	CERAT_TIME=to_date(#{CERAT_TIME},'yyyy-mm-dd HH24:mi:ss'),
+		    </if>
+		    <if test="EDIT_TIME != null and EDIT_TIME != ''">
+		    	EDIT_TIME=to_date(#{EDIT_TIME},'yyyy-mm-dd HH24:mi:ss'),
+		    </if>
+		    ID=#{ID, jdbcType=VARCHAR}
+		where
+			ID=#{ID, jdbcType=VARCHAR}
+	</update>	
+	<!-- 通过指标查询结果范围-->
+	<select id="findByIndexId" parameterType="pd" resultType="pd">
+	select <include refid="Field"></include> from
+		<include refid="tableName"></include>
+		where 1=1
+		<if test="ID != null and ID !=''">
+			and INDEX_ID=#{ID, jdbcType=VARCHAR}
+		</if>
+	    	and RESULT_RANGE_STATE=#{RESULT_RANGE_STATE, jdbcType=VARCHAR}
+	</select>
+
+</mapper>

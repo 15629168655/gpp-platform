@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="TreateCaseImpMapper">
+	<!--治疗方案表-->
+	<sql id="tableName">
+		GPP_TREATE_CASE_IMP
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		ID,
+		TREATE_ID,
+		IMPLEMENT_TIME,
+		IMPLEMENT_DOC,
+		IMPLEMENT_NUM,
+		CONTENT,
+		SUGGESTION
+	</sql>
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{ID, jdbcType=VARCHAR},
+		#{TREATE_ID, jdbcType=VARCHAR},
+		to_date(#{IMPLEMENT_TIME},'yyyy-mm-dd'),
+		#{IMPLEMENT_DOC, jdbcType=VARCHAR},
+		#{IMPLEMENT_NUM, jdbcType=VARCHAR},
+		#{CONTENT, jdbcType=NUMERIC},
+		#{SUGGESTION,jdbcType=NUMERIC}
+	</sql>
+	<!-- 查询全部 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select <include refid="Field"></include> from
+		<include refid="tableName"></include>
+		where 1=1 and RESIDENT_ID=#{pd.RESIDENT_ID, jdbcType=VARCHAR}
+        <if test="pd.keywords != null and pd.keywords !=''">
+        	and(
+        		 IMPLEMENT_DOC LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				 or
+				 IMPLEMENT_NUM LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+        	)
+        </if>
+        order by EDIT_TIME desc
+	</select>
+	<!-- 查看详情 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+			<include refid="Field"></include>
+		from 
+			<include refid="tableName"></include>
+		where 
+			ID = #{ID,jdbcType=VARCHAR}
+	</select>
+	<!-- 编辑 -->
+	<update id="edit" parameterType="pd">
+		update
+			<include refid="tableName"></include>
+		set 
+			ID=#{ID, jdbcType=VARCHAR},
+			TREATE_ID=#{TREATE_ID, jdbcType=VARCHAR},
+			TREATE_TIME=to_date(#{IMPLEMENT_TIME},'yyyy-mm-dd'),
+			IMPLEMENT_DOC=#{IMPLEMENT_DOC, jdbcType=VARCHAR},
+			IMPLEMENT_NUM=#{IMPLEMENT_NUM, jdbcType=VARCHAR},
+			CONTENT=#{CONTENT, jdbcType=NUMERIC},
+			SUGGESTION=#{SUGGESTION, jdbcType=NUMERIC}
+		where
+			ID=#{ID, jdbcType=VARCHAR}
+	</update>
+	<!-- 删除 -->
+	<delete id="delete" parameterType="pd">
+		delete from
+			<include refid="tableName"></include>
+		where
+			ID=#{ID, jdbcType=VARCHAR}
+	</delete>
+	<insert id="save" parameterType="pd">
+		insert into 
+	<include refid="tableName"></include>
+	(<include refid="Field"></include>)
+            VALUES
+     (<include refid="FieldValue"></include>)
+	</insert>
+	<!-- 通过方案ID查询执行记录 -->
+	<select id = "findByTreateId" parameterType="pd" resultType="pd">
+		select 
+			<include refid="Field"></include>
+		from 
+			<include refid="tableName"></include> 
+		where 
+			TREATE_ID=#{TREATE_ID, jdbcType=VARCHAR}
+	</select>
+</mapper>

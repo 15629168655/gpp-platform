@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ShapeMapper">
+<!-- 表名 -->
+<!-- 个人体型表 -->
+	<sql id="tableName">
+		 TB_USER_SHAPE
+	</sql>
+	<!-- 字段 -->
+	<sql id="Field">
+		ID ,<!--居民体型记录表ID-->
+		USER_AGENT_ID,<!--居民关联的ID-->
+		WEIGHT,<!--体重-->
+		HEIGHT,<!--身高-->
+		HIPLINE,<!--臀围-->
+		WAIST,<!--腰围-->
+		BMI,<!--体质指数(体质指数（BMI）=体重（kg）÷身高^2（m）)-->
+		WHR,<!--腰臀比-->
+		TEST_TIME ,<!--测试时间-->
+		CREAT_TIME <!--生成时间-->
+		
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+			#{ID, jdbcType=VARCHAR},	
+			#{USER_AGENT_ID, jdbcType=VARCHAR},	
+			#{WEIGHT, jdbcType=NUMERIC},	
+			#{HEIGHT, jdbcType=NUMERIC},
+			#{HIPLINE, jdbcType=NUMERIC},
+			#{WAIST, jdbcType=NUMERIC},	
+			#{BMI, jdbcType=NUMERIC},	
+			#{WHR, jdbcType=NUMERIC},
+			to_date(#{TEST_TIME},'yyyy-mm-dd HH24:mi:ss'),
+			to_date(#{CREAT_TIME},'yyyy-mm-dd HH24:mi:ss')
+	</sql>
+	<!-- app体型记录分页查询 -->
+	<select id="queryPage" parameterType="pd" resultType="pd">
+		select 
+			<include refid="Field"></include>
+		from 
+			(select <include refid="Field"></include>,ROWNUM AS rowno  from <include refid="tableName"></include>
+			where 1=1
+				<if test="testSTART != null and testSTART !=''">
+					and TEST_TIME &gt; to_date(#{testSTART},'yyyy-mm-dd')
+				</if>
+				<if test="testEND != null and testEND != ''">
+		            and TEST_TIME &lt;  to_date(#{testEND},'yyyy-mm-dd')
+		        </if>
+		        <if test="YEAR_MONTH != null and YEAR_MONTH !=''">      <!-- 按具体年月查询 -->
+					and to_char(CREAT_TIME,'yyyy-mm') = #{YEAR_MONTH}
+				</if>
+		        <if test="USER_AGENT_ID != null and USER_AGENT_ID !=''">
+		        	and USER_AGENT_ID=#{USER_AGENT_ID, jdbcType=VARCHAR}
+		        </if>
+			) t where t.rowno BETWEEN #{pageStart} and #{pageEnd}
+	</select>
+	<!-- 查询全部 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select * from
+		<include refid="tableName"></include>
+		where 1=1
+		<if test="pd.BMI != null and pd.BMI != ''"> <!-- 体质指数-->
+			and BMI = #{pd.BMI, jdbcType=NUMERIC}
+		</if>
+		<if test="pd.WHR != null and pd.WHR != ''"><!-- 腰臀比 -->
+			and	WHR = #{pd.WHR, jdbcType=NUMERIC} 
+		</if>
+		<if test="pd.testSTART != null and pd.testSTART !=''">
+			and TEST_TIME &gt; to_date(#{pd.testSTART},'yyyy-mm-dd HH24:mi:ss')
+		</if>
+		<if test="pd.testEND != null and pd.testEND != ''">
+            and TEST_TIME &lt;  to_date(#{pd.testEND},'yyyy-mm-dd')
+        </if>
+         and USER_AGENT_ID=#{pd.USER_AGENT_ID, jdbcType=VARCHAR}
+	</select>
+	<!-- 查看详情 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+			<include refid="Field"></include>
+		from 
+			<include refid="tableName"></include>
+		where 
+			ID = #{ID,jdbcType=VARCHAR}
+	</select>
+	<!-- 根据用户ID查询最近一次记录-->
+	<select id="findLastByUserID" parameterType="pd" resultType="pd">
+		select * from
+			(select 
+				<include refid="Field"></include>
+			from 
+				<include refid="tableName"></include>
+			where 
+				USER_AGENT_ID = #{USER_AGENT_ID,jdbcType=VARCHAR}
+				ORDER BY CREAT_TIME DESC)
+		where ROWNUM &lt;2
+	</select>
+	<!-- 编辑 -->
+	<update id="edit" parameterType="pd">
+		update
+			<include refid="tableName"></include>
+		set 
+			ID=#{ID, jdbcType=VARCHAR},	
+			USER_AGENT_ID=#{USER_AGENT_ID, jdbcType=VARCHAR},	
+			WEIGHT=#{WEIGHT, jdbcType=NUMERIC},	
+			HEIGHT=#{HEIGHT, jdbcType=NUMERIC},
+			HIPLINE=#{HIPLINE, jdbcType=NUMERIC},
+			WAIST=#{WAIST, jdbcType=NUMERIC},
+			BMI=#{BMI, jdbcType=NUMERIC},	
+			WHR=#{WHR, jdbcType=NUMERIC},
+			TEST_TIME=to_date(#{TEST_TIME},'yyyy-mm-dd HH24:mi:ss'),
+			CREAT_TIME=to_date(#{CREAT_TIME},'yyyy-mm-dd HH24:mi:ss')
+		where
+			ID=#{ID, jdbcType=VARCHAR}
+	</update>
+	<!-- 删除 -->
+	<delete id="delete" parameterType="pd">
+		delete 
+		from
+			<include refid="tableName"></include>
+		where
+			ID=#{ID, jdbcType=VARCHAR}
+	</delete>
+	<!-- 批量删除 -->
+	<delete id="deleteAll" parameterType="String">
+		delete from
+		<include refid="tableName"></include>
+		where 
+			ID in
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                 #{item}
+		</foreach>
+	</delete>
+	<!-- 增加-->
+	<insert id="save" parameterType="pd">
+		insert into 
+	<include refid="tableName"></include>
+		(
+	<include refid="Field"></include>
+		) values (
+	<include refid="FieldValue"></include>
+		)
+	</insert>
+	<!-- app更新 -->
+	<update id="renew" parameterType="pd">
+		update
+			<include refid="tableName"></include>
+		set 
+		    <if test="ID != null and ID != ''">
+		    	ID=#{ID, jdbcType=VARCHAR},
+		    </if>
+			<if test="USER_AGENT_ID != null and USER_AGENT_ID != ''">
+				USER_AGENT_ID=#{USER_AGENT_ID, jdbcType=VARCHAR},
+			</if>
+			<if test="WEIGHT != null and WEIGHT != ''">
+				WEIGHT=#{WEIGHT, jdbcType=NUMERIC},	
+			</if>
+			<if test="HEIGHT != null and HEIGHT != ''">
+				HEIGHT=#{HEIGHT, jdbcType=NUMERIC},
+			</if>	
+			<if test="HIPLINE != null and HIPLINE != ''">
+				HIPLINE=#{HIPLINE, jdbcType=NUMERIC},
+			</if>
+			<if test="WAIST != null and WAIST != ''">
+				WAIST=#{WAIST, jdbcType=NUMERIC},
+			</if>
+			<if test="BMI != null and BMI != ''">
+				BMI=#{BMI, jdbcType=NUMERIC},
+			</if>
+			<if test="WHR != null and WHR != ''">
+				WHR=#{WHR, jdbcType=NUMERIC},
+			</if>
+			<if test="TEST_TIME != null and TEST_TIME != ''">
+				TEST_TIME=to_date(#{TEST_TIME},'yyyy-mm-dd HH24:mi:ss'),
+			</if>
+			<if test="CREAT_TIME != null and CREAT_TIME != ''">
+				CREAT_TIME=to_date(#{CREAT_TIME},'yyyy-mm-dd HH24:mi:ss')
+			</if>
+		where
+			ID=#{ID, jdbcType=VARCHAR}
+	</update>
+		
+</mapper>

@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="VersionMapper">
+	
+	<!--版本管理表名 -->
+	<sql id="tableName">
+		GPP_VERSION
+	</sql>
+	<!--用户表 -->
+	<sql id="userName">
+		SYS_APP_USER
+	</sql>
+	
+	<!--版本管理字段 -->
+	<sql id="Field">
+		ID,
+  		TYPE,
+  		DOWNLOAD_URL,
+  		VERSIONCODE,
+  		GROUND_TIME,
+  		OFFICIALCONTENT,
+  		MEMO,
+  		ISFORCE,        
+  		CREATEMAN,
+  		CREATE_TIME
+	</sql>
+	
+	<!--版本管理字段值 -->
+	<sql id="FieldValue">
+		#{ID,jdbcType=VARCHAR},
+  		#{TYPE,jdbcType=VARCHAR},
+  		#{DOWNLOAD_URL,jdbcType=VARCHAR},      
+  		#{VERSIONCODE,jdbcType=VARCHAR},
+  		to_date(#{GROUND_TIME,jdbcType=DATE},'YYYY-MM-DD HH24:MI:SS'),
+  		#{OFFICIALCONTENT,jdbcType=NUMERIC},
+  		#{MEMO,jdbcType=VARCHAR},
+  		#{ISFORCE,jdbcType=VARCHAR},
+  		#{CREATEMAN,jdbcType=VARCHAR},
+  		to_date(#{CREATE_TIME,jdbcType=DATE},'YYYY-MM-DD HH24:MI:SS')
+	</sql>
+	<!--版本管理列表 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include>
+		<where>
+		1=1
+			<if test="pd.TYPE != null and pd.TYPE != ''"><!-- 类型检索 -->
+				and TYPE=#{pd.TYPE} 
+			</if>
+			<if test="pd.VERSIONCODE != null and pd.VERSIONCODE != ''"><!-- 版本号检索 -->
+				and VERSIONCODE=#{pd.VERSIONCODE} 
+			</if>
+			
+			<if test="pd.start_time !=null and pd.start_time !=''"><!-- 上架时间-->
+				and to_char(CREATE_TIME,'yyyymmdd') &gt;= to_char(to_date(#{pd.start_time},'YYYY-MM-DD HH24:MI:SS'),'yyyymmdd')
+			</if>
+			<if test="pd.end_time !=null and pd.end_time !=''"><!-- 创建时间   -->
+				and to_char(CREATE_TIME,'yyyymmdd') &lt;= to_char(to_date(#{pd.end_time},'YYYY-MM-DD HH24:MI:SS'),'yyyymmdd')
+			</if>
+        </where>
+        order by CREATE_TIME desc
+	</select>
+	
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+  		v.ID,
+  		v.TYPE,
+  		v.DOWNLOAD_URL,
+  		v.VERSIONCODE,
+  		v.GROUND_TIME,
+  		v.OFFICIALCONTENT,
+  		v.MEMO,
+  		v.ISFORCE,        
+  		v.CREATEMAN,
+  		v.CREATE_TIME,
+  		r.NAME,
+  		r.USER_ID
+		from <include refid="tableName"></include> v, <include refid="userName"></include> r 
+		where
+			v.CREATEMAN = r.USER_ID
+			and ID = #{ID}
+	</select>
+	
+	 <!-- 根据user_id获取用户名 -->
+	<!--<select id="queryUserToId" parameterType="String" resultType="pd">
+		select  USER_ID,NAME
+		from 
+			<include refid="tableName"></include>
+		where 
+			USER_ID = #{USER_ID}
+	</select> -->
+	
+	<!-- 增加-->
+	<insert id="save" parameterType="pd">
+		insert into 
+	<include refid="tableName"></include>
+		(
+	<include refid="Field"></include>
+		) values (
+	<include refid="FieldValue"></include>
+		)
+	</insert>
+	
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+		update
+		<include refid="tableName"></include>
+		set 
+		TYPE = #{TYPE,jdbcType=VARCHAR},
+  		DOWNLOAD_URL = #{DOWNLOAD_URL,jdbcType=VARCHAR},   
+  		VERSIONCODE = #{VERSIONCODE,jdbcType=VARCHAR},
+  		GROUND_TIME = to_date(#{GROUND_TIME,jdbcType=DATE},'YYYY-MM-DD HH24:MI:SS'),
+  		OFFICIALCONTENT = #{OFFICIALCONTENT,jdbcType=NUMERIC},
+  		MEMO = #{MEMO,jdbcType=VARCHAR},
+  		ISFORCE = #{ISFORCE,jdbcType=VARCHAR},
+  		CREATEMAN = #{CREATEMAN,jdbcType=VARCHAR},
+  		CREATE_TIME = to_date(#{CREATE_TIME,jdbcType=DATE},'YYYY-MM-DD HH24:MI:SS')
+		where
+		ID = #{ID}
+	</update>
+	
+	<!-- 删除-->
+	<delete id="delete" parameterType="pd">
+		delete from
+		<include refid="tableName"></include>
+		where 
+			ID = #{ID}
+	</delete>
+	
+	<!-- 批量删除 -->
+	<delete id="deleteAll" parameterType="String">
+		delete from
+		<include refid="tableName"></include>
+		where 
+			ID in
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                 #{item}
+		</foreach>
+	</delete>
+</mapper>

@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="TaskInfoMapper">
+	<!-- 列表 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+   SELECT a.guid ,
+    a.jobtid ,
+    a.jobclass,
+    a.ZT,
+    a.jobname,
+    a.des,
+    a.typename,
+    a.createtime,
+    b.timedes,
+    b.cornTime
+    FROM job_task_info a
+    LEFT JOIN job_time b ON a.jobtid = b.guid
+		 <where>
+		  1=1
+			order  by  a.createtime   desc  
+          </where>
+	</select>
+	
+<select id="querytask" parameterType="page" resultType="pd">
+   SELECT a.guid ,
+    a.jobtid ,
+    a.ZT,
+    a.jobclass,
+    a.jobname,
+    a.description,
+    a.typename,
+    a.createtime,
+    b.timedes,
+    b.cornTime,
+    FROM job_task_info a
+    LEFT JOIN job_time b ON a.jobtid = b.guid
+		 <where>
+          <if test="pd.STATUS != null and pd.STATUS != ''"> 
+               a.STATUT	= #{STATUT,jdbcType=VARCHAR},
+			</if>
+          </where>
+	</select>
+	
+	
+	<select id="querytime" parameterType="page" resultType="pd">
+   SELECT b.guid ,
+    b.timedes,
+    b.cornTime
+    FROM job_time b
+		 <where>
+      
+          </where>
+	</select>
+	
+ 
+	<!-- 通过ID获取数据 -->
+<select id="findById" parameterType="pd" resultType="pd">
+  SELECT a.guid ,
+    a.jobtid,
+    a.ZT,
+    a.jobclass,
+    a.jobname,
+    a.status,
+    a.des,
+    a.typename,
+    a.createtime,
+    b.timedes,
+    b.cornTime
+    FROM job_task_info a
+    LEFT JOIN job_time b ON a.jobtid = b.guid
+		<where>
+		   a.guid = #{ID,jdbcType=VARCHAR}
+		</where>
+	</select>
+	
+	<!-- 修改定时任务主信息-->
+	<update id="edit" parameterType="pd">
+	     update job_task_info 
+	      	<set>
+		<if test="JOBCLASS != null" >
+			 JOBCLASS= #{JOBCLASS,jdbcType=VARCHAR},  		 
+		</if>
+		<if test="JOBNAME != null" >
+			 JOBNAME= #{JOBNAME,jdbcType=VARCHAR},
+		</if>  		
+		 <if test="DESCRIPTION != null" >
+			 DESCRIPTION = #{DESCRIPTION,jdbcType=VARCHAR},
+		</if>
+		<if test="JOBTID!= null" >
+			 JOBTID	= #{JOBTID,jdbcType=VARCHAR},  
+		</if>
+		<if test="STATUS!= null" >
+			 ZT	= #{ZT,jdbcType=VARCHAR},  
+		</if>
+        modifytime = sysdate
+		 </set>
+		 where 
+			GUID = #{GUID,jdbcType=VARCHAR}
+	</update>
+
+	<insert id="savezb" parameterType="pd">
+		insert into
+			JOB_TASK_INFO
+		(
+			 "GUID","JOBTID", "JOBNAME", "ZT",
+			 "DES"
+		) values (
+			#{GUID},
+			#{JOBTID},
+			#{JOBNAME},
+			#{ZT},
+			#{DES}
+		)
+	</insert>
+    
+  <delete id="delete" parameterType="pd">
+  　　　　　	delete  job_task_info
+		 where 
+			GUID = #{GUID,jdbcType=VARCHAR}
+	</delete>
+
+ 
+</mapper>

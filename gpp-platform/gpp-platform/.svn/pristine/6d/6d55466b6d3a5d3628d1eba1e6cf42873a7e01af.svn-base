@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="YpKnowledgeBaseManager">
+	
+	
+
+	<select id="datalistPage" parameterType="page" resultType="pd">
+				SELECT *
+				  FROM GPP_KNOWLEDGE_BASE_YP
+				  where 1=1 
+			<if test="pd.keywords != null and pd.keywords!= ''"><!-- 关键词检索 -->
+			and (
+				YP_TYPE_MC LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				or
+				FIRST LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				)
+			</if>
+			<if test="pd.IS_RECOMMEND != null and pd.IS_RECOMMEND!= ''"><!-- 关键词检索 -->
+					and IS_RECOMMEND=#{pd.IS_RECOMMEND} 
+			</if>
+			order by FIRST
+	</select>	
+	<delete id="delete" parameterType="pd">
+		delete from
+		GPP_KNOWLEDGE_BASE_YP
+		where 
+			"ID" = #{ID}
+	</delete>
+	
+	<insert id="save" parameterType="pd">
+		insert into GPP_KNOWLEDGE_BASE_YP (
+			"ID","YP_TYPE","YP_TYPE_MC",
+			"REMARK","IS_RECOMMEND",
+			"CREATED_TIME","MODIFY_TIME","FIRST"
+		) values (
+			#{ID},#{YP_TYPE},#{YP_TYPE_MC},
+			to_blob(#{REMARK}),#{IS_RECOMMEND},
+			sysdate,sysdate,#{FIRST}
+		)
+	</insert>
+	
+	<select id="findById" parameterType="pd" resultType="pd">
+				SELECT *
+				  FROM GPP_KNOWLEDGE_BASE_YP where "ID" = #{ID}
+	</select>
+	
+	<update id="edit" parameterType="pd">
+		update
+		GPP_KNOWLEDGE_BASE_YP
+			set 
+				"YP_TYPE" = #{YP_TYPE},	
+				"YP_TYPE_MC" = #{YP_TYPE_MC},	
+				"REMARK" = #{REMARK},	
+				"IS_RECOMMEND" = #{IS_RECOMMEND},	
+				"MODIFY_TIME" = to_date(#{MODIFY_TIME},'YYYY-MM-DD HH24:MI:SS'),
+				"FIRST" = #{FIRST}
+			where 
+				"ID" = #{ID}
+	</update>
+</mapper>

@@ -1,0 +1,8 @@
+.from-control-span {
+    padding-top: 7px;
+    font-size: 14px;
+}
+
+/**zDialog css**/
+.buttonStyle{width:64px;height:22px;line-height:22px;color:#369;text-align:center;background:url(../../plugins/attention/zDialog2.0/images/buticon.gif) no-repeat left top;border:0;font-size:12px;}
+.buttonStyle:hover{background:url(../../plugins/attention/zDialog2.0/images/buticon.gif) no-repeat left -23px;}

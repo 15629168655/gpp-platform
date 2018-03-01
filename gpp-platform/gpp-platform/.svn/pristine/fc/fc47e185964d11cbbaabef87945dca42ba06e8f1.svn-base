@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="AgreementApplyMapper">
+	
+	
+	<!-- 新增-->
+	<insert id="addOrder" parameterType="pd">
+		insert into
+			GPP_AGREEMENT_APPLY
+		(
+			 "ID","APPLICANT_ID", "APPLICANT_NAME", "APPLICANT_PHONE","APPLICANT_IDCARD","APPLICANT_ADDR",
+			 "GEN_PRACTITIONER_ID","GEN_PRACTITIONER_NAME","GEN_PRACTITIONER_PHONE","GEN_PRACTITIONER_CODE",
+			 "ORG_CODE","REGION_CODE","GMT_CREATED","STATUS","GMT_APPOINTMENT","SIGNED_TYPE"
+		) values (
+			#{ID,jdbcType=VARCHAR},
+			#{APPLICANT_ID,jdbcType=VARCHAR},
+			#{APPLICANT_NAME,jdbcType=VARCHAR},
+			#{APPLICANT_PHONE,jdbcType=VARCHAR},
+			#{APPLICANT_IDCARD,jdbcType=VARCHAR},
+			#{APPLICANT_ADDR,jdbcType=VARCHAR},
+			#{GEN_PRACTITIONER_ID,jdbcType=VARCHAR},
+			#{GEN_PRACTITIONER_NAME,jdbcType=VARCHAR},
+			#{GEN_PRACTITIONER_PHONE,jdbcType=VARCHAR},
+			#{GEN_PRACTITIONER_CODE,jdbcType=VARCHAR},
+			#{ORG_CODE,jdbcType=VARCHAR},
+			#{REGION_CODE,jdbcType=VARCHAR},
+			#{GMT_CREATED,jdbcType=VARCHAR},
+			#{STATUS,jdbcType=VARCHAR},
+			#{GMT_APPOINTMENT,jdbcType=VARCHAR},
+			#{SIGNED_TYPE,jdbcType=VARCHAR}
+		)
+	</insert>
+	
+		<!--APP接口分页查询-->
+	<select id="queryPage" parameterType="pd" resultType="pd">
+				SELECT *
+				  FROM ( SELECT ROWNUM AS rowno, t.*,h.ORG_NAME
+				           FROM GPP_AGREEMENT_APPLY t LEFT OUTER JOIN HM_ORGANIZATION h ON t.ORG_CODE=h.ORG_CODE
+			where STATUS != 3 
+			<if test="KEYWORDS != null and KEYWORDS!= ''"><!-- 关键词检索 -->
+			and (
+				APPLICANT_NAME LIKE CONCAT(CONCAT('%', #{KEYWORDS}),'%')
+				or
+				APPLICANT_PHONE LIKE CONCAT(CONCAT('%', #{KEYWORDS}),'%')
+				or
+				APPLICANT_IDCARD LIKE CONCAT(CONCAT('%', #{KEYWORDS}),'%')
+				or
+				APPLICANT_ADDR LIKE CONCAT(CONCAT('%', #{KEYWORDS}),'%')
+				)
+			</if>
+			<if test="CREATEDSTART !=null and CREATEDSTART!=''"><!-- 登录时间检索 -->
+				and GMT_CREATED &gt;= to_date(#{CREATEDSTART},'yyyy-mm-dd')
+			</if>
+			<if test="CREATEDEND!=null and CREATEDEND!=''"><!-- 登录时间检索   -->
+				and GMT_CREATED &lt;= to_date(#{CREATEDEND},'yyyy-mm-dd')
+			</if>
+			<if test="STATUS!=null and STATUS!=''"><!-- 申请状态   -->
+				and STATUS = #{STATUS}
+			</if>
+			<if test="ORG_CODE!=null and ORG_CODE!=''"><!-- 机构ID   -->
+				and ORG_CODE = #{ORG_CODE}
+			</if>
+			<if test="APPLICANT_ID!=null and APPLICANT_ID!=''"><!-- 机构ID   -->
+				and APPLICANT_ID = #{APPLICANT_ID}
+			</if>
+				           ) table_alias
+				 WHERE table_alias.rowno BETWEEN #{pageStart} and #{pageEnd}
+	</select>	
+	
+	<!-- 审核 -->
+	<update id="edit" parameterType="pd">
+		update
+		GPP_AGREEMENT_APPLY
+		<set >
+		<if test="AUDITOR_ID != null and AUDITOR_ID !=''" >
+        AUDITOR_ID = #{AUDITOR_ID},
+        </if>
+        <if test="AUDITOR_NAME != null and AUDITOR_NAME !=''" >
+        AUDITOR_NAME = #{AUDITOR_NAME},
+        </if>
+		<if test="AUDITOR_COMMENT != null and AUDITOR_COMMENT !=''" >
+        AUDITOR_COMMENT = #{AUDITOR_COMMENT},
+        </if>
+		<if test="GMT_APPOINTMENT != null and GMT_APPOINTMENT !=''" >
+        GMT_APPOINTMENT = to_date(#{GMT_APPOINTMENT},'YYYY-MM-DD HH24:MI:SS'),
+        </if>
+  		<if test="SIGNED_TYPE != null and SIGNED_TYPE !=''" >
+        SIGNED_TYPE = #{SIGNED_TYPE},
+        </if>
+        <if test="STATUS != null and STATUS !=''" >
+        STATUS = #{STATUS},
+        </if>
+        </set>
+		where
+		ID = #{ID}
+	</update>
+	
+	<!-- 查询详情 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select t.*,p.PRO_POSITION_NAME
+		 FROM GPP_AGREEMENT_APPLY t LEFT OUTER JOIN HM_PROVIDER p ON t.GEN_PRACTITIONER_ID=p.ID
+		where
+			t.ID = #{ID}
+	</select>
+</mapper>

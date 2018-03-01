@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="FeedbackMapper">
+	
+	<!--表名 -->
+	<sql id="tableName">
+		GPP_FEEDBACK
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		ID,
+  		REMARK,
+  		LXFS,
+  		TJSJ,
+  		TJR,
+  		STATE,
+  		CLR,
+  		CLREMARK,
+  		TJRID
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{ID,jdbcType=VARCHAR},
+  		#{REMARK,jdbcType=BLOB},
+  		#{LXFS,jdbcType=VARCHAR},  
+  		to_date(#{TJSJ,jdbcType=DATE},'YYYY-MM-DD HH24:MI:SS'),    
+  		#{TJR,jdbcType=VARCHAR},
+  		#{STATE,jdbcType=VARCHAR},
+  		#{CLR,jdbcType=NUMERIC},
+  		#{CLREMARK,jdbcType=VARCHAR},
+  		#{TJRID,jdbcType=VARCHAR}
+	</sql>
+	
+	<!-- 列表 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include>
+		<where>
+		1=1
+			<if test="pd.keywords != null and pd.keywords != ''"><!-- 启用状态检索 -->
+				and TJR LIKE CONCAT(CONCAT('%', #{keywords}),'%')
+			</if>
+			<if test="pd.start_time!=null and pd.start_time!=''"><!-- 开始时间检索 -->
+				and to_char(TJSJ,'yyyymmdd') &gt;= to_char(to_date(#{pd.start_time},'YYYY-MM-DD HH24:MI:SS'),'yyyymmdd')
+			</if>
+			<if test="pd.end_time!=null and pd.end_time!=''"><!-- 结束时间检索   -->
+				and to_char(TJSJ,'yyyymmdd') &lt;= to_char(to_date(#{pd.end_time},'YYYY-MM-DD HH24:MI:SS'),'yyyymmdd')
+			</if>
+			<if test="pd.STATE != null and pd.STATE != ''"><!-- 处理状态 -->
+				and STATE=#{pd.STATE} 
+			</if>
+        </where>
+	</select>
+	
+	<!-- 新增-->
+	<insert id="Appsave" parameterType="pd">
+		insert into
+			GPP_FEEDBACK
+		(
+			 "ID","REMARK", "LXFS", "TJSJ",
+			 "TJR","STATE","TJRID"
+		) values (
+			#{ID,jdbcType=VARCHAR},#{REMARK,jdbcType=VARCHAR},#{LXFS,jdbcType=VARCHAR},sysdate,
+			#{TJR,jdbcType=VARCHAR},#{STATE,jdbcType=VARCHAR},#{TJRID,jdbcType=VARCHAR}
+		)
+	</insert>
+	
+	<!-- 通过TJRID获取数据 -->
+	<select id="findByTjrId" parameterType="pd" resultType="pd">
+		select 
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include> 
+		where
+			TJRID = #{TJRID}
+	</select>
+	
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include> 
+		where
+			ID = #{ID}
+	</select>
+	
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+		update
+		<include refid="tableName"></include>
+		set 
+		CLR = #{CLR,jdbcType=VARCHAR},
+		CLREMARK = #{CLREMARK,jdbcType=VARCHAR},
+		STATE =  #{STATE,jdbcType=VARCHAR}
+		where
+		ID = #{ID}
+	</update>
+	
+</mapper>

@@ -1,0 +1,421 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%
+	String path = request.getContextPath();
+	String basePath = request.getScheme() + "://"
+			+ request.getServerName() + ":" + request.getServerPort()
+			+ path + "/";
+%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<base href="<%=basePath%>">
+<!-- 下拉框 -->
+<link rel="stylesheet" href="static/ace/css/chosen.css" />
+<link rel="stylesheet" href="static/ace/css/jquery.gritter.css" />
+<!-- jsp文件头和头部 -->
+<%@ include file="../../system/index/top.jsp"%>
+<!-- 日期框 -->
+<link rel="stylesheet" href="static/ace/css/datepicker.css" />
+</head>
+<body class="no-skin">
+
+	<!-- /section:basics/navbar.layout -->
+	<div class="main-container" id="main-container">
+		<!-- /section:basics/sidebar -->
+		<div class="main-content">
+			<div class="main-content-inner">
+				<div class="page-content">
+					<div class="row">
+						<div class="col-xs-12">
+							
+						<!-- 检索  -->
+						<form action="yhry/yhrylist.do" method="post" name="Form" id="Form">
+						<input type="hidden" id="ORG_CODE" name="ORG_CODE" value="${pd.ORG_CODE}" />
+						<table style="margin-top:5px;">
+							<tr>
+								<td>
+									<div class="nav-search">
+										<span class="input-icon">
+											<input type="text" placeholder="这里输入姓名" class="nav-search-input" id="nav-search-input" autocomplete="off" name="keywords" value="${pd.keywords}" placeholder="这里输入关键词"/>
+										</span>
+									</div>
+								</td>
+								<td>
+										<c:if test="${QX.cha == 1 }">
+										<td style="vertical-align:top;padding-left:2px"><a class="btn btn-light btn-xs" onclick="tosearch();"  title="检索"><i id="nav-search-icon" class="ace-icon fa fa-search bigger-110 nav-search-icon blue"></i>检索</a></td>
+										</c:if>
+								</td>
+							</tr>
+						</table>
+						<!-- 检索  -->
+						<table id="simple-table" class="table table-striped table-bordered table-hover" style="margin-top:5px;">	
+							<thead>
+								<tr>
+									<th class="center" style="width:35px;">
+									<label class="pos-rel"><input type="checkbox" class="ace" id="zcheckbox" /><span class="lbl"></span></label>
+									</th>
+									<th class="center" style="width:50px;">序号</th>
+									<th class="center">工号</th>
+									<th class="center">姓名</th>
+									<th class="center">性别</th>
+									<th class="center">职位名称</th>
+									<th class="center">联系电话</th>
+									<th class="center">地址</th>
+									<th class="center">操作</th>
+								</tr>
+							</thead>
+							<tbody>
+							<!-- 开始循环 -->	
+							<c:choose>
+								<c:when test="${not empty varList}">
+									<c:if test="${QX.cha == 1 }">
+									<c:forEach items="${varList}" var="var" varStatus="vs">
+										<tr>
+											<td class='center'>
+												<label class="pos-rel"><input type='checkbox' name='ids' value="${var.ID}" class="ace" /><span class="lbl"></span></label>
+											</td>
+											<td class='center' style="width: 30px;">${vs.index+1}</td>
+											<td class='center'>${var.PROVIDER_CODE}</td>
+											<td class='center'>${var.PROVIDER_NAME}</td>
+										 	<td class='center'>
+                                                <c:forEach items="${pd.enumSex}" var="s">
+                                                    <c:if test="${s.key == var.SEX}">${s.value}</c:if>
+                                                </c:forEach>
+                                            </td>
+											<td class='center'>${var.PRO_POSITION_NAME}</td>
+											<td class='center'>${var.TELECOM}</td>
+											<td class='center'>${var.ADDRESS}</td>
+											<td class="center">
+												<c:if test="${QX.edit != 1 && QX.del != 1 }">
+												<span class="label label-large label-grey arrowed-in-right arrowed-in"><i class="ace-icon fa fa-lock" title="无权限"></i></span>
+												</c:if>
+												<div class="hidden-sm hidden-xs btn-group">
+													<c:if test="${QX.edit == 1 }">
+                                                        <a class="btn btn-xs btn-success" title="修改" onclick="edit('${var.ID}');">
+                                                          	 修改
+                                                        </a>
+                                                        <a class="btn btn-xs btn-success" title="会员信息" onclick="toAppUser('${var.ID}','${var.PROVIDER_CODE}');">
+                                                           	 会员信息
+                                                        </a>
+													</c:if>
+													<c:if test="${QX.del == 1 }">
+                                                        <a class="btn btn-xs btn-danger" onclick="del('${var.ID}');">
+                                                            	删除
+                                                        </a>
+													</c:if>
+												</div>
+												<div class="hidden-md hidden-lg">
+													<div class="inline pos-rel">
+														<button class="btn btn-minier btn-primary dropdown-toggle" data-toggle="dropdown" data-position="auto">
+															<i class="ace-icon fa fa-cog icon-only bigger-110"></i>
+														</button>
+			
+														<ul class="dropdown-menu dropdown-only-icon dropdown-yellow dropdown-menu-right dropdown-caret dropdown-close">
+															<c:if test="${QX.edit == 1 }">
+															<li>
+																<a style="cursor:pointer;" onclick="edit('${var.ID}');" class="tooltip-success" data-rel="tooltip" title="修改">
+																	<span class="green">
+																		修改
+																	</span>
+																</a>
+															</li>
+                                                            <li>
+                                                                <a style="cursor:pointer;" onclick="toAppUser('${var.ID}','${var.PROVIDER_CODE}');" class="tooltip-success" data-rel="tooltip" title="会员信息">
+                                                                <span class="green">
+                                                                    	会员信息
+                                                                </span>
+                                                                </a>
+                                                            </li>
+															</c:if>
+															<c:if test="${QX.del == 1 }">
+															<li>
+																<a style="cursor:pointer;" onclick="del('${var.ID}');" class="tooltip-error" data-rel="tooltip" title="删除">
+																	<span class="red">
+																			删除
+																	</span>
+																</a>
+															</li>
+															</c:if>
+														</ul>
+													</div>
+												</div>
+											</td>
+										</tr>
+									</c:forEach>
+									</c:if>
+									<c:if test="${QX.cha == 0 }">
+										<tr>
+											<td colspan="100" class="center">您无权查看</td>
+										</tr>
+									</c:if>
+								</c:when>
+								<c:otherwise>
+									<tr class="main_info">
+										<td colspan="100" class="center" >没有相关数据</td>
+									</tr>
+								</c:otherwise>
+							</c:choose>
+							</tbody>
+						</table>
+						<div class="page-header position-relative">
+						<table style="width:100%;">
+							<tr>
+								<td style="vertical-align:top;">
+									<c:if test="${ISLEAF == 1 }">
+									<a class="btn btn-sm btn-success" onclick="add('${pd.ORG_CODE}', '${pd.ORG_NAME}');">新增</a>
+									</c:if>
+									<c:if test="${QX.del == 1 }">
+									<a class="btn btn-sm btn-danger" onclick="makeAll('确定要删除选中的数据吗?');" title="批量删除" ><i class='ace-icon fa fa-trash-o bigger-120'></i></a>
+									</c:if>
+								</td>
+									<td style="vertical-align:top;"><div class="pagination" style="float: right;padding-top: 0px;margin-top: 0px;">${page.pageStr}</div></td>
+							</tr>
+						</table>
+						</div>
+						</form>
+						</div>
+						<!-- /.col -->
+					</div>
+					<!-- /.row -->
+				</div>
+				<!-- /.page-content -->
+			</div>
+		</div>
+		<!-- /.main-content -->
+
+		<!-- 返回顶部 -->
+		<a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse">
+			<i class="ace-icon fa fa-angle-double-up icon-only bigger-110"></i>
+		</a>
+
+	</div>
+	<!-- /.main-container -->
+
+	<!-- basic scripts -->
+	<!-- 页面底部js¨ -->
+	<%@ include file="../../system/index/foot.jsp"%>
+	<!-- 删除时确认窗口 -->
+	<script src="static/ace/js/bootbox.js"></script>
+	<!-- ace scripts -->
+	<script src="static/ace/js/ace/ace.js"></script>
+	<!-- 下拉框 -->
+	<script src="static/ace/js/chosen.jquery.js"></script>
+	<!-- 日期框 -->
+	<script src="static/ace/js/date-time/bootstrap-datepicker.js"></script>
+	<!--提示框-->
+	<script type="text/javascript" src="static/js/jquery.tips.js"></script>
+    <script type="text/javascript" src="static/ace/js/jquery.gritter.js"></script>
+	<script type="text/javascript">
+		$(top.hangge());//关闭加载状态
+		//检索
+		function tosearch(){
+			top.jzts();
+			$("#Form").submit();
+		}
+		
+		$(function() {
+		
+			//复选框全选控制
+			var active_class = 'active';
+			$('#simple-table > thead > tr > th input[type=checkbox]').eq(0).on('click', function(){
+				var th_checked = this.checked;//checkbox inside "TH" table header
+				$(this).closest('table').find('tbody > tr').each(function(){
+					var row = this;
+					if(th_checked) $(row).addClass(active_class).find('input[type=checkbox]').eq(0).prop('checked', true);
+					else $(row).removeClass(active_class).find('input[type=checkbox]').eq(0).prop('checked', false);
+				});
+			});
+		});
+		
+		//新增
+		function add(ORG_CODE, ORG_NAME){
+            var treeObj = parent.window.$.fn.zTree.getZTreeObj("leftTree");
+            var nodes = treeObj.getSelectedNodes();
+            debugger;
+            if(jQuery.isEmptyObject(nodes) || nodes[0].name=="全部"){
+                bootbox.alert("请先选择树的某一节点,再点新增");
+                return;
+            }else{
+                 var diag = new top.Dialog();
+                 diag.Drag=true;
+                 diag.Title ="新增";
+                 diag.URL = encodeURI(encodeURI('<%=basePath%>yhry/toAdd.do?ORG_CODE='+ORG_CODE+'&ORG_NAME='+nodes[0].ORG_NAME));
+                 diag.Width = 950;
+                 diag.Height = 700;
+                 diag.CancelEvent = function(){ //关闭事件
+                     if(diag.innerFrame.contentWindow.document.getElementById('zhongxin').style.display == 'none'){
+                         if('${page.currentPage}' == '0'){
+                             top.jzts();
+                             setTimeout("self.location=self.location",100);
+                         }else{
+                             //nextPage(${page.currentPage});
+                             window.location.reload();
+                         }
+                    }
+                    diag.close();
+                 };
+                 diag.show();
+            }
+        }
+		
+		//删除
+		function del(id){
+			bootbox.confirm("确定要删除吗?", function(result) {
+				if(result) {
+					top.jzts();
+					var url = "<%=basePath%>yhry/delete.do?ID="+id+"&tm="+new Date().getTime();
+					$.get(url,function(data){
+						//nextPage(${page.currentPage});
+						 window.location.reload();
+					});
+				}
+			});
+		}
+		
+		//修改
+		function edit(id){
+			 top.jzts();
+			 var diag = new top.Dialog();
+			 diag.Drag=true;
+			 diag.Title ="编辑";
+			 diag.URL = '<%=basePath%>yhry/toUpdate.do?ID='+id;
+			 diag.Width = 950;
+			 diag.Height = 700;
+			 diag.CancelEvent = function(){ //关闭事件
+				 if(diag.innerFrame.contentWindow.document.getElementById('zhongxin').style.display == 'none'){
+						 //nextPage(${page.currentPage});
+					 window.location.reload();
+				}
+				diag.close();
+			 };
+			 diag.show();
+		}
+
+        //生成系统会员
+        function createAppUser(id, provider_code){
+            top.jzts();
+            $.ajax({
+                type: "POST",
+                url: '<%=basePath%>yhry/createAppUser.do?tm=' + new Date().getTime(),
+                data: {
+                    ID: id,
+                    PROVIDER_CODE:provider_code
+                },
+                cache: false,
+                success: function (data) {
+                    top.hangge();
+                    if(data == "success"){
+                        $.gritter.add({
+                            title: '生成成功！',
+                            text: '',
+                            time: 1000,
+                            class_name: 'gritter-info'
+                        });
+                    }else if(data == "created"){
+                        $.gritter.add({
+                            title: '已存在对应的系统会员，无法再次生成！',
+                            text: '',
+                            time: 1500,
+                            class_name: 'gritter-error'
+                        });
+                    }
+                }
+            })
+        }
+
+		//批量操作
+		function makeAll(msg){
+			bootbox.confirm(msg, function(result) {
+				if(result) {
+					var str = '';
+					for(var i=0;i < document.getElementsByName('ids').length;i++){
+					  if(document.getElementsByName('ids')[i].checked){
+					  	if(str=='') str += document.getElementsByName('ids')[i].value;
+					  	else str += ',' + document.getElementsByName('ids')[i].value;
+					  }
+					}
+					if(str==''){
+						bootbox.dialog({
+							message: "<span class='bigger-110'>您没有选择任何内容!</span>",
+							buttons: 			
+							{ "button":{ "label":"确定", "className":"btn-sm btn-success"}}
+						});
+						$("#zcheckbox").tips({
+							side:1,
+				            msg:'点这里全选',
+				            bg:'#AE81FF',
+				            time:8
+				        });
+						return;
+					}else{
+						if(msg == '确定要删除选中的数据吗?'){
+							top.jzts();
+							$.ajax({
+								type: "POST",
+								url: '<%=basePath%>yhry/deleteAll.do?tm='+new Date().getTime(),
+						    	data: {DATA_IDS:str},
+								dataType:'json',
+								//beforeSend: validateData,
+								cache: false,
+								success: function(data){
+									 $.each(data.list, function(i, list){
+										 window.location.reload();
+									 });
+								}
+							});
+						}
+					}
+				}
+			});
+		};
+		//会员信息
+		function toAppUser(id, provider_code){
+			var url= '<%=basePath%>yhry/checkAppUser.do';
+			$.post(url,
+				{
+				 "ID":id,
+                 "PROVIDER_CODE":provider_code
+				},
+				function(data){
+					if(data.type == '1'){//新增
+						bootbox.confirm("还没有对应的会员信息，是否生成会员信息?", function(result) {
+							if(result) {
+								top.jzts();
+								var curl = "<%=basePath%>yhry/addAppUser.do";
+								$.post(curl,
+										{
+											"ID":id,
+					                		"PROVIDER_CODE":provider_code
+										},
+										function(data){
+										 window.location.reload();
+										});
+							}
+						});
+					}else if(data.type == '0'){//编辑
+						console.log(data.data);
+						sessionStorage.obj= data.data;
+						var diag = new top.Dialog();
+						 diag.Drag=true;
+						 diag.Title ="会员资料";
+						 diag.URL = '<%=basePath%>yhry/goEditU.do?PROVIDER_CODE='+provider_code;
+						 diag.Width = 600;
+						 diag.Height = 419;
+						 diag.CancelEvent = function(){ //关闭事件
+							 if(diag.innerFrame.contentWindow.document.getElementById('zhongxin').style.display == 'none'){
+								 window.location.reload();
+							}
+							diag.close();
+						 };
+						 diag.show();
+					}
+				});
+		}
+		</script>
+
+
+</body>
+</html>

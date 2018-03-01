@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="AgreementChangeMapper">
+	
+	<!--表名 -->
+	<sql id="tableName">
+		GPP_AGREEMENT_CHANGE_APPLY
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		ID,
+  		APPLICANT_ID,
+  		APPLICANT_NAME,
+  		APPLICANT_PHONE,
+  		STATUS,
+  		GMT_CREATED,
+  		GEN_PRACTITIONER_ID,
+  		GEN_PRACTITIONER_NAME,        
+  		GEN_PRACTITIONER_PHONE,
+  		AGREEMENT_ID,
+  		ORG_CODE,
+  		REGION_CODE, 
+  		GMT_AUDIT, 
+  		SERVICE_PACK
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{ID},
+  		#{APPLICANT_ID},
+  		#{APPLICANT_NAME},      
+  		#{APPLICANT_PHONE,jdbcType=VARCHAR},
+  		#{STATUS,jdbcType=VARCHAR},
+  		to_date(#{GMT_CREATED,jdbcType=DATE},'YYYY-MM-DD HH24:MI:SS'),
+  		#{GEN_PRACTITIONER_ID,jdbcType=VARCHAR},
+  		#{GEN_PRACTITIONER_NAME,jdbcType=VARCHAR},
+  		#{GEN_PRACTITIONER_PHONE,jdbcType=VARCHAR},
+  		#{AGREEMENT_ID,jdbcType=VARCHAR},
+  		#{ORG_CODE,jdbcType=VARCHAR},
+  		#{REGION_CODE,jdbcType=VARCHAR}, 
+  		to_date(#{GMT_AUDIT,jdbcType=DATE},'YYYY-MM-DD HH24:MI:SS'), 
+  		#{SERVICE_PACK,jdbcType=VARCHAR}
+	</sql>
+	
+	<!-- 审核通过-->
+	<insert id="save" parameterType="pd">
+		insert into 
+	<include refid="tableName"></include>
+		(
+	<include refid="Field"></include>
+		) values (
+	<include refid="FieldValue"></include>
+		)
+	</insert>
+	<!-- 编辑 -->
+	<update id="edit" parameterType="pd">
+		update
+		<include refid="tableName"></include>
+		set 
+		"GEN_PRACTITIONER_ID" =#{GEN_PRACTITIONER_ID},
+		"GEN_PRACTITIONER_NAME" =#{GEN_PRACTITIONER_NAME},
+  		"GEN_PRACTITIONER_PHONE" = #{GEN_PRACTITIONER_PHONE}
+		where
+		"ID" = #{ID}
+	</update>
+		<!--APP接口分页查询-->
+	<select id="queryPage" parameterType="pd" resultType="pd">
+		SELECT *
+			FROM ( SELECT ROWNUM AS rowno, t.*
+				       FROM GPP_AGREEMENT_CHANGE_APPLY t
+					<where>
+					1=1
+					 <if test="KEYWORDS != null and KEYWORDS!= ''"><!-- 关键词检索 -->
+					and (
+						GEN_PRACTITIONER_NAME LIKE CONCAT(CONCAT('%', #{KEYWORDS}),'%')
+						)
+					</if>
+					<if test="GEN_PRACTITIONER_ID != null and GEN_PRACTITIONER_ID!= ''">
+					    and GEN_PRACTITIONER_ID =#{GEN_PRACTITIONER_ID}
+				    </if>
+				    <if test="APPLICANT_ID!=null and APPLICANT_ID!=''">
+				        and APPLICANT_ID =#{APPLICANT_ID}
+				    </if>
+		        </where>
+		        order by "STATUS" asc
+				           ) table_alias
+				 WHERE table_alias.rowno BETWEEN #{pageStart} and #{pageEnd}
+	</select>	
+	<select id="findById" parameterType="String" resultType="pd">
+	    
+	    SELECT <include refid="Field"></include>
+	    FROM <include refid="tableName"></include>
+	    WHERE "ID" = #{id}
+	</select>
+</mapper>

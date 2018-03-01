@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="XywhMapper">
+	<!--表名 -->
+	<sql id="tableName">
+		GPP_AGREEMENT_CONTENT
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+	    ID,
+		AGREEMENT_NAME,
+		VERSIONS,
+		GMT_CREATED,
+		GMT_MODIFIED,
+		STATUS,
+		APPLICANT_CONTENT,
+		ORG_CODE,
+		OPERATOR_ID,
+		OPERATOR_NAME
+
+	</sql>
+	
+	
+	<!-- 新增字段 -->
+	<sql id="Field1">
+		ID,
+		AGREEMENT_NAME,
+		APPLICANT_CONTENT,
+		VERSIONS,
+	    ORG_CODE,
+	    OPERATOR_ID,
+	    OPERATOR_NAME,
+	    GMT_CREATED, 	
+	    GMT_MODIFIED,
+		STATUS
+	</sql>
+	
+	<!-- 新增字段值 -->
+	<sql id="FieldValue">
+		#{ID,jdbcType=VARCHAR},
+		#{AGREEMENT_NAME,jdbcType=VARCHAR},
+		to_blob(#{APPLICANT_CONTENT}),
+		#{VERSIONS,jdbcType=VARCHAR},
+		#{ORG_CODE,jdbcType=VARCHAR},
+		#{OPERATOR_ID,jdbcType=VARCHAR},
+		#{OPERATOR_NAME,jdbcType=VARCHAR},
+		sysdate,
+		sysdate,
+	<!-- #{gmt_created,jdbcType=DATE} -->	
+		#{STATUS,jdbcType=VARCHAR}
+	</sql>
+	
+	<!-- 协议信息 -->
+	<select id="xyxxlistPage" parameterType="page" resultType="pd">
+		select 
+			<include refid="Field"></include> 
+		from 
+			<include refid="tableName"></include> 
+			where STATUS &lt;&gt; #{pd.status,jdbcType=VARCHAR}			<!-- 状态  -->
+		<if test="pd.ORG_CODE != null and pd.ORG_CODE != ''"> <!-- ORG_CODE  -->
+			and ORG_CODE = #{pd.ORG_CODE}
+		</if>
+		<if test="pd.keywords != null and pd.keywords!= ''"><!-- 关键词检索 -->
+			and (
+				AGREEMENT_NAME LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				or
+				VERSIONS LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				)
+		</if>
+	</select>
+	
+	<!-- 新增 -->
+	<insert id="saveXywh" parameterType="pd">
+		insert into <include refid="tableName"></include> (
+			<include refid="Field1"></include>
+		) values (
+			<include refid="FieldValue"></include>
+		)
+	</insert>
+	
+	<!-- 通过ID获取协议表数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+			<include refid="Field"></include>
+		from 
+			<include refid="tableName"></include> 
+		where 
+			ID = #{ID}
+	</select>
+	
+	<!-- 修改 -->
+	<update id="editXywh" parameterType="pd">
+		update  <include refid="tableName"></include>
+		<set>
+		<if test="AGREEMENT_NAME != null" >
+		    AGREEMENT_NAME				= #{AGREEMENT_NAME,jdbcType=VARCHAR},
+		</if>
+		<if test="VERSIONS != null" >
+		    VERSIONS					= #{VERSIONS,jdbcType=VARCHAR},
+		</if>
+		<if test="APPLICANT_CONTENT != null" >
+		    APPLICANT_CONTENT			= to_blob(#{APPLICANT_CONTENT}),
+		</if>
+		<if test="ORG_CODE != null" >
+		    ORG_CODE					= #{ORG_CODE,jdbcType=VARCHAR},
+		</if>
+		<if test="OPERATOR_ID != null" >
+		    OPERATOR_ID					= #{OPERATOR_ID,jdbcType=VARCHAR},
+		</if>
+		<if test="OPERATOR_NAME != null" >
+		    OPERATOR_NAME				= #{OPERATOR_NAME,jdbcType=VARCHAR},
+		</if>
+			GMT_MODIFIED				= sysdate
+        </set>
+		where 
+			ID = #{ID,jdbcType=VARCHAR}
+	</update>
+	
+	<!-- 修改协议维护状态（停用或启用）-->
+	<update id="qyXywh" parameterType="pd">
+		update  <include refid="tableName"></include>
+		<set>
+		    STATUS = #{STATUS},GMT_MODIFIED = sysdate
+        </set>
+		where 
+			ID = #{ID,jdbcType=VARCHAR}
+	</update>
+	
+	<!-- 删除协议 （协议状态改为9，删除状态）-->
+	<update id="deleteXywh" parameterType="pd">
+		update  <include refid="tableName"></include>
+		<set>
+		    STATUS = #{STATUS},GMT_MODIFIED = sysdate
+        </set>
+		where 
+			ID = #{ID,jdbcType=VARCHAR}
+	</update>
+	
+	<!-- 批量删除协议信息 （协议状态改为9，删除状态）-->
+	<update id="deleteAllXywh" parameterType="pd">
+		update  <include refid="tableName"></include>
+		<set>
+		    status = '9',GMT_MODIFIED = sysdate
+        </set>
+		where 
+			id in
+  			 <foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                  #{item}
+             </foreach>
+	</update>
+	
+	<!-- 通过ID数组循环查询可删除的协议的id -->
+	<select id="findByIdArray" parameterType="pd" resultType="pd">
+		select 
+			wm_concat(id) as delIds
+		from 
+			<include refid="tableName"></include> 
+		where 
+			status = '0' and id in 
+			<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                  #{item}
+             </foreach>
+	</select>
+	
+	<!-- 通过ID数组循环查询可删除的协议的id -->
+	<select id="findByIdForName" parameterType="pd" resultType="pd">
+		select 
+			wm_concat(agreement_name) as names
+		from 
+			<include refid="tableName"></include> 
+		where 
+				 id in 
+			<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                  #{item}
+             </foreach>
+	</select>
+	
+	<!-- app接口查询 -->
+	<select id="appXyxxlist" parameterType="pd" resultType="pd">
+		SELECT *
+			FROM ( SELECT ROWNUM AS rowno,  ID,
+		AGREEMENT_NAME,
+		VERSIONS,
+		GMT_CREATED,
+		STATUS
+				       FROM GPP_AGREEMENT_CONTENT t
+					<where>
+							1=1
+						<if test="KEYWORDS != null and KEYWORDS != ''"><!-- 关键词检索 -->
+							and (
+								AGREEMENT_NAME = #{KEYWORDS}
+								or
+								VERSIONS = #{KEYWORDS}
+								)
+						</if>and STATUS!=9
+					</where>
+				           ) table_alias
+				 WHERE table_alias.rowno BETWEEN #{pageStart} and #{pageEnd}
+	</select>
+</mapper>

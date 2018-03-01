@@ -1,0 +1,168 @@
+package com.tbyf.util.jpush.entity;
+
+import com.tbyf.util.PageData;
+
+/**
+ * 消息的实体类
+ * @author zanxc
+ * @创建日期2017年8月14日上午8:59:26
+ */
+public class MemberMessage {
+
+	 /**
+     * 
+     */
+    public static final long  serialVersionUID = 1L;
+    public Long               id;//消息ID
+    public Integer            type;                 // 消息类型 类型(1:通知2:站内信3:咨询消息4:任务提醒9:其他)
+    public String             title;                // 推送的标题
+    public String             content;              // 内容
+    public Integer            userType;             // 用户类型(1居民，2医生)
+    public Integer            isUrl;                // 是否有url 1:有,0没有
+    public String             url;                  // url地址
+    public Integer            isAuto;               // 是否自动 0自动
+    public Integer            isRead;               // 是否已读 0：未读 1已读
+    public String             userId;				//与app绑定的用户ID
+    public Integer            deviceType;			//设备类型
+    public String 			  deviceId;				//设备推送ID
+    public String 			  FHSMS_ID;            //站内信ID
+    public String			  nID;                  //通知公告ID
+    public String 			  jID;					//任务ID
+    public String 			  CONSULTATION_ID;      //咨询消息ID
+    public String[]           deviceIdStr;			//设备ID数组
+    public long               time;                 //推送时间
+    public PageData 		  FHSMS_IDStr;			//推送通知前面使用户Id后面是通知公告id
+    public String             pushTime;             //推送的时间
+    public String getPushTime() {
+		return pushTime;
+	}
+	public void setPushTime(String pushTime) {
+		this.pushTime = pushTime;
+	}
+	public PageData getFHSMS_IDStr() {
+		return FHSMS_IDStr;
+	}
+	public void setFHSMS_IDStr(PageData fHSMS_IDStr) {
+		FHSMS_IDStr = fHSMS_IDStr;
+	}
+	public long getTime() {
+		return time;
+	}
+	public void setTime(long time) {
+		this.time = time;
+	}
+	public String[] getDeviceIdStr() {
+		return deviceIdStr;
+	}
+	public void setDeviceIdStr(String[] deviceIdStr) {
+		this.deviceIdStr = deviceIdStr;
+	}
+	public String getCONSULTATION_ID() {
+		return CONSULTATION_ID;
+	}
+	public void setCONSULTATION_ID(String cONSULTATION_ID) {
+		CONSULTATION_ID = cONSULTATION_ID;
+	}
+	public Integer getUserType() {
+		return userType;
+	}
+	public void setUserType(Integer userType) {
+		this.userType = userType;
+	}
+	public String getFHSMS_ID() {
+		return FHSMS_ID;
+	}
+	public void setFHSMS_ID(String fHSMS_ID) {
+		FHSMS_ID = fHSMS_ID;
+	}
+	public String getnID() {
+		return nID;
+	}
+	public void setnID(String nID) {
+		this.nID = nID;
+	}
+	public String getjID() {
+		return jID;
+	}
+	public void setjID(String jID) {
+		this.jID = jID;
+	}
+	/**
+     * 函数构造
+     */
+    public MemberMessage() {
+    	
+    }
+    public MemberMessage(String title, String content) {
+    	this.content = content;
+    	this.title = title;
+    }
+	public String getDeviceId() {
+		return deviceId;
+	}
+	public void setDeviceId(String deviceId) {
+		this.deviceId = deviceId;
+	}
+	public Long getId() {
+		return id;
+	}
+	public void setId(Long id) {
+		this.id = id;
+	}
+	public Integer getType() {
+		return type;
+	}
+	public void setType(Integer type) {
+		this.type = type;
+	}
+	public String getTitle() {
+		return title;
+	}
+	public void setTitle(String title) {
+		this.title = title;
+	}
+	public String getContent() {
+		return content;
+	}
+	public void setContent(String content) {
+		this.content = content;
+	}
+	public Integer getIsUrl() {
+		return isUrl;
+	}
+	public void setIsUrl(Integer isUrl) {
+		this.isUrl = isUrl;
+	}
+	public String getUrl() {
+		return url;
+	}
+	public void setUrl(String url) {
+		this.url = url;
+	}
+	public Integer getIsAuto() {
+		return isAuto;
+	}
+	public void setIsAuto(Integer isAuto) {
+		this.isAuto = isAuto;
+	}
+	public Integer getIsRead() {
+		return isRead;
+	}
+	public void setIsRead(Integer isRead) {
+		this.isRead = isRead;
+	}
+	public String getUserId() {
+		return userId;
+	}
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+	public Integer getDeviceType() {
+		return deviceType;
+	}
+	public void setDeviceType(Integer deviceType) {
+		this.deviceType = deviceType;
+	}
+    
+
+}

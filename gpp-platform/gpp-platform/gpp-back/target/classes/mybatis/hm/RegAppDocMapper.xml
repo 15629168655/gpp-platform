@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="RegAppDocMapper">
+<!-- 表名 -->
+	<sql id="tableName">
+		"HM_REGAPP"
+	</sql>
+	<!-- 字段 -->
+	<sql id="Field">
+		"GUID",
+		"HOSPCODE",
+		"HOSPNAME",
+		"DEPTCODE",
+		"DEPTNAME",
+		"TITLENAME",
+		"TITLECODE",
+		"DOCTORNAME",
+		"DOCTORCODE",
+		"EDUCATION",
+		"EDUCATIONCODE",
+		"ATTENDING",
+		"APPT",
+		"SCHEDULING",
+		"DOCTORPHONE",
+		"DOCTORINTRO"
+	</sql>
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{GUID},
+		#{HOSPCODE},
+		#{HOSPNAME},
+		#{DEPTCODE},
+		#{DEPTNAME},
+		#{TITLENAME},
+		#{TITLECODE},
+		#{DOCTORNAME},
+		#{DOCTORCODE},
+		#{EDUCATION},
+		#{EDUCATIONCODE},
+		#{ATTENDING},
+		#{APPT},
+		#{SCHEDULING},
+		#{DOCTORPHONE},
+		#{DOCTORINTRO}
+	</sql>
+	
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from
+		<include refid="tableName"></include>
+		where
+		"GUID" = #{GUID}
+	</select>
+	
+	<!-- 条件查询 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include>
+		where 1=1
+		<!-- 姓名
+		<if test="pd.NAME!=null and pd.NAME!=''">
+			and NAME LIKE CONCAT(CONCAT('%',#{pd.NAME}),'%')
+		</if>	 -->
+		<!-- 医院编码 -->
+		<if test="pd.HOSPCODE != null and pd.HOSPCODE != ''">
+			and HOSPCODE = #{pd.HOSPCODE}
+		</if>
+		<!-- 科室编码编码 -->
+		<if test="pd.DEPTCODE != null and pd.DEPTCODE != ''">
+			and DEPTCODE = #{pd.DEPTCODE}
+		</if>
+		
+		<if test="pd.TITLECODE != null and pd.TITLECODE != ''">
+			and TITLECODE = #{pd.TITLECODE}
+		</if>
+		
+		
+		
+	</select>
+	<!-- 查询全部 -->
+	<select id="listAll" parameterType="page" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from
+		<include refid="tableName"></include>
+	</select>
+	<select id="listKS" parameterType="page" resultType="pd">
+		select
+		  distinct DEPTCODE,DEPTNAME
+		from
+		<include refid="tableName"></include>
+		where 1=1
+		
+		<if test="pd.HOSPCODE != null and pd.HOSPCODE != ''">
+			and HOSPCODE = #{pd.HOSPCODE}
+		</if>
+		
+	</select>
+	<!-- 通过 医院编码和医生编码获得医生信息-->
+	<select id="findByHospitialCodeAndDoctorCode" parameterType="pd" resultType="pd">
+		select
+			<include refid="Field"></include>
+		from
+			<include refid="tableName"></include>
+		where 
+			HOSPCODE = #{HOSPCODE} and
+			DOCTORCODE = #{DOCTORCODE}
+	</select>
+	<!-- 新增 -->
+	<insert id="save" parameterType="pd">
+		insert into
+		<include refid="tableName"></include>
+		(
+		<include refid="Field"></include>
+		) values (
+		<include refid="FieldValue"></include>
+		)
+	</insert>
+	<!-- 获得最大的GUID -->
+	<select id="maxGUID" parameterType="pd" resultType="pd">
+		select
+			max(cast(GUID as int)) as GUID
+		from 
+			<include refid="tableName"></include>
+	</select>
+	<update id="update">
+		update
+		<include refid="tableName"></include>
+			set 
+				"GUID"=#{GUID,jdbcType=VARCHAR},
+				"HOSPCODE"=#{HOSPCODE,jdbcType=VARCHAR},
+				"HOSPNAME"=#{HOSPNAME,jdbcType=VARCHAR},
+				"DEPTCODE"=#{DEPTCODE,jdbcType=VARCHAR},
+				"DEPTNAME"=#{DEPTNAME,jdbcType=VARCHAR},
+				"TITLENAME"=#{TITLENAME,jdbcType=VARCHAR},
+				"TITLECODE"=#{TITLECODE,jdbcType=VARCHAR},
+				"DOCTORNAME"=#{DOCTORNAME,jdbcType=VARCHAR},
+				"DOCTORCODE"=#{DOCTORCODE,jdbcType=VARCHAR},
+				"EDUCATION"=#{EDUCATION,jdbcType=VARCHAR},
+				"EDUCATIONCODE"=#{EDUCATIONCODE,jdbcType=VARCHAR},
+				"ATTENDING"=#{ATTENDING,jdbcType=VARCHAR},
+				"APPT"=#{APPT,jdbcType=VARCHAR},
+				"SCHEDULING"=#{SCHEDULING,jdbcType=VARCHAR},
+				"DOCTORPHONE"=#{DOCTORPHONE,jdbcType=VARCHAR},
+				"DOCTORINTRO"=#{DOCTORINTRO,jdbcType=VARCHAR}
+			where 
+				"GUID" = #{GUID,jdbcType=VARCHAR}
+	</update>
+</mapper>

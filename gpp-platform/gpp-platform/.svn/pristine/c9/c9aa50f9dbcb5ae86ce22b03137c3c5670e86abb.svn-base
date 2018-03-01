@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="HealthInfomationTypeMapper">
+	
+	<!--表名 -->
+	<sql id="tableName">
+		GPP_HEALTH_INFORMATION_TYPE
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		GUID,
+  		NAME,
+  		STATUS
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{GUID,jdbcType=VARCHAR},
+	    #{NAME,jdbcType=VARCHAR},
+	    #{STATUS,jdbcType=VARCHAR}
+	    
+	</sql>
+	
+	<!-- APP查询 -->
+	<select id="queryPage" parameterType="pd" resultType="pd">
+				SELECT *
+				  FROM ( SELECT ROWNUM AS rowno, t.* from ( SELECT *
+				  FROM GPP_HEALTH_INFORMATION_TYPE
+				where 1=1
+				
+            <if test="GUID != null and GUID != ''">
+				and GUID = #{GUID}
+			</if>
+			  <if test="NAME != null and NAME !=''">
+				and NAME = #{NAME}
+			</if>
+            <if test="STATUS != null and STATUS != ''">
+				and STATUS = #{STATUS}
+			</if>
+				order by GUID )  t ) table_alias
+				 WHERE table_alias.rowno BETWEEN #{pageStart} and #{pageEnd}
+	</select>
+	
+	<!-- 列表 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include>
+		<where>
+		1=1 and STATUS!=9
+			<if test="pd.NAME!= null and pd.NAME!= ''"><!-- 名称检索 -->
+			and (
+				NAME LIKE CONCAT(CONCAT('%', #{pd.NAME}),'%')
+				)
+			</if>
+			<if test="pd.STATUS!= null and pd.STATUS!= ''"><!-- 状态检索 -->
+			and (
+				STATUS = #{pd.STATUS}
+				)
+			</if>
+        </where>
+	</select>
+	
+	<!-- 通过ID获取数据 -->
+	<select id="findByGUID" parameterType="pd" resultType="pd">
+		select 
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include> 
+		where
+			GUID = #{GUID} AND STATUS!=9
+	</select>
+	
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+		update
+		<include refid="tableName"></include>
+		set 
+  		<if test="NAME!=null and NAME!=''">
+  		NAME = #{NAME,jdbcType=VARCHAR}
+  		</if>
+		where
+		GUID = #{GUID}
+	</update>
+	
+	<!-- 增加-->
+	<insert id="save" parameterType="pd">
+		insert into 
+	<include refid="tableName"></include>
+		(
+	<include refid="Field"></include>
+		) values (
+	<include refid="FieldValue"></include>
+		)
+	</insert>
+	
+	<!-- 删除（仅改变状态） -->
+	<update id="fDelete" parameterType="pd">
+		update
+		<include refid="tableName"></include>
+		set STATUS = '9'  
+		where
+		GUID = #{GUID}
+	</update>
+	
+	<!-- 删除-->
+	<delete id="tDelete" parameterType="pd">
+		delete from
+		<include refid="tableName"></include>
+		where 
+			GUID = #{GUID}
+	</delete>
+	
+	
+</mapper>

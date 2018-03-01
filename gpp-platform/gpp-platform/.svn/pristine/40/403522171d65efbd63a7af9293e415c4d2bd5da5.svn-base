@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ProviderMapper">
+	
+	
+
+	<select id="queryPage" parameterType="pd" resultType="pd">
+				SELECT *
+				  FROM ( SELECT ROWNUM AS rowno, t.*
+				          FROM HM_PROVIDER t
+			where 1=1
+			<if test="ORG_CODE != null and ORG_CODE != ''"> 
+				and  ORG_CODE = #{ORG_CODE}
+			</if>
+			<if test="PROVIDER_NAME != null and PROVIDER_NAME != ''"> 
+				and  PROVIDER_NAME LIKE CONCAT(CONCAT('%', #{PROVIDER_NAME}),'%')
+			</if>
+				           ) table_alias
+				 WHERE table_alias.rowno BETWEEN #{pageStart} and #{pageEnd}
+	</select>	
+	<!-- 同机构医护人员查询接口 -->
+	<select id="getProvider" parameterType="pd" resultType="pd">
+				SELECT *
+				  FROM ( SELECT ROWNUM AS rowno, t.*,s.REGIONCODE
+				          FROM HM_PROVIDER t ,HM_ORGANIZATION s
+			where 1=1 and t.ORG_CODE=s.ORG_CODE 
+				<if test="REGIONCODE != null and REGIONCODE != ''"> <!--区划 -->
+				    and s.REGIONCODE=#{REGIONCODE}
+				 </if>
+			 <if test="KEYWORDS != null and KEYWORDS!= ''"><!-- 关键词检索 -->
+			and (
+				PROVIDER_NAME LIKE CONCAT(CONCAT('%', #{KEYWORDS}),'%')
+				or
+				PROVIDER_CODE LIKE CONCAT(CONCAT('%', #{KEYWORDS}),'%')
+				)
+			</if>
+			<if test="ORG_CODE != null and ORG_CODE != ''"> <!-- 机构编码 -->
+				and  t.ORG_CODE = #{ORG_CODE}
+			</if>
+				           ) table_alias
+				 WHERE table_alias.rowno BETWEEN #{pageStart} and #{pageEnd}
+	</select>	
+	<!-- 同机构医护人员查询接口 -->
+	<select id="getProviderForApp" parameterType="pd" resultType="pd">
+				SELECT *
+				  FROM ( SELECT ROWNUM AS rowno, t.*,s.REGIONCODE,u.USER_ID
+				          FROM HM_PROVIDER t ,HM_ORGANIZATION s,SYS_APP_USER u
+			where 1=1 and t.ORG_CODE=s.ORG_CODE and t.ID=u.BUSINESS_ID
+				<if test="REGIONCODE != null and REGIONCODE != ''"> <!--区划 -->
+				    and s.REGIONCODE=#{REGIONCODE}
+				 </if>
+			 <if test="KEYWORDS != null and KEYWORDS!= ''"><!-- 关键词检索 -->
+			and (
+				PROVIDER_NAME LIKE CONCAT(CONCAT('%', #{KEYWORDS}),'%')
+				or
+				PROVIDER_CODE LIKE CONCAT(CONCAT('%', #{KEYWORDS}),'%')
+				)
+			</if>
+			<if test="ORG_CODE != null and ORG_CODE != ''"> <!-- 机构编码 -->
+				and  t.ORG_CODE = #{ORG_CODE}
+			</if>
+				           ) table_alias
+				 WHERE table_alias.rowno BETWEEN #{pageStart} and #{pageEnd}
+	</select>	
+	<!-- 同机构医护人员查询接口 -->
+	<select id="getProviderByOneCode" parameterType="pd" resultType="pd">
+				SELECT *
+				  FROM (SELECT ROWNUM AS rowno, t.*,s.REGIONCODE,u.USER_ID FROM HM_PROVIDER t ,HM_ORGANIZATION s,SYS_APP_USER u 
+				where 1=1 and t.ORG_CODE=s.ORG_CODE and t.ID=u.BUSINESS_ID and t.ORG_CODE=#{ORG_CODE}
+				<if test="KEYWORDS !=null and KEYWORDS !=''"><!-- 关键词检索 -->
+				and
+					t.PROVIDER_NAME LIKE CONCAT(CONCAT('%',#{KEYWORDS}),'%')
+				</if>
+				           ) table_alias
+				 WHERE table_alias.rowno BETWEEN #{pageStart} and #{pageEnd}
+	</select>	
+	<!-- 同机构及其下级机构医护人员查询接口 -->
+	<select id="getProviderByOneCodeAndFollowCode" parameterType="pd" resultType="pd">
+				SELECT *
+				  FROM (SELECT ROWNUM AS rowno, t.*,s.REGIONCODE,u.USER_ID FROM HM_PROVIDER t ,HM_ORGANIZATION s,SYS_APP_USER u 
+				where 1=1 and t.ORG_CODE=s.ORG_CODE and t.ID=u.BUSINESS_ID and (t.ORG_CODE=#{ORG_CODE} or t.ORG_CODE in
+				(SELECT SIGN_ORG_CODE from HM_WORKFLOW where ORG_CODE=#{ORG_CODE}))
+				<if test="KEYWORDS !=null and KEYWORDS !=''"><!-- 关键词检索 -->
+				and
+					t.PROVIDER_NAME LIKE CONCAT(CONCAT('%',#{KEYWORDS}),'%')
+				</if>
+				           ) table_alias
+				 WHERE table_alias.rowno BETWEEN #{pageStart} and #{pageEnd}
+	</select>	
+	<!-- 同机构同团队医护人员查询接口 -->
+	<select id="getProviderByOneCodeAndOneTeam" parameterType="pd" resultType="pd">
+				SELECT *
+				  FROM (SELECT ROWNUM AS rowno, t.*,s.REGIONCODE,u.USER_ID,b.TEAM_ID,a.TEAM_NAME FROM HM_PROVIDER t 
+				  FULL OUTER JOIN GPP_TEAM_MEMBER b ON b.TEAM_MEMBER_ID=t.ID FULL OUTER JOIN GPP_TEAM a ON a.ID=b.TEAM_ID,
+				  HM_ORGANIZATION s,SYS_APP_USER u
+				where 1=1 and t.ORG_CODE=s.ORG_CODE and t.ID=u.BUSINESS_ID
+				<if test="PROVIDER_NAME !=null and PROVIDER_NAME !=''"><!-- 姓名检索 -->
+				and
+					t.PROVIDER_NAME LIKE CONCAT(CONCAT('%',#{PROVIDER_NAME}),'%')
+				</if>
+				<if test="TEAM_ID !=null and TEAM_ID !=''"><!-- 团队检索 -->
+				and
+					b.TEAM_ID = #{TEAM_ID}
+				</if>
+				and t.ID in
+				(select m.TEAM_MEMBER_ID from GPP_TEAM_MEMBER m ,GPP_TEAM n 
+				where m.TEAM_ID=n.ID and n.ID=(select p.TEAM_ID from GPP_TEAM_MEMBER p where p.TEAM_MEMBER_ID=#{PROVIDER_ID}) 
+				and m.STATUS='0' and n.STATUS='0' and n.ORG_CODE=#{ORG_CODE})
+				           ) table_alias
+				 WHERE table_alias.rowno BETWEEN #{pageStart} and #{pageEnd}
+	</select>	
+	<!-- 同机构医护人员及其下级机构团队医护人员查询接口 -->
+	<select id="getProviderByOneCodeAndFollowCodeTeam" parameterType="pd" resultType="pd">
+				SELECT *
+				  FROM (SELECT ROWNUM AS rowno, t.*,s.REGIONCODE,u.USER_ID,a.TEAM_NAME,B.TEAM_ID FROM HM_PROVIDER t 
+				   FULL OUTER JOIN GPP_TEAM_MEMBER b ON b.TEAM_MEMBER_ID=t.ID FULL OUTER JOIN GPP_TEAM a ON a.ID=b.TEAM_ID,
+				   HM_ORGANIZATION s,SYS_APP_USER u	
+				where 1=1 and t.ORG_CODE=s.ORG_CODE and t.ID=u.BUSINESS_ID
+				<if test="PROVIDER_NAME !=null and PROVIDER_NAME !=''"><!-- 姓名检索 -->
+				and
+					t.PROVIDER_NAME LIKE CONCAT(CONCAT('%',#{PROVIDER_NAME}),'%')
+				</if>
+				<if test="TEAM_ID !=null and TEAM_ID !=''"><!-- 团队检索 -->
+				and
+					b.TEAM_ID = #{TEAM_ID}
+				</if>
+				and (t.ORG_CODE=#{ORG_CODE}
+				or t.ID in (SELECT t1.TEAM_MEMBER_ID from GPP_TEAM_MEMBER t1,GPP_TEAM t2 where t1.TEAM_ID=t2.ID and 
+				t1.STATUS='0' and t2.STATUS='0' and t2.ORG_CODE in 
+				(SELECT SIGN_ORG_CODE from HM_WORKFLOW where ORG_CODE=#{ORG_CODE})))
+				           ) table_alias
+				 WHERE table_alias.rowno BETWEEN #{pageStart} and #{pageEnd}
+	</select>	
+	 <select id="getProvierById" parameterType="pd"  resultType="pd">
+	     
+select t.ID,t.PROVIDER_CODE,t.PROVIDER_NAME,t.TELECOM ,t.ORG_CODE, o.REGIONCODE from HM_PROVIDER t ,HM_ORGANIZATION o 
+where t.id=#{id} and t.ORG_CODE=o.ORG_CODE 
+	     
+	 </select>
+	  <select id="getProvierTeamById" parameterType="pd"  resultType="pd">
+	     
+select t.ID,t.PROVIDER_CODE,t.PROVIDER_NAME,t.TELECOM ,t.ORG_CODE, t.REGIONCODE,g.TEAM_ID  from (select t.ID,t.PROVIDER_CODE,t.PROVIDER_NAME,t.TELECOM ,t.ORG_CODE, o.REGIONCODE from HM_PROVIDER t ,HM_ORGANIZATION o 
+where t.id=#{id} and t.ORG_CODE=o.ORG_CODE )t   left join GPP_TEAM_MEMBER g on g.TEAM_MEMBER_ID=t.ID where g.STATUS!=9
+	  
+	     
+	 </select>
+	<select id="listPage" parameterType="pd" resultType="pd">
+				select * from HM_PROVIDER
+				<where>
+			1=1
+            <if test="pd.keywords != null and pd.keywords!= ''"><!-- 关键词检索 -->
+			and (
+				PROVIDER_NAME LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				or
+				PROVIDER_CODE LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				or
+				DEP_NAME LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				)
+			</if>
+        </where>
+	</select>
+	<select id="queryDataById" parameterType="pd" resultType="pd">
+				SELECT *
+				  FROM HM_PROVIDER where "ID" = #{id}
+	</select>
+</mapper>

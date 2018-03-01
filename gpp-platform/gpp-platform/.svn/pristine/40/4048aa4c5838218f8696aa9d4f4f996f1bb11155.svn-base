@@ -1,0 +1,498 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%
+	String path = request.getContextPath();
+	String basePath = request.getScheme() + "://"
+			+ request.getServerName() + ":" + request.getServerPort()
+			+ path + "/";
+%>
+<!DOCTYPE html>
+<!-- 居民信息页面 -->
+<html lang="en">
+<head>
+<base href="<%=basePath%>">
+<!-- 下拉框 -->
+<link rel="stylesheet" href="static/ace/css/chosen.css" />
+<!-- jsp文件头和头部 -->
+<%@ include file="../../system/index/top.jsp"%>
+<!-- 日期框 -->
+<link rel="stylesheet" href="static/ace/css/datepicker.css" />
+</head>
+<body class="no-skin">
+
+	<!-- /section:basics/navbar.layout -->
+	<div class="main-container" id="main-container">
+		<!-- /section:basics/sidebar -->
+		<div class="main-content">
+			<div class="main-content-inner">
+				<div class="page-content">
+					<div class="row">
+						<div class="col-xs-12">
+						<!-- 检索  -->
+						<form action="jmxx/listJmxx.do" method="post" name="userForm" id="userForm">
+						<table style="margin-top:5px;">
+							<tr>
+								<td>
+									<div class="nav-search">
+										<input class="nav-search-input" autocomplete="off" id="user_name" type="text" name="user_name" value="${pd.user_name }" placeholder="居民姓名" />
+									</div>
+								</td>
+								<td>
+									<div class="nav-search">
+										<input class="nav-search-input" autocomplete="off" id="mi_card" type="text" name="mi_card" value="${pd.mi_card }" placeholder="医保卡号" />
+									</div>
+								</td>
+								<td>
+									<div class="nav-search">
+										<input class="nav-search-input" autocomplete="off" id="id_number" type="text" name="id_number" value="${pd.id_number }" placeholder="身份证号" />
+									</div>
+								</td>
+								<td style="padding-left:2px;"><input class="span10 date-picker" name="sign_apply_time" id="sign_apply_time"  value="${pd.sign_apply_time}" type="text" data-date-format="yyyy-mm-dd" readonly="readonly" style="width:88px;" placeholder="签约日期" title="签约日期"/></td>
+								<td style="vertical-align:top;padding-left:2px;"> 
+								 	<select class="pos-rel" name="is_sign" id="is_sign" data-placeholder="协议状态" style="vertical-align:top;width: 120px;">
+									<option style="width: 120px;" value="">签约状态</option>
+									<option value="0" <c:if test="${pd.is_sign == '0' }">selected</c:if> >未签约</option>
+									<option value="1" <c:if test="${pd.is_sign == '1' }">selected</c:if> >待审核</option>
+									<option value="2" <c:if test="${pd.is_sign == '2' }">selected</c:if> >已签约</option>
+									</select>
+								</td>
+								<td style="vertical-align:top;padding-left:2px;"> 
+								 	<select class="pos-rel" name="processing_status" id="processing_status" data-placeholder="加急状态" style="vertical-align:top;width: 120px;">
+									<option style="width: 120px;" value="">加急状态</option>
+									<option value="1" <c:if test="${pd.PROCESSING_STATUS == '1' }">selected</c:if> >立即</option>
+									<option value="2" <c:if test="${pd.PROCESSING_STATUS == '2' }">selected</c:if> >优先</option>
+									<option value="3" <c:if test="${pd.PROCESSING_STATUS == '3' }">selected</c:if> >尽快</option>
+									<option value="4" <c:if test="${pd.PROCESSING_STATUS == '4' }">selected</c:if> >普通</option>
+									</select>
+								</td>
+								<td style="vertical-align:top;padding-left:2px;"> 
+								 	<select class="pos-rel" name="zdrq" id="zdrq" data-placeholder="重点人群" style="vertical-align:top;width: 120px;">
+									<option style="width: 120px;" value="">重点人群</option>
+									<option value="1" <c:if test="${pd.ZDRQ == '1' }">selected</c:if> >是</option>
+									<option value="2" <c:if test="${pd.ZDRQ == '2' }">selected</c:if> >否</option>
+									</select>
+								</td>
+								<c:if test="${QX.cha == 1 }">
+								<td><a class="btn btn-light btn-xs" onclick="searchs();"  title="检索"><i id="nav-search-icon" class="ace-icon fa fa-search bigger-110 nav-search-icon blue"></i>检索</a></td>
+								<td><a class="btn btn-grey btn-xs" onclick="reset();"  title="重置"><i class="fa fa-undo bigger-110 nav-search-icon"  ></i>重置</a></td>
+								</c:if>
+							</tr>
+						</table>
+						<!-- 检索  -->
+						<table id="simple-table" class="table table-striped table-bordered table-hover" style="margin-top:5px;">
+							<thead>
+								<tr>
+									<th class="center" style="width:35px;">
+										<label class="pos-rel"><input type="checkbox" class="ace" id="zcheckbox" /><span class="lbl"></span></label>
+									</th>
+									<th class="center" style="width:50px;">序号</th>
+									<th class="center">姓名</th>
+									<th class="center">性别</th>
+									<th class="center">身份证号</th>
+									<th class="center">医保卡号</th>
+									<th class="center"><i class="ace-icon fa fa-clock-o bigger-110 hidden-480"></i>出生日期</th>
+									<th class="center">重点人群</th>
+									<th class="center">加急状态</th>
+									<!-- 
+									<th class="center">详细地址</th>
+									<th class="center">邮箱</th>
+									<th class="center">QQ账号</th> 
+									-->
+									<th class="center">当前状态</th>
+									<th class="center">操作</th>
+								</tr>
+							</thead>
+							<tbody>
+							<!-- 开始循环 -->
+							<c:choose>
+								<c:when test="${not empty jmxxList}">
+									<c:if test="${QX.cha == 1 }">
+									<c:forEach items="${jmxxList }" var="jmxxList" varStatus="vs">
+										<tr>
+											<td class='center' style="width: 30px;">
+												<label><input type='checkbox' name='ids' value="${jmxxList.USER_AGENT_ID }" id="${user.USER_AGENT_ID }" class="ace"/><span class="lbl"></span></label>
+											</td>
+											
+											<td class='center' style="width: 30px;">${vs.index+1}</td>
+											
+											<td class='center' style="width: 140px;">
+												<c:if test="${jmxxList.PROCESSING_STATUS =='4'}">
+												<i class="ace-icon fa fa-star orange2" title="普通"></i>
+												<i class="ace-icon fa fa-star-o light-grey" title="普通"></i>
+												<i class="ace-icon fa fa-star-o light-grey" title="普通"></i>
+												<i class="ace-icon fa fa-star-o light-grey" title="普通"></i>
+												</c:if>
+												<c:if test="${jmxxList.PROCESSING_STATUS=='3'}">
+												<i class="ace-icon fa fa-star orange2" title="尽快"></i>
+												<i class="ace-icon fa fa-star orange2" title="尽快"></i>
+												<i class="ace-icon fa fa-star-o light-grey" title="尽快"></i>
+												<i class="ace-icon fa fa-star-o light-grey" title="尽快"></i>
+												</c:if>
+												<c:if test="${jmxxList.PROCESSING_STATUS=='2'}">
+												<i class="ace-icon fa fa-star orange2" title="优先"></i>
+												<i class="ace-icon fa fa-star orange2" title="优先"></i>
+												<i class="ace-icon fa fa-star orange2" title="优先"></i>
+												<i class="ace-icon fa fa-star-o light-grey" title="优先"></i>
+												</c:if>
+												<c:if test="${jmxxList.PROCESSING_STATUS=='1'}">
+												<i class="ace-icon fa fa-star orange2" title="立即"></i>
+												<i class="ace-icon fa fa-star orange2" title="立即"></i>
+												<i class="ace-icon fa fa-star orange2" title="立即"></i>
+												<i class="ace-icon fa fa-star orange2" title="立即"></i>
+												</c:if>
+												<a onclick="showInfo('${jmxxList.USER_AGENT_ID}');" title="点击查看居民详情" style="cursor: pointer">${jmxxList.USER_NAME }</a>
+												
+											</td>
+											<td style="width: 60px;" class="center">
+												<c:if test="${jmxxList.SEX == '1' }"><span>男</span></c:if>
+												<c:if test="${jmxxList.SEX == '2' }"><span>女</span></c:if>
+											</td>
+											<td class="center">${jmxxList.ID_NUMBER }</td>
+											<td class="center">${jmxxList.MI_CARD }</td>
+											<td class="center"><fmt:formatDate pattern="yyyy-MM-dd"  value="${jmxxList.BIRTHDAY_TIME }"/></td>
+											<td class="center">
+												<c:if test="${jmxxList.ZDRQ == '2' }"><span>否</span></c:if>
+												<c:if test="${jmxxList.ZDRQ == '1' }"><span>是</span></c:if>
+											</td>
+											<td class="center">
+												<c:if test="${jmxxList.PROCESSING_STATUS == '1' }"><span>立即</span></c:if>
+												<c:if test="${jmxxList.PROCESSING_STATUS == '2' }"><span>优先</span></c:if>
+												<c:if test="${jmxxList.PROCESSING_STATUS == '3' }"><span>尽快</span></c:if>
+												<c:if test="${jmxxList.PROCESSING_STATUS == '4' }"><span>普通</span></c:if>
+											</td>
+											<%-- 
+											<td class="center">${jmxxList.ADDRESS }</td>
+											<td class="center">${jmxxList.EMAIL }</td>
+											<td class="center">${jmxxList.QQACCOUNT }</td>
+											 --%>
+											<td class="center">
+												<c:if test="${jmxxList.STATE == '0'}"><span class="label label-success arrowed-in-right arrowed tooltip-success" data-rel="tooltip" data-placement="bottom" title="" data-original-title="有效" style="cursor: pointer">有效</span></c:if>
+												<c:if test="${jmxxList.STATE == '1'}"><span class="label label-warning arrowed-in-right arrowed tooltip-warning" data-rel="tooltip" data-placement="bottom" title="" data-original-title="禁用" style="cursor: pointer">禁用</span></c:if>
+												<c:if test="${jmxxList.STATE == '2'}"><span class="label label-info  arrowed-in arrowed-right  tooltip-info" data-rel="tooltip" data-placement="bottom" title="" data-original-title="删除" style="cursor: pointer">删除</span></c:if>
+											</td>
+											<td class="center">
+											
+												<c:if test="${QX.edit != 1 && QX.del != 1 }">
+												<span class="label label-large label-grey arrowed-in-right arrowed-in"><i class="ace-icon fa fa-lock" title="无权限"></i></span>
+												</c:if>
+												<div class="hidden-sm hidden-xs btn-group">
+													<c:if test="${QX.edit == 1 }">
+													<a class="btn btn-xs btn-success" title="编辑" onclick="editUser('${jmxxList.USER_AGENT_ID }');">
+														编辑
+													</a>
+													</c:if>
+													<c:if test="${QX.del == 1 }">
+													<a class="btn btn-xs btn-danger" onclick="delJmxx('${jmxxList.USER_AGENT_ID }','${jmxxList.USER_NAME }');">
+														删除
+													</a>
+													</c:if>
+													<a class="btn btn-xs btn-info" title="诊疗信息" onclick="goClinicalInfo('${jmxxList.ID_NUMBER }','${jmxxList.USER_AGENT_ID }');">诊疗信息</a>
+													<a class="btn btn-xs btn-success" title="预约挂号" onclick="register('${jmxxList.USER_AGENT_ID }');">预约挂号</a>
+													<a class="btn btn-info btn-xs tooltip-info" title="档案自测" onclick="goSelfTestFile('${jmxxList.USER_AGENT_ID}');">档案自测</a>
+												</div>
+												<div class="hidden-md hidden-lg">
+													<div class="inline pos-rel">
+														<button class="btn btn-minier btn-primary dropdown-toggle" data-toggle="dropdown" data-position="auto">
+															<i class="ace-icon fa fa-cog icon-only bigger-110"></i>
+														</button>
+														<ul class="dropdown-menu dropdown-only-icon dropdown-yellow dropdown-menu-right dropdown-caret dropdown-close">
+															<c:if test="${QX.edit == 1 }">
+															<li>
+																<a style="cursor:pointer;" onclick="editUser('${xywhList.USER_AGENT_ID }');" class="tooltip-success" data-rel="tooltip" title="编辑">
+																	<span class="green">
+																		<i class="ace-icon fa fa-pencil-square-o bigger-120"></i>
+																	</span>
+																</a>
+															</li>
+															</c:if>
+															<c:if test="${QX.del == 1 }">
+															<li>
+																<a style="cursor:pointer;" onclick="delJmxx('${jmxxList.USER_AGENT_ID }','${jmxxList.USER_NAME }');" class="tooltip-error" data-rel="tooltip" title="删除">
+																	<span class="red">
+																		<i class="ace-icon fa fa-trash-o bigger-120"></i>
+																	</span>
+																</a>
+															</li>
+															</c:if>
+														</ul>
+													</div>
+												</div>
+											</td>
+											
+										</tr>
+									</c:forEach>
+									</c:if>
+									<c:if test="${QX.cha == 0 }">
+										<tr>
+											<td colspan="100" class="center">您无权查看</td>
+										</tr>
+									</c:if>
+								</c:when>
+								<c:otherwise>
+									<tr class="main_info">
+										<td colspan="100" class="center" >没有相关数据</td>
+									</tr>
+								</c:otherwise>
+							</c:choose>
+							</tbody>
+						</table>
+						 	<div class="page-header position-relative">
+						<table style="width:100%;">
+							<tr>
+								<td style="vertical-align:top;">
+									<c:if test="${QX.add == 1 }">
+										<a class="btn btn-mini btn-success" onclick="add();">
+												<i class="ace-icon fa fa-plus-square" aria-hidden="true"></i>
+												新增
+										</a>
+										<!-- <a class="btn btn-mini btn-success" onclick="add();">新增</a> -->
+									</c:if>
+									<c:if test="${QX.del == 1 }">
+									  <a title="批量删除" class="btn btn-mini btn-danger" onclick="makeAll('确定要删除选中的数据吗?');" ><i class='ace-icon fa fa-trash-o bigger-120'></i>批量删除</a>  
+									</c:if>
+								</td>
+								<td style="vertical-align:top;"><div class="pagination" style="float: right;padding-top: 0px;margin-top: 0px;">${page.pageStr}</div></td>
+							</tr>
+						</table>
+						</div>
+						</form>
+ 						</div>
+						<!-- /.col -->
+					</div>
+					<!-- /.row -->
+				</div>
+				<!-- /.page-content -->
+			</div>
+		</div>
+		<!-- /.main-content -->
+		<!-- 返回顶部 -->
+		<a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse">
+			<i class="ace-icon fa fa-angle-double-up icon-only bigger-110"></i>
+		</a>
+	</div>
+	<!-- /.main-container -->
+	<!-- basic scripts -->
+	<!-- 页面底部js¨ -->
+	<%@ include file="../../system/index/foot.jsp"%>
+	<!-- 删除时确认窗口 -->
+	<script src="static/ace/js/bootbox.js"></script>
+	<!-- ace scripts -->
+	<script src="static/ace/js/ace/ace.js"></script>
+	<!-- 日期框 -->
+	<script src="static/ace/js/date-time/bootstrap-datepicker.js"></script>
+	<!-- 下拉框 -->
+	<script src="static/ace/js/chosen.jquery.js"></script>
+	<!--提示框-->
+	<script type="text/javascript" src="static/js/jquery.tips.js"></script>
+	</body>
+ 	<script type="text/javascript">
+ 		
+		$(top.hangge());
+		
+		$(function() {
+			//日期框
+			$('.date-picker').datepicker({autoclose: true,todayHighlight: true});
+			//下拉框
+			if(!ace.vars['touch']) {
+				$('.chosen-select').chosen({allow_single_deselect:true}); 
+				$(window)
+				.off('resize.chosen')
+				.on('resize.chosen', function() {
+					$('.chosen-select').each(function() {
+						 var $this = $(this);
+						 $this.next().css({'width': $this.parent().width()});
+					});
+				}).trigger('resize.chosen');
+				$(document).on('settings.ace.chosen', function(e, event_name, event_val) {
+					if(event_name != 'sidebar_collapsed') return;
+					$('.chosen-select').each(function() {
+						 var $this = $(this);
+						 $this.next().css({'width': $this.parent().width()});
+					});
+				});
+				$('#chosen-multiple-style .btn').on('click', function(e){
+					var target = $(this).find('input[type=radio]');
+					var which = parseInt(target.val());
+					if(which == 2) $('#form-field-select-4').addClass('tag-input-style');
+					 else $('#form-field-select-4').removeClass('tag-input-style');
+				});
+			}
+		});
+		
+		//复选框全选控制
+		var active_class = 'active';
+		$('#simple-table > thead > tr > th input[type=checkbox]').eq(0).on('click', function(){
+			var th_checked = this.checked;//checkbox inside "TH" table header
+			$(this).closest('table').find('tbody > tr').each(function(){
+				var row = this;
+				if(th_checked) $(row).addClass(active_class).find('input[type=checkbox]').eq(0).prop('checked', true);
+				else $(row).removeClass(active_class).find('input[type=checkbox]').eq(0).prop('checked', false);
+			});
+		});
+		
+		//检索
+		function searchs(){
+			top.jzts();
+			$("#userForm").submit();
+		}
+		
+		//清空查询条件
+		function reset(){
+			$("#user_name").val("");
+			$("#mi_card").val("");
+			$("#id_number").val("");
+			$("#sign_apply_time").val("");
+			$("#is_sign").find("option:selected").attr("selected",false);
+			$("#is_sign").find("option[text='']").attr("selected",true);
+			$("#processing_status").find("option:selected").attr("selected",false);
+			$("#processing_status").find("option[text='']").attr("selected",true);
+		}
+		
+		//新增
+		function add(){
+			 top.jzts();
+			 var diag = new top.Dialog();
+			 diag.Drag=true;
+			 diag.Title ="新增居民信息";
+			 diag.URL = '<%=basePath%>jmxx/goAddJmxx.do';
+			 diag.Width = 950;
+			 diag.Height = 700;
+			 diag.CancelEvent = function(){ //关闭事件
+                 if(diag.innerFrame.contentWindow.document.getElementById('zhongxin').style.display == 'none'){
+                     if('${page.currentPage}' == '0'){
+                         top.jzts();
+                         setTimeout("self.location=self.location",100);
+                     }else{
+                         //nextPage(${page.currentPage});
+                         window.location.reload();
+                     }
+                }
+                diag.close();
+             };
+			 diag.show();
+			 
+		}
+		//预约挂号
+        function register(Id){
+            top.jzts();
+            window.location.href="<%=basePath%>/regAppointment/doctor.do?REFERRAL_ID="+Id+"&fromUrl="+encodeURIComponent(window.location.href);
+        }
+		//修改
+		function editUser(USER_AGENT_ID){
+			 top.jzts();
+			 var diag = new top.Dialog();
+			 diag.Drag=true;
+			 diag.Title ="修改居民信息";
+			 diag.URL = '<%=basePath%>jmxx/goEditJmxx.do?USER_AGENT_ID='+USER_AGENT_ID;
+			 diag.Width = 950;
+			 diag.Height = 700;
+			 diag.CancelEvent = function(){ //关闭事件
+				 if(diag.innerFrame.contentWindow.document.getElementById('zhongxin').style.display == 'none'){
+					 nextPage(${page.currentPage});
+				}
+				diag.close();
+			 };
+			 diag.show();
+		}
+		
+		//删除
+		function delJmxx(user_agent_id,msg){
+			bootbox.confirm("确定要删除["+msg+"]吗?", function(result) {
+				if(result) {
+					top.jzts();
+					var url = "<%=basePath%>jmxx/deleteJmxx.do?USER_AGENT_ID="+user_agent_id+"&tm="+new Date().getTime();
+					$.get(url,function(data){
+						nextPage(${page.currentPage});
+					});
+				}
+			});
+		}
+		//诊疗信息
+		function goClinicalInfo(Id,user_id){
+            top.jzts();
+            top.siMenu('z106','lm70','诊疗信息','jmxx/goClinicalInfo.do?CARDID='+Id+'&USER_AGENT_ID='+user_id);
+		}
+		//档案自测
+		function goSelfTestFile(user_id){
+            top.jzts();
+            top.siMenu('z106','lm70','档案自测','jmxx/goSelfTestFile.do?USER_AGENT_ID='+user_id);
+		}
+		//显示 居民信息详情
+		function showInfo(Id) {
+			 top.jzts();
+			 var diag = new top.Dialog();
+			 diag.Drag=true;
+			 diag.Title ="居民详情";
+			 diag.URL = '<%=basePath%>jmxx/showInfo.do?USER_AGENT_ID='+Id;
+			 diag.Width = 950;
+			 diag.Height = 700;
+			 diag.CancelEvent = function(){ //关闭事件
+				 if(diag.innerFrame.contentWindow.document.getElementById('zhongxin').style.display == 'none'){
+					 nextPage(${page.currentPage});
+				}
+				diag.close();
+			 };
+			 diag.show();
+		}
+
+		//批量操作
+		function makeAll(msg){
+			bootbox.confirm(msg, function(result) {
+				if(result) {
+					var str = '';
+					var emstr = '';
+					var phones = '';
+					for(var i=0;i < document.getElementsByName('ids').length;i++)
+					{
+						  if(document.getElementsByName('ids')[i].checked){
+						  	if(str=='') str += document.getElementsByName('ids')[i].value;
+						  	else str += ',' + document.getElementsByName('ids')[i].value;
+						  	
+						  	if(emstr=='') emstr += document.getElementsByName('ids')[i].id;
+						  	else emstr += ';' + document.getElementsByName('ids')[i].id;
+						  	
+						  	if(phones=='') phones += document.getElementsByName('ids')[i].alt;
+						  	else phones += ';' + document.getElementsByName('ids')[i].alt;
+						  }
+					}
+					if(str==''){
+						bootbox.dialog({
+							message: "<span class='bigger-110'>您没有选择任何内容!</span>",
+							buttons: 			
+							{ "button":{ "label":"确定", "className":"btn-sm btn-success"}}
+						});
+						$("#zcheckbox").tips({
+							side:3,
+				            msg:'点这里全选',
+				            bg:'#AE81FF',
+				            time:8
+				        });
+						
+						return;
+					}else{
+						if(msg == '确定要删除选中的数据吗?'){
+							top.jzts();
+							$.ajax({
+								type: "POST",
+								url: '<%=basePath%>jmxx/deleteAllJmxx.do?tm='+new Date().getTime(),
+						    	data: {user_agent_ids:str},
+								dataType:'json',
+								//beforeSend: validateData,
+								cache: false,
+								success: function(data){
+										nextPage(${page.currentPage});
+								}
+							});
+						}
+					}
+				}
+			});
+		}
+
+
+		</script>
+</html>
+

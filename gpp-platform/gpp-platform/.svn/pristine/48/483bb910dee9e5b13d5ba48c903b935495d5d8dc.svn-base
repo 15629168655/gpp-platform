@@ -1,0 +1,13 @@
+package com.tbyf.service.gp.treatecasedis;
+
+import com.tbyf.util.PageData;
+/**
+ * 治疗方案保存
+ * @author zanxc
+ * @创建日期2017年7月27日下午5:28:32
+ */
+public interface TreateCaseDisManager {
+
+	public void save(PageData pd) throws Exception;
+	
+}

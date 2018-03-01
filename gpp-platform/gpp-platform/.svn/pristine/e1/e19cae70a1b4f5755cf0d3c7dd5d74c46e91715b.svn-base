@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="HealthInfomationMapper">
+	
+	<!--表名 -->
+	<sql id="tableName">
+		GPP_HEALTH_INFORMATION
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		ID,
+  		SJ,
+  		MC,
+  		REMARK, 
+  		TYPE,
+  		STATE,
+  		FBR,        
+  		LLL,
+  		LY,
+  		IMAGE_ID,
+  		IMAGE_URL
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{ID,jdbcType=VARCHAR},
+		to_date(#{SJ,jdbcType=DATE},'YYYY-MM-DD HH24:MI:SS'),
+  		#{MC,jdbcType=VARCHAR},      
+  		to_blob(#{REMARK}), 
+  		#{TYPE,jdbcType=NUMERIC},
+  		#{STATE,jdbcType=VARCHAR},
+	    #{FBR,jdbcType=VARCHAR},
+	    #{LLL,jdbcType=NUMERIC},
+	    #{LY,jdbcType=VARCHAR},
+	    #{IMAGE_ID,jdbcType=VARCHAR},
+	    #{IMAGE_URL,jdbcType=VARCHAR}
+	    
+	</sql>
+	
+	<!-- APP查询 -->
+	<select id="queryPage" parameterType="pd" resultType="pd">
+				SELECT *
+				  FROM ( SELECT ROWNUM AS rowno, t.* from ( SELECT p.* ,t.NAME AS TYPENAME
+				  FROM GPP_HEALTH_INFORMATION p,GPP_HEALTH_INFORMATION_TYPE t
+				where 1=1 AND p.TYPE=t.GUID 
+				
+            <if test="STATE != null and STATE!= ''"><!-- 是否启用 -->
+				and STATE = #{STATE}
+			</if>
+			  <if test="TYPE != null and TYPE !=''"><!-- 类型 -->
+				and TYPE = #{TYPE}
+			</if>
+			and STATE!=9 
+				order by SJ DESC )  t ) table_alias
+				 WHERE table_alias.rowno BETWEEN #{pageStart} and #{pageEnd}
+	</select>
+	
+	<!-- 列表 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select
+		<include refid="Field"></include>,t.NAME AS TYPENAME
+		from 
+		<include refid="tableName"></include> p
+		,GPP_HEALTH_INFORMATION_TYPE t
+		<where>
+		1=1 and p.TYPE=t.GUID and STATE!=9 
+			<if test="pd.keywords != null and pd.keywords != ''"><!-- 名称检索 -->
+			and (
+				MC LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				or
+				TYPE LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				)
+			</if>
+			<if test="pd.start_time!=null and pd.start_time!=''"><!-- 开始时间检索 -->
+				and to_char(SJ,'yyyymmdd') &gt;= to_char(to_date(#{pd.start_time},'YYYY-MM-DD HH24:MI:SS'),'yyyymmdd')
+			</if>
+			<if test="pd.end_time!=null and pd.end_time!=''"><!-- 结束时间检索   -->
+				and to_char(SJ,'yyyymmdd') &lt;= to_char(to_date(#{pd.end_time},'YYYY-MM-DD HH24:MI:SS'),'yyyymmdd')
+			</if>
+			
+        </where>
+         order by SJ desc
+	</select>
+	
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include> 
+		where
+			ID = #{ID}
+	</select>
+	
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+		update
+		<include refid="tableName"></include>
+		set 
+  		<if test="MC!=null and MC!=''">
+  		MC = #{MC,jdbcType=VARCHAR},   
+  		</if>
+  		<if test="REMARK!=null and REMARK!=''">
+  		REMARK = to_blob(#{REMARK}),
+  		</if>
+  		<if test="TYPE!=null and TYPE!=''">
+  		TYPE = #{TYPE,jdbcType=VARCHAR},
+  		</if>
+  		<if test="STATE!=null and STATE!=''">
+  			STATE = #{STATE,jdbcType=VARCHAR},
+  		</if>
+  		<if test="IMAGE_ID!=null and IMAGE_ID!=''">
+  		    IMAGE_ID = #{IMAGE_ID},
+  		</if>
+  		<if test="IMAGE_URL!=null and IMAGE_URL!=''">
+  		    IMAGE_URL = #{IMAGE_URL},
+  		</if>
+  		<if test="LY!=null and LY!=''">
+  		    LY = #{LY},
+  		</if>
+  		SJ =sysdate
+		where
+		ID = #{ID}
+	</update>
+	
+		<!-- 修改 -->
+	<update id="addLLL" parameterType="pd">
+		update
+		<include refid="tableName"></include>
+		set   LLL = LLL + #{num} 
+		where
+		ID = #{ID}
+	</update>
+	<!-- 增加-->
+	<insert id="save" parameterType="pd">
+		insert into 
+	<include refid="tableName"></include>
+		(
+	<include refid="Field"></include>
+		) values (
+	<include refid="FieldValue"></include>
+		)
+	</insert>
+	
+	<!-- 删除-->
+	<delete id="delete" parameterType="pd">
+		delete from
+		<include refid="tableName"></include>
+		where 
+			ID = #{ID}
+	</delete>
+	
+	
+</mapper>

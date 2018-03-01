@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="AutoRegisterMapper">
+	
+	
+
+	<select id="querylistPage" parameterType="page" resultType="pd">
+				SELECT *
+				  FROM TB_HIS_MZ_REG 
+				  where 1=1 
+			<if test="pd.keywords != null and pd.keywords!= ''"><!-- 关键词检索 -->
+			and (
+				DEPART_NAME LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				or
+				DISEASES_CLASS_NAME LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				or
+				DISEASES_NAME LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				)
+		</if>
+	</select>	
+	
+	<insert id="saveObj" parameterType="pd">
+		insert into TB_HIS_MZ_REG (
+			"GHRQ","GHBM","GTHBZ","YLJGDM","STFBH","JZLSH",
+			"YYLSH","GTHSJ","GHLB","KSBM","KSMC","GHFS",
+			"YYTJDM","TXBZ","ZFZLF","ZLF","QTF","KH",
+			"KLX","GHRCBS","personID","XM","YLFYLYLB","HZGSD",
+			"XGBZ","YLYL1"
+		) values (
+			#{GHRQ,jdbcType=VARCHAR},
+			#{GHBM,jdbcType=VARCHAR},
+			#{GTHBZ,jdbcType=VARCHAR},
+			#{YLJGDM,jdbcType=VARCHAR},
+			#{STFBH,jdbcType=VARCHAR},
+			#{JZLSH,jdbcType=VARCHAR},
+			#{YYLSH,jdbcType=VARCHAR},
+			sysdate,
+			#{GHLB,jdbcType=VARCHAR},
+			#{KSBM,jdbcType=VARCHAR},
+			#{KSMC,jdbcType=VARCHAR},
+			#{GHFS,jdbcType=VARCHAR},
+			#{YYTJDM,jdbcType=VARCHAR},
+			#{TXBZ,jdbcType=VARCHAR},
+			#{ZFZLF,jdbcType=NUMERIC},
+			#{ZLF,jdbcType=NUMERIC},
+			#{QTF,jdbcType=NUMERIC},
+			#{KH,jdbcType=VARCHAR},
+			#{KLX,jdbcType=VARCHAR},
+			#{GHRCBS,jdbcType=VARCHAR},
+			#{personID,jdbcType=VARCHAR},
+			#{XM,jdbcType=VARCHAR},
+			#{YLFYLYLB,jdbcType=VARCHAR},
+			#{HZGSD,jdbcType=VARCHAR},
+			#{XGBZ,jdbcType=NUMERIC},
+			#{YLYL1,jdbcType=VARCHAR}
+		)
+	</insert>
+	
+	<update id="editObj" parameterType="pd">
+		update
+		TB_HIS_MZ_REG
+			set 
+				"GTHBZ" = #{GTHBZ},	
+				"GTHSJ" = sysdate
+			where 
+				"GHBM" = #{GHBM}
+	</update>
+	<select id="findById" parameterType="pd" resultType="pd">
+		select * from TB_HIS_MZ_REG where GHBM = #{GHBM}
+	</select>
+	<!-- 编辑详情 -->
+	<update id="editObject" parameterType="pd">
+		update
+		TB_HIS_MZ_REG
+			set 
+				"KSBM" = #{KSBM,jdbcType=VARCHAR},	
+				"KSMC" = #{KSMC,jdbcType=VARCHAR},	
+				"personID" = #{personID,jdbcType=VARCHAR},	
+				"XM" = #{XM,jdbcType=VARCHAR},	
+				"HZGSD" = #{HZGSD,jdbcType=VARCHAR},	
+				"STFBH" = #{STFBH,jdbcType=VARCHAR},	
+				"JZLSH" = #{JZLSH,jdbcType=VARCHAR},	
+				"YYLSH" = #{YYLSH,jdbcType=VARCHAR},	
+				"GHLB" = #{GHLB,jdbcType=VARCHAR},	
+				"GHFS" = #{GHFS,jdbcType=VARCHAR},	
+				"YYTJDM" = #{YYTJDM,jdbcType=VARCHAR},	
+				"ZFZLF" = #{ZFZLF,jdbcType=NUMERIC},	
+				"ZLF" = #{ZLF,jdbcType=NUMERIC},	
+				"QTF" = #{QTF,jdbcType=NUMERIC},
+				"KLX" = #{KLX,jdbcType=VARCHAR},
+				"KH" = #{KH,jdbcType=VARCHAR},
+				"YLFYLYLB" = #{YLFYLYLB,jdbcType=VARCHAR},
+				"GHRCBS" = #{GHRCBS,jdbcType=VARCHAR},
+				"TXBZ" = #{TXBZ,jdbcType=VARCHAR},	
+				"GTHSJ" = sysdate
+			where 
+				"GHBM" = #{GHBM}
+	</update>
+	<!-- 根据挂号编码查询 详情及病人信息 -->
+	<select id="findPersonObjById" parameterType="pd" resultType="pd">
+		select a.*,b.* from TB_HIS_MZ_REG a left join TB_YL_PATIENT_INFORMATION b 
+				on a."personID" = b."PERSONID"
+		where a.GHBM = #{id}
+	</select>
+</mapper>

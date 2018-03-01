@@ -1,0 +1,415 @@
+package com.tbyf.controller.hm.yhry;
+
+import java.io.PrintWriter;
+import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.tbyf.service.system.appuser.AppuserManager;
+import com.tbyf.service.system.role.RoleManager;
+import com.tbyf.util.*;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.tbyf.controller.base.BaseController;
+import com.tbyf.plugin.Page;
+import com.tbyf.service.hm.organization.OrganizationManager;
+import com.tbyf.service.hm.yhry.YhryManager;
+import com.tbyf.entity.enums.EnumSex;
+import com.tbyf.entity.system.Role;
+
+import net.sf.json.JSONArray;
+
+/**
+ * 医护人员管理
+ * @author Administrator
+ *
+ */
+@Controller
+@RequestMapping(value="/yhry")
+public class YhryController extends BaseController{	
+	
+	String menuUrl = "yhry/yhrylist.do"; //菜单地址(权限用)
+	@Resource(name="yhryService")
+	private YhryManager yhryService;
+	@Resource(name="organizationService")
+	private OrganizationManager organizationService;
+	@Resource(name="appuserService")
+	private AppuserManager appuserService;
+	@Resource(name="roleService")
+	private RoleManager roleService;
+	@Value("${defaultPwd}")
+	String defaultPwd;
+	
+	/**
+	 * 保存
+	 */
+	@RequestMapping(value="/save")
+	public ModelAndView save() throws Exception{
+		logBefore(logger, Jurisdiction.getUsername()+"新增yhry");
+		if(!Jurisdiction.buttonJurisdiction(menuUrl, "add")){return null;} //校验权限
+		ModelAndView mv = this.getModelAndView();
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		pd.put("ID", this.get32UUID());	//主键
+		yhryService.save(pd);
+		mv.addObject("msg","success");
+		mv.setViewName("save_result");
+		return mv;
+	}
+	
+	/**
+	 * 新增页面
+	 */
+	@RequestMapping(value="/toAdd")
+	public ModelAndView toAdd() throws Exception{
+		ModelAndView mv = this.getModelAndView();
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		pd.put("enumSex", EnumSex.toMap()); //性别
+		String ORG_CODE = null == pd.getString("ORG_CODE")?"":pd.getString("ORG_CODE").toString();
+		pd.put("ORG_CODE", ORG_CODE);					//机构管理编码
+		pd.put("ORG_NAME", URLDecoder.decode(pd.getString("ORG_NAME"),"utf8"));					//机构管理编码
+		mv.addObject("ORG_CODE", ORG_CODE);			//传入机构管理编码，作为查询条件
+		mv.addObject("pd", pd);
+		mv.setViewName("hm/yhry/yhry_edit");
+		mv.addObject("msg", "save");
+
+		return mv;
+	}
+	
+	/**
+	 * 修改
+	 */
+	@RequestMapping(value="/edit")
+	public ModelAndView edit() throws Exception{
+		logBefore(logger, Jurisdiction.getUsername()+"修改yhry");
+		if(!Jurisdiction.buttonJurisdiction(menuUrl, "edit")){return null;} //校验权限
+		ModelAndView mv = this.getModelAndView();
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		String ID = pd.getString("ID");
+		yhryService.edit(pd);
+		mv.addObject("msg","success");
+		mv.setViewName("save_result");
+		return mv;
+	}
+	
+	/**
+	 * 修改页面
+	 */
+	@RequestMapping(value="/toUpdate")
+	public ModelAndView toUpdate() throws Exception{
+		ModelAndView mv = this.getModelAndView();
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		pd = yhryService.findById(pd);	//根据ID读取
+		pd.put("enumSex", EnumSex.toMap()); // 性别
+		mv.addObject("pd", pd);
+		mv.setViewName("hm/yhry/yhry_edit");
+		mv.addObject("msg", "edit");
+
+		return mv;
+	}
+	
+	/**
+	 * 删除
+	 */
+	@RequestMapping(value="/delete")
+	public void delete(PrintWriter out) throws Exception{
+		logBefore(logger, Jurisdiction.getUsername()+"删除yhry");
+		if(!Jurisdiction.buttonJurisdiction(menuUrl, "delete")){return;} //校验权限
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		yhryService.delete(pd);
+		out.write("success");
+		out.close();
+	}
+	
+	 /**批量删除
+	 * @param
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/deleteAll")
+	@ResponseBody
+	public Object deleteAll() throws Exception{
+		logBefore(logger, Jurisdiction.getUsername()+"批量删除Yhry");
+		if(!Jurisdiction.buttonJurisdiction(menuUrl, "del")){return null;} //校验权限
+		PageData pd = new PageData();		
+		Map<String,Object> map = new HashMap<String,Object>();
+		pd = this.getPageData();
+		List<PageData> pdList = new ArrayList<PageData>();
+		String DATA_IDS = pd.getString("DATA_IDS");
+		if(null != DATA_IDS && !"".equals(DATA_IDS)){
+			String ArrayDATA_IDS[] = DATA_IDS.split(",");
+			yhryService.deleteAll(ArrayDATA_IDS);
+			pd.put("msg", "ok");
+		}else{
+			pd.put("msg", "no");
+		}
+		pdList.add(pd);
+		map.put("list", pdList);
+		return AppUtil.returnObject(pd, map);
+	}
+	
+	/**判断同一机构下医护人员id不能重复
+	 * @return
+	 */
+	@RequestMapping(value="/hasProviderId")
+	@ResponseBody
+	public Object hasProviderId(){
+		Map<String,String> map = new HashMap<String,String>();
+		String errInfo = "success";
+		PageData pd = new PageData();
+		try{
+			pd = this.getPageData();
+			if(yhryService.findByProviderId(pd) != null){
+				errInfo = "error";
+			}
+		} catch(Exception e){
+			logger.error(e.toString(), e);
+		}
+		map.put("result", errInfo);				//返回结果
+		return AppUtil.returnObject(new PageData(), map);
+	}
+	
+	/**获取医护人员列表
+	 * @param page
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/yhrylist")
+	public ModelAndView yhrylist(Page page) throws Exception{
+		logBefore(logger, Jurisdiction.getUsername()+"列表yhry");
+		ModelAndView mv = this.getModelAndView();
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		String keywords = pd.getString("keywords");				//关键词检索条件
+		if(null != keywords && !"".equals(keywords)){
+			pd.put("keywords", keywords.trim());
+		}
+		String org_code = pd.getString("ORG_CODE");
+		if(null != org_code && !"".equals(org_code)){
+		pd.put("ORG_CODE", org_code);
+		}
+		pd.put("enumSex", EnumSex.toMap()); // 性别
+		page.setPd(pd);
+		//通过ORG_CODE获得机构下的医护人员列表
+		List<PageData> varList = yhryService.yhrylist(page);
+		mv.setViewName("hm/yhry/yhry_list");
+		mv.addObject("varList", varList);
+		mv.addObject("pd", pd);
+		mv.addObject("ISLEAF",pd.getString("ISLEAF"));
+		mv.addObject("QX",Jurisdiction.getHC());	//按钮权限
+		return mv;
+	}
+	
+	/**
+	 * 显示列表   ztree
+	 * @param model
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/listAllYhry")
+	public ModelAndView listAllYhry(Model model) throws Exception{
+		ModelAndView mv = this.getModelAndView();
+		try{
+			JSONArray array=JSONArray.fromObject(organizationService.packageTreeDate(Const.TREE_TOP_NODE,null,null));
+			String json = array.toString();
+			mv.addObject("treeTopJson", json);
+			//设置跳转路径
+			mv.setViewName("hm/yhry/yhry_ztree");
+		} catch(Exception e){
+			logger.error(e.toString(), e);
+	}
+		return mv;
+	}
+	
+	/**
+	 * 带链接的树
+	 * @param
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/treeData")
+	@ResponseBody
+	public String depTreeData(HttpServletRequest request,
+							  HttpServletResponse response) throws Exception {
+		String id = request.getParameter("id");
+		JSONArray array=JSONArray.fromObject(organizationService.packageTreeDate(id,request.getParameter("type"),request.getParameter("action")));
+		String json = array.toString();
+		//json=json.replaceAll("guid", "id").replaceAll("sjxzqhdm", "pId").replaceAll("xzqhmc", "name").replaceAll("hasDist", "isParent").replaceAll("treeurl", "url");
+		return json;
+	}
+
+	/**
+	 * 生成系统会员
+	 * @param out
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "createAppUser")
+	public void createAppUser(PrintWriter out) throws Exception {
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		String USERNAME = pd.getString("PROVIDER_CODE");
+		pd.put("USERNAME",USERNAME);
+		if(appuserService.findByUsername(pd)==null){
+			pd.remove("USERNAME");
+			PageData yhryPd = yhryService.findById(pd);
+			PageData appUserPd = new PageData();
+			appUserPd.put("USER_ID", this.get32UUID());
+			appUserPd.put("RIGHTS", "");
+			appUserPd.put("LAST_LOGIN", "");
+			appUserPd.put("IP", "");
+			appUserPd.put("YEARS", "");
+			appUserPd.put("PASSWORD", MD5.md5(defaultPwd));
+			appUserPd.put("USERNAME", USERNAME);
+			appUserPd.put("NAME", yhryPd.getString("PROVIDER_NAME"));
+			appUserPd.put("ROLE_ID", "115b386ff04f4352b060dffcd2b5d1da");
+			appUserPd.put("STATUS", 1);
+			appUserPd.put("BZ", "医护人员");
+			appUserPd.put("PHONE", yhryPd.getString("TELECOM")==null?"":yhryPd.getString("TELECOM"));
+			appUserPd.put("SFID", yhryPd.getString("IDCARD")==null?"":yhryPd.getString("IDCARD"));
+			appUserPd.put("START_TIME", yhryPd.getString("EFFECTIVE_TIME_LOW")==null?"":yhryPd.getString("EFFECTIVE_TIME_LOW"));
+			appUserPd.put("END_TIME", yhryPd.getString("EFFECTIVE_TIME_HIGH")==null?"":yhryPd.getString("EFFECTIVE_TIME_HIGH"));
+			appUserPd.put("NUM", yhryPd.getString("ID"));
+			appUserPd.put("EMAIL", "");
+			appUserPd.put("BUSINESS_ID", yhryPd.getString("ID"));
+			appUserPd.put("SKIN", "default");
+			appUserPd.put("VALIDATEFLAG", "0");
+			appUserPd.put("NAMEPY", GetPinyin.getPingYin(appUserPd.get("NAME").toString()));
+			appuserService.saveU(appUserPd);
+			out.write("success");
+		}else {
+			out.write("created");
+		}
+		out.close();
+	}
+	
+	
+	/**
+	 * 选择医生列表
+	 * @param page
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/getChooseYhryList")
+	public ModelAndView getChooseYhryList(Page page) throws Exception{
+		logBefore(logger, Jurisdiction.getUsername()+"获取选择医生列表");
+		ModelAndView mv = this.getModelAndView();
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		String PROVIDER_NAME = pd.getString("PROVIDER_NAME");	//查询条件：医生姓名
+		if(null != PROVIDER_NAME && !"".equals(PROVIDER_NAME)){
+			pd.put("keywords", PROVIDER_NAME.trim());
+		}
+		pd.put("ORG_CODE", getCurUser().getOrgCode());	//机构编码
+		pd.put("enumSex", EnumSex.toMap()); // 性别
+		page.setPd(pd);
+		List<PageData>	yhry = yhryService.yhrylist(page);
+		mv.setViewName("hm/yhry/choose_yhry_list");
+		mv.addObject("yhryList", yhry);
+		mv.addObject("pd", pd);
+		mv.addObject("QX",Jurisdiction.getHC());	//按钮权限
+		return mv;
+	}
+	@RequestMapping(value="/checkAppUser")
+	@ResponseBody
+	public Object checkAppUser(){
+		Map<String,Object> map = new HashMap<String,Object>();
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		try{
+			String USERNAME = pd.getString("PROVIDER_CODE");
+			pd.put("USERNAME",USERNAME);
+			PageData data =appuserService.findByUsername(pd);
+			if(null != data){
+				map.put("type", "0");
+				map.put("data", data);
+			}else{
+				map.put("type", "1");
+			}
+		}catch (Exception e){
+			logger.error(e.toString(), e);
+		}
+		return AppUtil.returnObject(new PageData(), map);
+	}
+	/**
+	 * 新增用户
+	 * 点击会员信息时，无用户时直接新增
+	 */
+	@RequestMapping(value = "addAppUser")
+	public void addAppUser(PrintWriter out) {
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		String USERNAME = pd.getString("PROVIDER_CODE");
+		try {
+			
+			PageData yhryPd = yhryService.findById(pd);
+			PageData appUserPd = new PageData();
+			appUserPd.put("USER_ID", this.get32UUID());
+			appUserPd.put("RIGHTS", "");
+			appUserPd.put("LAST_LOGIN", "");
+			appUserPd.put("IP", "");
+			appUserPd.put("YEARS", "");
+			appUserPd.put("PASSWORD", MD5.md5(defaultPwd));
+			appUserPd.put("USERNAME", USERNAME);
+			appUserPd.put("NAME", yhryPd.getString("PROVIDER_NAME"));
+			appUserPd.put("ROLE_ID", "115b386ff04f4352b060dffcd2b5d1da");
+			appUserPd.put("STATUS", 1);
+			appUserPd.put("BZ", "医护人员");
+			appUserPd.put("PHONE", yhryPd.getString("TELECOM")==null?"":yhryPd.getString("TELECOM"));
+			appUserPd.put("SFID", yhryPd.getString("IDCARD")==null?"":yhryPd.getString("IDCARD"));
+			appUserPd.put("START_TIME", yhryPd.getString("EFFECTIVE_TIME_LOW")==null?"":yhryPd.getString("EFFECTIVE_TIME_LOW"));
+			appUserPd.put("END_TIME", yhryPd.getString("EFFECTIVE_TIME_HIGH")==null?"":yhryPd.getString("EFFECTIVE_TIME_HIGH"));
+			appUserPd.put("NUM", yhryPd.getString("ID"));
+			appUserPd.put("EMAIL", "");
+			appUserPd.put("BUSINESS_ID", yhryPd.getString("ID"));
+			appUserPd.put("SKIN", "default");
+			appUserPd.put("VALIDATEFLAG", "0");
+			appUserPd.put("NAMEPY", GetPinyin.getPingYin(appUserPd.get("NAME").toString()));
+			appuserService.saveU(appUserPd);
+			out.write("success");
+			
+			out.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**医护人员页面--去修改用户页面
+	 */
+	@RequestMapping(value="/goEditU")
+	public ModelAndView goEditU(){
+		ModelAndView mv = this.getModelAndView();
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		String editMode = pd.getString("editMode");
+		String USERNAME = pd.getString("PROVIDER_CODE");
+		pd.put("USERNAME",USERNAME);
+		try {
+			PageData data = appuserService.findByUsername(pd);	
+			pd.remove("USERNAME");
+			pd.put("ROLE_ID", "2");
+			List<Role> roleList = roleService.listAllRolesByPId(pd);//列出会员组角色
+			pd.put("editMode",editMode);
+			mv.setViewName("system/appuser/appuser_edit");
+			mv.addObject("msg", "editU");
+			mv.addObject("pd", data);
+			mv.addObject("roleList", roleList);
+		} catch (Exception e) {
+			logger.error(e.toString(), e);
+		}						
+		return mv;
+	}
+}

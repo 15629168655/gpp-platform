@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MzblMapper">
+<!-- 表名 -->
+<!-- 门诊病历表 -->
+	<sql id="tableName">
+		GPP_OUTPATIENT_RECORDS
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="FieldSave">
+	    ID,
+		MZJZLSH,
+		HZID,
+		HZXM,
+		JGBM,
+		KSBM,
+		JZSJ,
+		BLMC,
+		ZS,
+		XBS,
+		JWS,
+		TJ,
+		FZJCJG,
+		CBPD,
+		ZLYJ,
+		YSBM,
+		YSXM,
+		RQ,
+		ZT
+	</sql>
+	
+	<!-- 新增字段值 -->
+	<sql id="FieldValue">
+	  #{ID,jdbcType=VARCHAR},
+	  #{MZJZLSH,jdbcType=VARCHAR},
+	  #{HZID,jdbcType=VARCHAR},
+	  #{HZXM,jdbcType=VARCHAR},
+	  #{JGBM,jdbcType=VARCHAR},
+	  #{KSBM,jdbcType=VARCHAR},
+	  #{JZSJ,jdbcType=VARCHAR},
+	  #{BLMC,jdbcType=VARCHAR},
+	  #{ZS,jdbcType=VARCHAR},
+	  #{XBS,jdbcType=VARCHAR},
+	  #{JWS,jdbcType=VARCHAR},
+	  #{TJ,jdbcType=VARCHAR},
+	  #{FZJCJG,jdbcType=VARCHAR},
+	  #{CBPD,jdbcType=VARCHAR},
+	  #{ZLYJ,jdbcType=VARCHAR},
+	  #{YSBM,jdbcType=VARCHAR},
+	  #{YSXM,jdbcType=VARCHAR},
+	  sysdate,
+	  #{ZT,jdbcType=VARCHAR}
+	</sql>
+	
+	<!-- 查询全部 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select
+		*
+		from
+		<include refid="tableName"></include>
+			where ZT &lt;&gt; #{pd.ZT} 
+		<if test="pd.personid != null and pd.personid != ''"><!-- 患者ID -->
+			and	HZID = #{pd.personid} 
+		</if>
+	</select>
+	
+	<!-- 通过ID号获取数据 ,查看详情 -->
+	<select id="findByID" parameterType="pd" resultType="pd">
+		select 
+			*
+		from 
+			<include refid="tableName"></include>
+		where 
+			ID = #{ID,jdbcType=VARCHAR}
+	</select>
+	
+	<!-- 新增-->
+	<insert id="save" parameterType="pd">
+		insert into 
+	<include refid="tableName"></include>
+		(
+	<include refid="FieldSave"></include>
+		) values (
+	<include refid="FieldValue"></include>
+		)
+	</insert>
+	
+	<!--修改 -->
+	<update id="edit" parameterType="Menu">
+		update 
+		<include refid="tableName"></include> 
+		set 
+			MZJZLSH 		=#{MZJZLSH,jdbcType=VARCHAR},
+			HZID 		=#{HZID,jdbcType=VARCHAR},
+			HZXM 		=#{HZXM,jdbcType=VARCHAR},
+			JGBM 		=#{JGBM,jdbcType=VARCHAR},
+			KSBM 	=#{KSBM,jdbcType=VARCHAR},
+			JZSJ 	=#{JZSJ,jdbcType=VARCHAR},
+			BLMC 		=#{BLMC,jdbcType=VARCHAR},
+			ZS 	=#{ZS,jdbcType=VARCHAR},
+			XBS 	=#{XBS,jdbcType=VARCHAR},
+			JWS 	=#{JWS,jdbcType=VARCHAR},
+			TJ 	=#{TJ,jdbcType=VARCHAR},
+			CBPD 		=#{CBPD,jdbcType=VARCHAR},
+			ZLYJ 		=#{ZLYJ,jdbcType=VARCHAR},
+			YSBM 		=#{YSBM,jdbcType=VARCHAR},
+			YSXM 		=#{YSXM,jdbcType=VARCHAR},
+			ZT 		=#{ZT,jdbcType=VARCHAR},
+			FZJCJG 		=#{FZJCJG,jdbcType=VARCHAR},
+			RQ 	=sysdate
+		where 
+			ID=#{ID}
+	</update>
+	
+	<update id="delete" parameterType="Menu">
+		update 
+		<include refid="tableName"></include> 
+		set 
+			ZT 		=#{ZT,jdbcType=VARCHAR}
+		where 
+			ID=#{ID,jdbcType=VARCHAR}
+	</update>
+</mapper>

@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="TreatmentInfoMapper">
+	
+	<!--表名 -->
+	<sql id="tableName">
+		"HM_TREATMENTINFO"
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		"ORG_CODE",	
+		"ORG_NAME",	
+		"PROVIDER_ID",	
+		"PROVIDER_NAME",	
+		"IDCARD",	
+		"TELECOM",	
+		"NAME",	
+		"SEX",	
+		"BIRTHDAY",	
+		"ADDRESS",	
+		"VISITCARDNO",	
+		"INSURETYPE",	
+		"INSURENO",	
+		"HEADTHCARDNO",	
+		"PHONE",	
+		"ILLDESC",	
+		"DISEASE_CODE",
+		"DISEASE_NAME",
+		"TREATMENT_TIME",	
+		"INCLUDED_TIME",	
+		"TREATMENTINFO_ID"
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+			#{ORG_CODE},	
+			#{ORG_NAME},	
+			#{PROVIDER_ID},	
+			#{PROVIDER_NAME},	
+			#{IDCARD},	
+			#{TELECOM},	
+			#{NAME},	
+			#{SEX},	
+			to_date(#{BIRTHDAY},'yyyy-mm-dd'),
+			#{ADDRESS},	
+			#{VISITCARDNO},	
+			#{INSURETYPE},	
+			#{INSURENO},	
+			#{HEADTHCARDNO},	
+			#{PHONE},	
+			#{ILLDESC},	
+			#{DISEASE_CODE},
+			#{DISEASE_NAME},
+			to_date(#{TREATMENT_TIME},'yyyy-mm-dd'),
+			to_date(#{INCLUDED_TIME},'yyyy-mm-dd'),
+			#{TREATMENTINFO_ID}
+	</sql>
+	
+	<!-- 新增-->
+	<insert id="save" parameterType="pd">
+		insert into
+		<include refid="tableName"></include>
+		(
+		<include refid="Field"></include>
+		) values (
+		<include refid="FieldValue"></include>
+		)
+	</insert>
+	
+	<!-- 删除-->
+	<delete id="delete" parameterType="pd">
+		delete from
+		<include refid="tableName"></include>
+		where 
+			"TREATMENTINFO_ID" = #{TREATMENTINFO_ID}
+	</delete>
+	
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+		update
+		<include refid="tableName"></include>
+			set 
+				"ORG_CODE" = #{ORG_CODE},	
+				"ORG_NAME" = #{ORG_NAME},	
+				"PROVIDER_ID" = #{PROVIDER_ID},	
+				"PROVIDER_NAME" = #{PROVIDER_NAME},	
+				"IDCARD" = #{IDCARD},	
+				"TELECOM" = #{TELECOM},	
+				"NAME" = #{NAME},	
+				"SEX" = #{SEX},	
+				"BIRTHDAY" = to_date(#{BIRTHDAY},'yyyy-mm-dd'),
+				"ADDRESS" = #{ADDRESS},
+				"VISITCARDNO" = #{VISITCARDNO},	
+				"INSURETYPE" = #{INSURETYPE},	
+				"INSURENO" = #{INSURENO},	
+				"HEADTHCARDNO" = #{HEADTHCARDNO},	
+				"PHONE" = #{PHONE},	
+				"ILLDESC" = #{ILLDESC},	
+				"DISEASE_CODE" = #{DISEASE_CODE},
+                "DISEASE_NAME" = #{DISEASE_NAME},
+				"TREATMENT_TIME" = to_date(#{TREATMENT_TIME},'yyyy-mm-dd'),
+				"INCLUDED_TIME" = to_date(#{INCLUDED_TIME},'yyyy-mm-dd'),
+			"TREATMENTINFO_ID" = #{TREATMENTINFO_ID}
+			where 
+				"TREATMENTINFO_ID" = #{TREATMENTINFO_ID}
+	</update>
+	
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include>
+		where 
+			"TREATMENTINFO_ID" = #{TREATMENTINFO_ID}
+	</select>
+	
+	<!-- 列表 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include>
+		where 1=1
+		<if test="pd.keywords!= null and pd.keywords != ''"><!-- 关键词检索 -->
+			and
+				(
+					"ORG_NAME" LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+					 or 
+					"PROVIDER_NAME" LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+                    or
+                    "NAME" LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				)
+		</if>
+        <if test="pd.TREATMENT_TIME_Start!= null and pd.TREATMENT_TIME_Start != ''">
+            and "TREATMENT_TIME" &gt; to_date(#{pd.TREATMENT_TIME_Start},'yyyy-mm-dd')
+        </if>
+        <if test="pd.TREATMENT_TIME_End!= null and pd.TREATMENT_TIME_End != ''">
+            and "TREATMENT_TIME" &lt;  to_date(#{pd.TREATMENT_TIME_End},'yyyy-mm-dd')
+        </if>
+	</select>
+	
+	<!-- 列表(全部) -->
+	<select id="listAll" parameterType="pd" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include>
+	</select>
+	
+	<!-- 批量删除 -->
+	<delete id="deleteAll" parameterType="String">
+		delete from
+		<include refid="tableName"></include>
+		where 
+			"TREATMENTINFO_ID" in
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                 #{item}
+		</foreach>
+	</delete>
+	
+</mapper>

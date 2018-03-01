@@ -1,0 +1,430 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="zyjzjlMapper">
+<!-- 表名 -->
+<!-- 住院就诊记录表 -->
+	<sql id="tableName">
+		TB_YL_ZY_MEDICAL_RECORD
+	</sql>
+
+	<!-- 查询全部 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select
+		*
+		from
+		<include refid="tableName"></include>
+		where 1=1
+		<if test="pd.YLJGDM != null and pd.YLJGDM!= ''"> <!-- 医疗机构代码 -->
+			and YLJGDM = #{pd.YLJGDM}
+		</if>
+		<if test="pd.CISID != null and pd.CISID!= ''"><!-- 住院号 -->
+			and	CISID = #{pd.CISID} 
+		</if>
+		<if test="pd.HZXM != null and pd.HZXM!= ''"> <!-- 患者姓名 -->
+			and HZXM = #{pd.HZXM}
+		</if>
+		<if test="pd.PERSONID != null and pd.PERSONID != ''"> <!-- 院内患者唯一ID号 -->
+			and PERSONID = #{pd.PERSONID}
+		</if>
+		<if test="pd.KLX != null and pd.KLX != ''"> <!-- 患者卡类型 -->
+			and KLX = #{pd.KLX}
+		</if>
+		<if test="pd.KH != null and pd.KH != ''"> <!-- 患者卡号 -->
+			and KH = #{pd.KH}
+		</if>
+		<if test="pd.id != null and pd.id != ''"> <!-- 患者身份证号 -->
+			and ID_NUMBER = #{pd.id} order by RYSJ
+		</if>
+	</select>
+	
+	<!-- 通过ID号获取数据 ,查看详情 -->
+	<select id="findByID" parameterType="pd" resultType="pd">
+		select 
+			*
+		from 
+			<include refid="tableName"></include>
+		where 
+			ID = #{ID,jdbcType=VARCHAR}
+	</select>
+	
+	<!-- 通过院内患者唯一ID号获取数据 ,判断是否已存在 -->
+	<select id="findByPERSONID" parameterType="pd" resultType="pd">
+		select 
+			*
+		from 
+			<include refid="tableName"></include>
+		where 
+			PERSONID = #{PERSONID,jdbcType=VARCHAR}
+	</select>
+	
+	<insert id ="batchSave" parameterType="java.util.List" useGeneratedKeys="false">
+	  insert into TB_YL_ZY_MEDICAL_RECORD
+	   (ID,
+	    YLJGDM,
+        JZLSH,
+        CISID,
+        KH,
+        KLX,
+        HZXM,
+        JZLX,
+        ZZYSGH,
+        ZZYSXM,
+        TXBZ,
+        JZKSBM,
+        JZKSMC,
+        CYKSBM,
+        CYKSMC,
+        ZDBM,
+        ZDMC,
+        BMLX,
+        RYSJ,
+        ZDSJ,
+        QZSJ,
+        CYSJ,
+        XGBZ,
+        MJ,
+        YLFYLYLB,
+        HZGSD,
+        BAH,
+        PERSONID,
+        YLYL1,
+        YLYL2)
+        <foreach open="(" close=")" collection="list" item="item" index="index" separator="union">
+			select
+			#{item.ID,jdbcType=VARCHAR},
+			#{item.YLJGDM,jdbcType=VARCHAR},
+			#{item.JZLSH,jdbcType=VARCHAR},
+			#{item.CISID,jdbcType=VARCHAR},
+			#{item.KH,jdbcType=VARCHAR},
+			#{item.KLX,jdbcType=VARCHAR},
+			#{item.HZXM,jdbcType=VARCHAR},
+			#{item.JZLX,jdbcType=VARCHAR},
+			 
+			 <choose>
+				 <when test="item.containsKey('ZZYSGH')">
+				 	#{item.ZZYSGH,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 
+			 <choose>
+				 <when test="item.containsKey('ZZYSXM')">
+				 	#{item.ZZYSXM,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			
+			<choose>
+				 <when test="item.containsKey('TXBZ')">
+				 	#{item.TXBZ,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			
+			#{item.JZKSBM,jdbcType=VARCHAR},
+			#{item.JZKSMC,jdbcType=VARCHAR},
+			#{item.CYKSBM,jdbcType=VARCHAR},
+			#{item.CYKSMC,jdbcType=VARCHAR},
+			#{item.ZDBM,jdbcType=VARCHAR},
+			
+			<choose>
+				 <when test="item.containsKey('ZDMC')">
+				 	#{item.ZDMC,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			
+			#{item.BMLX,jdbcType=VARCHAR},
+			TO_DATE(#{item.RYSJ,jdbcType=DATE},'yyyy-mm-dd HH24:mi:ss'),
+			
+			<choose>
+				 <when test="item.containsKey('ZDSJ')">
+				 	TO_DATE(#{item.ZDSJ,jdbcType=DATE},'yyyy-mm-dd HH24:mi:ss')
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 <choose>
+				 <when test="item.containsKey('QZSJ')">
+				 	TO_DATE(#{item.QZSJ,jdbcType=DATE},'yyyy-mm-dd HH24:mi:ss')
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			 
+			TO_DATE(#{item.CYSJ,jdbcType=DATE},'yyyy-mm-dd HH24:mi:ss'),
+			#{item.XGBZ,jdbcType=INTEGER},
+			<choose>
+				 <when test="item.containsKey('MJ')">
+				 	#{item.MJ,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			#{item.YLFYLYLB,jdbcType=VARCHAR},
+			<choose>
+				 <when test="item.containsKey('HZGSD')">
+				 	#{item.HZGSD,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			</choose>,
+			<choose>
+				 <when test="item.containsKey('BAH')">
+				 	#{item.BAH,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			#{item.PERSONID,jdbcType=VARCHAR},
+			<choose>
+				 <when test="item.containsKey('YLYL1')">
+				 	#{item.YLYL1,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			<choose>
+				 <when test="item.containsKey('YLYL2')">
+				 	#{item.YLYL2,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>
+			from dual 
+		</foreach>
+	</insert>
+	 
+	 
+	<!-- 新增-->
+	<insert id="save" parameterType="pd">
+		insert into TB_YL_ZY_MEDICAL_RECORD
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="ID != null" >
+        ID,
+      </if>
+      <if test="YLJGDM != null" >
+        YLJGDM,
+      </if>
+      <if test="JZLSH != null" >
+        JZLSH,
+      </if>
+      <if test="CISID != null" >
+        CISID,
+      </if>
+      <if test="KH != null" >
+        KH,
+      </if>
+      <if test="KLX != null" >
+        KLX,
+      </if>
+      <if test="HZXM != null" >
+        HZXM,
+      </if>
+      <if test="JZLX != null" >
+        JZLX,
+      </if>
+      <if test="ZZYSGH != null" >
+        ZZYSGH,
+      </if>
+      <if test="ZZYSXM != null" >
+        ZZYSXM,
+      </if>
+      <if test="TXBZ != null" >
+        TXBZ,
+      </if>
+      <if test="JZKSBM != null" >
+        JZKSBM,
+      </if>
+      <if test="JZKSMC != null" >
+        JZKSMC,
+      </if>
+      <if test="CYKSBM != null" >
+        CYKSBM,
+      </if>
+      <if test="CYKSMC != null" >
+        CYKSMC,
+      </if>
+      <if test="ZDBM != null" >
+        ZDBM,
+      </if>
+      <if test="ZDMC != null" >
+        ZDMC,
+      </if>
+      <if test="BMLX != null" >
+        BMLX,
+      </if>
+      <if test="RYSJ != null" >
+        RYSJ,
+      </if>
+      <if test="ZDSJ != null" >
+        ZDSJ,
+      </if>
+      <if test="QZSJ != null" >
+        QZSJ,
+      </if>
+      <if test="CYSJ != null" >
+        CYSJ,
+      </if>
+      <if test="XGBZ != null" >
+        XGBZ,
+      </if>
+      <if test="MJ != null" >
+        MJ,
+      </if>
+      <if test="YLFYLYLB != null" >
+        YLFYLYLB,
+      </if>
+      <if test="HZGSD != null" >
+        HZGSD,
+      </if>
+      <if test="BAH != null" >
+        BAH,
+      </if>
+      <if test="PERSONID != null" >
+        PERSONID,
+      </if>
+      <if test="YLYL1 != null" >
+        YLYL1,
+      </if>
+      <if test="YLYL2 != null" >
+        YLYL2,
+      </if>
+    </trim>
+    VALUES
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="ID != null" >
+        #{ID,jdbcType=VARCHAR},
+      </if>
+      <if test="YLJGDM != null" >
+        #{YLJGDM,jdbcType=VARCHAR},
+      </if>
+      <if test="JZLSH != null" >
+        #{JZLSH,jdbcType=VARCHAR},
+      </if>
+      <if test="CISID != null" >
+        #{CISID,jdbcType=VARCHAR},
+      </if>
+      <if test="KH != null" >
+        #{KH,jdbcType=VARCHAR},
+      </if>
+      <if test="KLX != null" >
+        #{KLX,jdbcType=VARCHAR},
+      </if>
+      <if test="HZXM != null" >
+        #{HZXM,jdbcType=VARCHAR},
+      </if>
+      <if test="JZLX != null" >
+        #{JZLX,jdbcType=VARCHAR},
+      </if>
+      <if test="ZZYSGH != null" >
+        #{ZZYSGH,jdbcType=VARCHAR},
+      </if>
+      <if test="ZZYSXM != null" >
+        #{ZZYSXM,jdbcType=VARCHAR},
+      </if>
+      <if test="TXBZ != null" >
+        #{TXBZ,jdbcType=VARCHAR},
+      </if>
+      <if test="JZKSBM != null" >
+        #{JZKSBM,jdbcType=VARCHAR},
+      </if>
+      <if test="JZKSMC != null" >
+        #{JZKSMC,jdbcType=VARCHAR},
+      </if>
+      <if test="CYKSBM != null" >
+        #{CYKSBM,jdbcType=VARCHAR},
+      </if>
+      <if test="CYKSMC != null" >
+        #{CYKSMC,jdbcType=VARCHAR},
+      </if>
+      <if test="ZDBM != null" >
+        #{ZDBM,jdbcType=VARCHAR},
+      </if>
+      <if test="ZDMC != null" >
+        #{ZDMC,jdbcType=VARCHAR},
+      </if>
+      <if test="BMLX != null" >
+        #{BMLX,jdbcType=VARCHAR},
+      </if>
+      <if test="RYSJ != null" >
+        to_date(#{RYSJ,jdbcType=DATE},'yyyy-mm-dd HH24:mi:ss'),
+      </if>
+      <if test="ZDSJ != null" >
+        to_date(#{ZDSJ,jdbcType=DATE},'yyyy-mm-dd HH24:mi:ss'),
+      </if>
+      <if test="QZSJ != null" >
+        to_date(#{QZSJ,jdbcType=DATE},'yyyy-mm-dd HH24:mi:ss'),
+      </if>
+      <if test="CYSJ != null" >
+        to_date(#{CYSJ,jdbcType=DATE},'yyyy-mm-dd HH24:mi:ss'),
+      </if>
+      <if test="XGBZ != null" >
+        #{XGBZ,jdbcType=NUMERIC},
+      </if>
+      <if test="MJ != null" >
+        #{MJ,jdbcType=VARCHAR},
+      </if>
+      <if test="YLFYLYLB != null" >
+        #{YLFYLYLB,jdbcType=VARCHAR},
+      </if>
+      <if test="HZGSD != null" >
+        #{HZGSD,jdbcType=VARCHAR},
+      </if>
+      <if test="BAH != null" >
+        #{BAH,jdbcType=VARCHAR},
+      </if>
+      <if test="PERSONID != null" >
+        #{PERSONID,jdbcType=VARCHAR},
+      </if>
+      <if test="YLYL1 != null" >
+        #{YLYL1,jdbcType=VARCHAR},
+      </if>
+      <if test="YLYL2 != null" >
+        #{YLYL2,jdbcType=VARCHAR},
+      </if>
+    </trim>
+	</insert>
+	
+	<!-- 通过医疗机构代码获取数据 -->
+	<select id="findByYLJGDM" parameterType="pd" resultType="pd">
+		select
+		*
+		from
+		<include refid="tableName"></include>
+		where
+		YLJGDM = #{YLJGDM}
+		<if test="CISID != null and CISID != ''"><!-- 住院号-->
+			and CISID=#{CISID} 
+		</if>
+		<if test="HZXM != null and HZXM != ''"><!-- 患者姓名-->
+			and HZXM=#{HZXM} 
+		</if>
+		<if test="PERSONID != null and PERSONID != ''"><!-- 院内唯一ID-->
+			and PERSONID=#{PERSONID} 
+		</if>
+		<if test="pd.KLX != null and pd.KLX != ''"> <!-- 患者卡类型 -->
+			and KLX = #{pd.KLX}
+		</if>
+		<if test="pd.KH != null and pd.KH != ''"> <!-- 患者卡号 -->
+			and KH = #{pd.KH}
+		</if>
+		
+	</select>
+	
+</mapper>

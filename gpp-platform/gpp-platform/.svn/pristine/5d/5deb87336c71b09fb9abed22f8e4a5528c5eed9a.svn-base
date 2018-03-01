@@ -1,0 +1,571 @@
+package com.tbyf.util;
+
+import org.codehaus.jackson.map.util.*;
+
+import java.util.*;
+
+/** 接口参数校验
+ * 修改日期：2015/11/2
+ */
+public class AppUtil  {
+	
+	protected static Logger logger = Logger.getLogger(AppUtil.class);
+	
+	/**检查参数是否完整
+	 * @param method
+	 * @param pd
+	 * @return
+	 */
+	public static boolean checkParam(String method, PageData pd){
+		boolean result = false;
+		
+		int falseCount = 0;
+		String[] paramArray = new String[20];
+		String[] valueArray = new String[20];
+		String[] tempArray  = new String[20];  //临时数组
+		if(method=="getMobileCode"){//获取短信验证码
+			paramArray = Const.APP_GETMOBILECODE_PARAM_ARRAY;  //参数
+			valueArray = Const.APP_GETMOBILECODE_VALUE_ARRAY;  //参数名称
+		}else if(method=="registered"){// 注册
+			paramArray = Const.APP_REGISTERED_PARAM_ARRAY;  //参数
+			valueArray = Const.APP_REGISTERED_VALUE_ARRAY;  //参数名称
+		}else if(method=="getAppuserByUsernmae"){//根据用户名获取会员信息
+			paramArray = Const.APP_GETAPPUSER_PARAM_ARRAY;  
+			valueArray = Const.APP_GETAPPUSER_VALUE_ARRAY;
+		}else if(method=="login"){//登录
+			paramArray = Const.APP_LOGIN_PARAM_ARRAY;  
+			valueArray = Const.APP_LOGIN_VALUE_ARRAY;  
+		}else if(method=="saveOrganization"){//机构注册
+			paramArray = Const.APP_SAVEORG_PARAM_ARRAY;
+			valueArray = Const.APP_SAVEORG_VALUE_ARRAY;
+		}else if(method=="getOrgByOrgCode"){//机构查询
+			paramArray = Const.APP_QUERYORG_PARAM_ARRAY;
+			valueArray = Const.APP_QUERYORG_VALUE_ARRAY;
+		}
+		else if(method=="saveDepartments"){//科室注册
+			paramArray = Const.APP_SAVEDEP_PARAM_ARRAY;
+			valueArray = Const.APP_SAVEDEP_VALUE_ARRAY;
+		}else if(method=="getDepByDepId"){//科室查询
+			paramArray = Const.APP_QUERYDEP_PARAM_ARRAY;
+			valueArray = Const.APP_QUERYDEP_VALUE_ARRAY;
+		}else if(method=="saveDoctor"){//医护人员注册
+			paramArray = Const.APP_SAVEDOC_PARAM_ARRAY;
+			valueArray = Const.APP_SAVEDOC_VALUE_ARRAY;
+		}else if(method=="getDocById"){//医护人员查询
+			paramArray = Const.APP_QUERYDOC_PARAM_ARRAY;
+			valueArray = Const.APP_QUERYDOC_VALUE_ARRAY;
+		}else if(method=="addOrder"){//预签约申请
+			paramArray = Const.APP_ADDGPP_AGREEMENT_APPLY_PARAM_ARRAY;
+			valueArray = Const.APP_ADDGPP_AGREEMENT_APPLY_VALUE_ARRAY;
+		}else if(method=="appSaveXywh"){
+			paramArray = Const.GPP_AGREEMENT_CONTENT_PARAM_ARRAY;
+			valueArray = Const.GPP_AGREEMENT_CONTENT_VALUE_ARRAY;
+		}else if(method=="appEditXywh"){
+			paramArray = Const.GPP_AGREEMENT_CONTENT_PARAM_ARRAY_EDIT;
+			valueArray = Const.GPP_AGREEMENT_CONTENT_VALUE_ARRAY_EDIT;
+		}else if(method=="saveAgreementService"){//新增签约管理
+			paramArray = Const.APP_ADDGPP_AGREEMENT_SERVICE_PARAM_ARRAY;
+			valueArray = Const.APP_ADDGPP_AGREEMENT_SERVICE_VALUE_ARRAY;
+		}else if(method=="editAgreementService"){//修改签约管理
+			paramArray = Const.APP_EDITGPP_AGREEMENT_SERVICE_PARAM_ARRAY;
+			valueArray = Const.APP_EIDTGPP_AGREEMENT_SERVICE_VALUE_ARRAY;
+		}else if(method=="transfer"){//签约管理--转签
+			paramArray = Const.APP_TRANSFER_GPP_AGREEMENT_SERVICE_PARAM_ARRAY;
+			valueArray = Const.APP_TRANSFER_GPP_AGREEMENT_SERVICE_VALUE_ARRAY;
+		}else if(method=="renew"){//签约管理--续约
+			paramArray = Const.APP_RENEW_GPP_AGREEMENT_SERVICE_PARAM_ARRAY;
+			valueArray = Const.APP_RENEW_GPP_AGREEMENT_SERVICE_VALUE_ARRAY;
+		}else if(method=="rescission"){//签约管理--解约
+			paramArray = Const.APP_RESCISSION_GPP_AGREEMENT_SERVICE_PARAM_ARRAY;
+			valueArray = Const.APP_RESCISSION_GPP_AGREEMENT_SERVICE_VALUE_ARRAY;
+		}else if(method=="saveBloodSugar"){//门诊测血糖 新增
+			paramArray = Const.APP_SAVE_GPP_BLOODSUGAR_PARAM_ARRAY;
+			valueArray = Const.APP_SAVE_GPP_BLOODSUGAR_VALUE_ARRAY;
+		}else if(method=="intAgreementService_agreeApply"){//变更申请--审核通过
+			paramArray = Const.APP_AGREEAPPLY_GPP_AGREEMENTCHANGE_PARAM_ARRAY;
+			valueArray = Const.APP_AGREEAPPLY_GPP_AGREEMENTCHANGE_VALUE_ARRAY;
+		}else if(method=="intAgreementService_unagreeApply"){//变更申请--审核拒绝
+			paramArray = Const.APP_UNAGREEAPPLY_GPP_AGREEMENTCHANGE_PARAM_ARRAY;
+			valueArray = Const.APP_UNAGREEAPPLY_GPP_AGREEMENTCHANGE_VALUE_ARRAY;
+		}else if(method=="intAgreementService_expire"){//变更申请--作废
+			paramArray = Const.APP_EXPIRE_GPP_AGREEMENTCHANGE_PARAM_ARRAY;
+			valueArray = Const.APP_EXPIRE_GPP_AGREEMENTCHANGE_VALUE_ARRAY;
+		}else if(method=="saveTeamApp"){//签约团队新增
+			paramArray = Const.APP_ADDGPP_TEAM_ADD_PARAM_ARRAY;
+			valueArray = Const.APP_ADDGPP_TEAM_ADD_VALUE_ARRAY;
+		}else if(method=="editTeamApp"){//签约团队编辑
+			paramArray = Const.APP_ADDGPP_TEAM_EDIT_PARAM_ARRAY;
+			valueArray = Const.APP_ADDGPP_TEAM_EDIT_VALUE_ARRAY;
+		}else if(method=="validateTeamNameApp"){//签约团队名称唯一性判断
+			paramArray = Const.APP_ADDGPP_TEAM_VALIDATE_PARAM_ARRAY;
+			valueArray = Const.APP_ADDGPP_TEAM_VALIDATE_VALUE_ARRAY;
+		}else if(method=="validateMemberApp"){//签约团队成员唯一性判断
+			paramArray = Const.APP_ADDGPP_TEAMMEMBER_VALIDATE_PARAM_ARRAY;
+			valueArray = Const.APP_ADDGPP_TEAMMEMBER_VALIDATE_VALUE_ARRAY;
+		}else if(method=="statusTeamApp"){//签约团队更新状态
+			paramArray = Const.APP_ADDGPP_TEAM_STATUS_PARAM_ARRAY;
+			valueArray = Const.APP_ADDGPP_TEAM_STATUS_VALUE_ARRAY;
+		}else if(method=="saveGmPatientApp"){//过敏管理新增信息
+			paramArray = Const.APP_ADDGPP_GM_ADD_PARAM_ARRAY;
+			valueArray = Const.APP_ADDGPP_GM_ADD_VALUE_ARRAY;
+		}else if(method=="editGmPatientApp"){//过敏管理编辑信息
+			paramArray = Const.APP_ADDGPP_GM_EDIT_PARAM_ARRAY;
+			valueArray = Const.APP_ADDGPP_GM_EDIT_VALUE_ARRAY;
+		}else if(method=="appSaveMZCXY"){//门诊测血压新增
+			paramArray = Const.APP_BLOODPRESSURE_ADD_PARAM_ARRAY;
+			valueArray = Const.APP_BLOODPRESSURE_ADD_VALUE_ARRAY;
+		}else if(method=="appEditMZCXY"){//门诊测血压修改
+			paramArray = Const.APP_BLOODPRESSURE_EDIT_PARAM_ARRAY;
+			valueArray = Const.APP_BLOODPRESSURE_EDIT_VALUE_ARRAY;
+		}else if(method=="saveCheckApp"){//检查管理新增信息
+			paramArray = Const.APP_ADDGPP_CHECK_ADD_PARAM_ARRAY;
+			valueArray = Const.APP_ADDGPP_CHECK_ADD_VALUE_ARRAY;
+		}else if(method=="editCheckApp"){//检查申请管理编辑信息
+			paramArray = Const.APP_ADDGPP_CHECK_EDIT_PARAM_ARRAY;
+			valueArray = Const.APP_ADDGPP_CHECK_EDIT_VALUE_ARRAY;
+		}else if(method=="saveInjectionApp"){//注射登记新增信息
+			paramArray = Const.APP_ADDGPP_INJECTION_ADD_PARAM_ARRAY;
+			valueArray = Const.APP_ADDGPP_INJECTION_ADD_VALUE_ARRAY;
+		}else if(method=="editInjectionApp"){//注射登记管理编辑信息
+			paramArray = Const.APP_ADDGPP_INJECTION_EDIT_PARAM_ARRAY;
+			valueArray = Const.APP_ADDGPP_INJECTION_EDIT_VALUE_ARRAY;
+		}else if(method=="addTask"){//全科医生任务列表--新增
+			paramArray = Const.APP_ADDGPP_TASK_PARAM_ARRAY;
+			valueArray = Const.APP_ADDGPP_TASK_VALUE_ARRAY;
+		}else if(method=="editTask"){//全科医生任务列表--修改
+			paramArray = Const.APP_EIDTGPP_TASK_PARAM_ARRAY;
+			valueArray = Const.APP_EIDTGPP_TASK_VALUE_ARRAY;
+		}else if(method=="dealTask"){//全科医生任务列表--处理
+			paramArray = Const.APP_DEALGPP_TASK_PARAM_ARRAY;
+			valueArray = Const.APP_DEALGPP_TASK_VALUE_ARRAY;
+		}else if(method=="addPatient"){//患者信息--新增
+			paramArray = Const.APP_ADDGPP_PATIENT_PARAM_ARRAY;
+			valueArray = Const.APP_ADDGPP_PATIENT_VALUE_ARRAY;
+		//}else if(method=="editPatient"){//患者信息--修改
+		//	paramArray = Const.APP_EIDTGPP_PATIENT_PARAM_ARRAY;
+		//	valueArray = Const.APP_EIDTGPP_PATIENT_VALUE_ARRAY;
+		}else if(method=="addHospitalization"){//住院证--新增
+			paramArray = Const.APP_ADDGPP_HOSPITALIZATION_PARAM_ARRAY;
+			valueArray = Const.APP_ADDGPP_HOSPITALIZATION_VALUE_ARRAY;
+		//}else if(method=="editHospitalization"){//住院证--修改
+		//	paramArray = Const.APP_EIDTGPP_HOSPITALIZATION_PARAM_ARRAY;
+		//	valueArray = Const.APP_EIDTGPP_HOSPITALIZATION_VALUE_ARRAY;
+		}else if(method=="appSaveJCWSTX"){//基层卫生提醒--新增
+			paramArray = Const.APP_TB_HYGIENE_REMIND_ADD_PARAM_ARRAY;
+			valueArray = Const.APP_TB_HYGIENE_REMIND_ADD_VALUE_ARRAY;
+		}else if(method=="appEditJCWSTX"){//基层卫生提醒--修改
+			paramArray = Const.APP_TB_HYGIENE_REMIND_EDIT_PARAM_ARRAY;
+			valueArray = Const.APP_TB_HYGIENE_REMIND_EDIT_VALUE_ARRAY;
+
+		}else if(method=="saveSydj"){//输液登记--新增
+			paramArray = Const.APP_ADD_GPP_INFUSION_REGISTRATION_PARAM_ARRAY;
+			valueArray = Const.APP_ADD_GPP_INFUSION_REGISTRATION_VALUE_ARRAY;
+		}else if(method=="editSydj"){//输液登记--修改
+			paramArray = Const.APP_EDIT_GPP_INFUSION_REGISTRATION_PARAM_ARRAY;
+			valueArray = Const.APP_EDIT_GPP_INFUSION_REGISTRATION_VALUE_ARRAY;
+
+
+		}else if(method=="appSaveBLFYYPGL"){//不良反应药品管理--新增
+			paramArray = Const.APP_GPP_ADVERSE_DRUG_REACTION_ADD_PARAM_ARRAY;
+			valueArray = Const.APP_GPP_ADVERSE_DRUG_REACTION_ADD_VALUE_ARRAY;
+		}else if(method=="appEditBLFYYPGL"){//不良反应药品管理--修改
+			paramArray = Const.APP_GPP_ADVERSE_DRUG_REACTION_EDIT_PARAM_ARRAY;
+			valueArray = Const.APP_GPP_ADVERSE_DRUG_REACTION_EDIT_VALUE_ARRAY;
+
+		}else if(method=="addSkintest"){//皮试管理--新增
+			paramArray = Const.APP_ADDGPP_SKINTEST_PARAM_ARRAY;
+			valueArray = Const.APP_ADDGPP_SKINTEST_VALUE_ARRAY;
+		//}else if(method=="editSkintest"){//皮试管理--修改
+		//	paramArray = Const.APP_EDITGPP_SKINTEST_PARAM_ARRAY;
+		//	valueArray = Const.APP_EDITGPP_SKINTEST_VALUE_ARRAY;
+		}else if(method=="editSh"){//预签约申请审核
+			paramArray = Const.APP_EDITGPP_AGREEMENT_SH_PARAM_ARRAY;
+			valueArray = Const.APP_EDITGPP_AGREEMENT_SH_VALUE_ARRAY;
+		}else if(method=="editAppUserPW"){//修改appUser密码
+			paramArray = Const.EDITPW_SYS_APP_USER_PARAM_ARRAY;
+			valueArray = Const.EDITPW_SYS_APP_USER_VALUE_ARRAY;
+		}else if(method=="findAppUserPW"){//找回密码修改
+			paramArray = Const.FIND_SYS_APP_USER_PARAM_ARRAY;
+			valueArray = Const.FIND_SYS_APP_USER_PARAM_ARRAY;
+		}else if(method=="view"){//预签约申请查询详情
+			paramArray = Const.APP_FINDBYID_AGREEMENT_PARAM_ARRAY;
+			valueArray = Const.APP_FINDBYID_AGREEMENT_VALUE_ARRAY;
+		}else if(method=="editBloodSugar"){//门诊测血糖 修改
+			paramArray = Const.APP_EDIT_GPP_BLOODSUGAR_PARAM_ARRAY;
+			valueArray = Const.APP_EDIT_GPP_BLOODSUGAR_VALUE_ARRAY;
+		}else if(method=="queryPage"){//预签约申请查询详情
+			paramArray = Const.APP_QUERYPAGE_AGREEMENT_PARAM_ARRAY;
+			valueArray = Const.APP_QUERYPAGE_AGREEMENT_VALUE_ARRAY;
+		}else if(method=="InjectionQueryPage"){//注射登记查询详情
+			paramArray = Const.APP_INJECTIONQUERYPAGE_AGREEMENT_PARAM_ARRAY;
+			valueArray = Const.APP_INJECTIONQUERYPAGE_AGREEMENT_VALUE_ARRAY;
+		}else if(method=="GmQueryPage"){//过敏管理申请查询详情
+			paramArray = Const.APP_GMQUERYPAGE_AGREEMENT_PARAM_ARRAY;
+			valueArray = Const.APP_GMQUERYPAGE_AGREEMENT_VALUE_ARRAY;
+		}else if(method=="CheckQueryPage"){//检查申请查询详情
+			paramArray = Const.APP_CHECKQUERYPAGE_AGREEMENT_PARAM_ARRAY;
+			valueArray = Const.APP_CHECKQUERYPAGE_AGREEMENT_VALUE_ARRAY;
+		}else if(method=="TeamQueryPage"){//团队查询详情
+			paramArray = Const.APP_TEAMQUERYPAGE_AGREEMENT_PARAM_ARRAY;
+			valueArray = Const.APP_TEAMQUERYPAGE_AGREEMENT_VALUE_ARRAY;
+		}else if(method=="TeamQueryPageByProvider"){//团队查询详情
+			paramArray = Const.APP_TEAMQUERYPAGEBYPROVIDER_AGREEMENT_PARAM_ARRAY;
+			valueArray = Const.APP_TEAMQUERYPAGEBYPROVIDER_AGREEMENT_VALUE_ARRAY;
+		}else if(method=="GgglQueryPage"){//广告管理查询
+			paramArray = Const.APP_GGGL_AGREEMENT_PARAM_ARRAY;
+			valueArray = Const.APP_GGGL_AGREEMENT_VALUE_ARRAY;
+		}else if(method=="loginjmxx"){ //居民登陆
+			paramArray = Const.APP_JMXX_LOGIN_PARAM_ARRAY;  //参数
+			valueArray = Const.APP_JMXX_LOGIN_VALUE_ARRAY;  //参数名称
+		}else if(method=="UserPhoneBind"){ //医生用户绑定手机号
+			paramArray = Const.APP_USER_PHONEBIND_PARAM_ARRAY;  //参数
+			valueArray = Const.APP_USER_PHONEBIND_VALUE_ARRAY;  //参数名称
+		}else if(method=="savejmxx"){//居民注册
+			paramArray = Const.APP_JMXX_SAVE_PARAM_ARRAY;
+			valueArray = Const.APP_JMXX_SAVE_VALUE_ARRAY;
+		}else if(method=="editJmxxPw"){//居民密码修改
+			paramArray = Const.APP_JMXX_EDITPW_PARAM_ARRAY;
+			valueArray = Const.APP_JMXX_EDITPW_VALUE_ARRAY;
+		}else if(method=="phoneeditJmxxPw"){//居民忘记密码密码修改
+			paramArray = Const.APP_JMXX_PHONEEDITPW_PARAM_ARRAY;
+			valueArray = Const.APP_JMXX_PHONEEDITPW_VALUE_ARRAY;
+		}else if(method=="editJmxx"){//居民信息修改
+			paramArray = Const.APP_JMXX_EDIT_PARAM_ARRAY;
+			valueArray = Const.APP_JMXX_EDIT_VALUE_ARRAY;
+		}else if(method=="sfjlQueryPage"){//随访管理查询
+			paramArray = Const.APP_SFGL_AGREEMENT_PARAM_ARRAY;
+			valueArray = Const.APP_SFGL_AGREEMENT_VALUE_ARRAY;
+		}else if(method=="appSaveSFJL"){//随访管理新增
+			paramArray = Const.APP_SFGL_SAVE_AGREEMENT_PARAM_ARRAY;
+			valueArray = Const.APP_SFGL_SAVE_AGREEMENT_VALUE_ARRAY;
+		}else if(method=="appEditSFJL"){//随访管理修改
+			paramArray = Const.APP_SFGL_EDIT_AGREEMENT_PARAM_ARRAY;
+			valueArray = Const.APP_SFGL_EDIT_AGREEMENT_VALUE_ARRAY;
+		}else if(method=="sfTempQueryPage"){//随访模版查询
+			paramArray = Const.APP_SFTEMP_AGREEMENT_PARAM_ARRAY;
+			valueArray = Const.APP_SFTEMP_AGREEMENT_VALUE_ARRAY;
+		}else if(method=="appSaveSfTemp"){//随访模版新增
+			paramArray = Const.APP_SFTEMP_SAVE_PARAM_ARRAY;
+			valueArray = Const.APP_SFTEMP_SAVE_VALUE_ARRAY;
+		}else if(method=="appEditSfTemp"){
+			paramArray = Const.APP_SFTEMP_EDIT_PARAM_ARRAY;
+			valueArray = Const.APP_SFTEMP_EDIT_VALUE_ARRAY;
+		}
+		else if(method=="appSaveSfjlHypertension"){//高血压随访管理新增 
+			paramArray = Const.APP_SFGL_HYPERTENSION_SAVE_AGREEMENT_PARAM_ARRAY;
+			valueArray = Const.APP_SFGL_HYPERTENSION_SAVE_AGREEMENT_VALUE_ARRAY;
+		}else if(method=="appEditSfjlHypertension"){//高血压随访管理修改
+			paramArray = Const.APP_SFGL_HYPERTENSION_EDIT_AGREEMENT_PARAM_ARRAY;  
+			valueArray = Const.APP_SFGL_HYPERTENSION_EDIT_AGREEMENT_VALUE_ARRAY;
+		}
+		else if(method=="appSaveSfjlDiabetes"){//糖尿病随访管理新增 
+			paramArray = Const.APP_SFGL_DIABETES_SAVE_AGREEMENT_PARAM_ARRAY;
+			valueArray = Const.APP_SFGL_DIABETES_SAVE_AGREEMENT_VALUE_ARRAY;
+		}else if(method=="appEditSfjlDiabetes"){//糖尿病随访管理修改
+			paramArray = Const.APP_SFGL_DIABETES_EDIT_AGREEMENT_PARAM_ARRAY;
+			valueArray = Const.APP_SFGL_DIABETES_EDIT_AGREEMENT_VALUE_ARRAY;
+		}
+		else if(method=="appSaveSfjlMentalillness"){//精神病随访管理新增
+			paramArray = Const.APP_SFGL_MENTALILLNESS_SAVE_AGREEMENT_PARAM_ARRAY;
+			valueArray = Const.APP_SFGL_MENTALILLNESS_SAVE_AGREEMENT_VALUE_ARRAY;
+		}else if(method=="appEditSfjlMentalillness"){//精神病随访管理修改  
+			paramArray = Const.APP_SFGL_MENTALILLNESS_EDIT_AGREEMENT_PARAM_ARRAY;
+			valueArray = Const.APP_SFGL_MENTALILLNESS_EDIT_AGREEMENT_VALUE_ARRAY;
+		}
+		
+		else if(method=="saveFeedbackApp"){//意见反馈
+			paramArray = Const.APP_FEEDBACK_PARAM_ARRAY;
+			valueArray = Const.APP_FEEDBACK_VALUE_ARRAY;
+		}else if(method=="saveregapp"){//APP预约挂号申请
+			paramArray = Const.APP_REGAPP_PARAM_ARRAY;
+			valueArray = Const.APP_REGAPP_VALUE_ARRAY;
+		}else if(method=="queryregapp"){//APP预约挂号查询
+			paramArray = Const.APP_QUERY_REGAPP_PARAM_ARRAY;
+			valueArray = Const.APP_QUERY_REGAPP_VALUE_ARRAY;
+		}else if(method=="savejkzxinfo"){//健康咨询记录
+			paramArray = Const.APP_SAVE_JKZX_PARAM_ARRAY;
+			valueArray = Const.APP_SAVE_JKZX_VALUE_ARRAY;
+		}else if(method=="savejkzxcontent"){//健康咨询信息
+			paramArray = Const.APP_SAVE_JKZX_CONTENT_PARAM_ARRAY;
+			valueArray = Const.APP_SAVE_JKZX_CONTENT_VALUE_ARRAY;
+		}else if(method=="queryJkzxContent"){//健康咨询记录详情查询
+			paramArray = Const.APP_QUERY_JKZX_CONTENT_PARAM_ARRAY;
+			valueArray = Const.APP_QUERY_JKZX_CONTENT_VALUE_ARRAY;
+		}else if(method=="jkview"){//查看健康资讯
+			paramArray = Const.APP_FINDBYID_JKZX_PARAM_ARRAY;
+			valueArray = Const.APP_FINDBYID_JKZX_VALUE_ARRAY;
+		}else if(method=="appSaveTSXX"){//推送消息
+			paramArray = Const.APP_TSXX_PARAM_ARRAY;
+			valueArray = Const.APP_TSXX_VALUE_ARRAY;
+		}else if(method=="appEditDZ"){//推送消息点赞
+			paramArray = Const.APP_TSXX_DZ_PARAM_ARRAY;
+			valueArray = Const.APP_TSXX_DZ_VALUE_ARRAY;
+		}else if(method=="saveGrdzblApp"){//录入个人电子病历
+			paramArray = Const.APP_GRDZBL_PARAM_ARRAY;
+			valueArray = Const.APP_GRDZBL_VALUE_ARRAY;
+		}else if(method=="editJkzx"){//健康咨询修改
+			paramArray = Const.APP_EDIT_JKZX_PARAM_ARRAY;
+			valueArray = Const.APP_EDIT_JKZX_VALUE_ARRAY;
+		}else if(method=="getProvider"){//同机构医护人员查询
+			paramArray = Const.APP_GETPROVIDER_PARAM_ARRAY;
+			valueArray = Const.APP_GETPROVIDER_VALUE_ARRAY;
+		}else if(method=="getProviderByUserAndCode"){//根据医生机构查询医护人员
+			paramArray = Const.APP_GETPROVIDERBYUSERANDCODE_PARAM_ARRAY;
+			valueArray = Const.APP_GETPROVIDERBYUSERANDCODE_VALUE_ARRAY;
+		}else if(method=="myFeedback"){//居民查询意见反馈
+			paramArray = Const.APP_MYFEEDBACK_PARAM_ARRAY;
+			valueArray = Const.APP_MYFEEDBACK_VALUE_ARRAY;
+		}else if(method=="HealthQueryPage"){//健康资讯查询接口
+			paramArray = Const.APP_HEALTH_PARAM_ARRAY;
+			valueArray = Const.APP_HEALTH_VALUE_ARRAY;
+		}else if(method=="myGrdzbl"){//居民查看已提交个人病历
+			paramArray = Const.APP_MYGRDZBL_PARAM_ARRAY;
+			valueArray = Const.APP_MYGRDZBL_VALUE_ARRAY;
+		}else if(method=="noticeQueryPage"){//通知公告查询
+			paramArray = Const.APP_NOTICE_PARAM_ARRAY;
+			valueArray = Const.APP_NOTICE_VALUE_ARRAY;
+		}else if(method=="addAgreementChange"){ //app变更申请
+			paramArray = Const.APP_AGERMENTCHANGE_PARAM_ARRAY;
+			valueArray = Const.APP_AGERMENTCHANGE_VALUE_ARRAY;
+		}else if(method=="addTeamMemberApp"){ //新增签约团队成员
+			paramArray = Const.APP_ADDTEAMMEMBER_PARAM_ARRAY;
+			valueArray = Const.APP_ADDTEAMMEMBER_VALUE_ARRAY;
+		}else if(method=="delTeamMemberApp"){
+			paramArray = Const.APP_DELTEAMMEMBER_PARAM_ARRAY;
+			valueArray = Const.APP_DELTEAMMEMBER_VALUE_ARRAY;
+		}else if(method=="updateTeamMemberApp"){
+			paramArray = Const.APP_UPDATETEAMMEMBER_PARAM_ARRAY;
+			valueArray = Const.APP_UPDATETEAMMEMBER_VALUE_ARRAY;
+		}else if(method=="addFhsms"){
+			paramArray = Const.APP_ADDFHSMS_PARAM_ARRAY;
+			valueArray = Const.APP_ADDFHSMS_VALUE_ARRAY;
+		}
+		else if(method == "saveRegapp"){//医生预约信息注册接口参数
+			paramArray = Const.HM_REGAPP_SAVE_PARAM_ARRY;
+			valueArray = Const.HM_REGAPP_SAVE_VALUE_ARRY;
+		}
+		else if(method == "editRegapp"){//医生的预约信息更新接口参数
+			paramArray = Const.HM_REGAPP_EDIT_PARAM_ARRY;
+			valueArray = Const.HM_REGAPP_EDIT_VALUE_ARRY;
+		}
+		else if(method == "showInfoRegapp"){//医生预约信息详情接口参数
+			paramArray = Const.HM_REGAPP_FIND_PARAM_ARRY;
+			valueArray = Const.HM_REGAPP_FIND_VALUE_ARRY;
+		}
+		else if(method == "arrangementRegapp"){//医生排班接口参数
+			paramArray = Const.HM_REGAPP_ARRANGEMENT_SAVE_PARAM_ARRY;
+			valueArray = Const.HM_REGAPP_ARRANGEMENT_SAVE_VALUE_ARRY;
+		}
+		else if(method == "editArrangementRegapp") {//医生排班的修改接口
+			paramArray = Const.HM_REGAPP_ARRANGEMENT_EDIT_PARAM_ARRY;
+			valueArray = Const.HM_REGAPP_ARRANGEMENT_EDIT_VALUE_ARRY;
+		}
+		else if(method == "queryPageUric") {//app尿酸记录分页查询
+			paramArray = Const.APP_URIC_QUERY_PAPE_PARAM_ARRY;
+			valueArray = Const.APP_URIC_QUERY_PAPE_VALUE_ARRY;
+		}
+		else if(method == "delUric") {//app删除一条尿酸记录
+			paramArray = Const.APP_URIC_DEL_PARAM_ARRY;
+			valueArray = Const.APP_URIC_DEL_VALUE_ARRY;
+		}
+		else if(method == "addUric") {//APP增加尿酸记录
+			paramArray = Const.APP_URIC_SAVE_PARAM_ARRY;
+			valueArray = Const.APP_URIC_SAVE_VALUE_ARRY;
+		}
+		else if(method == "editUric") {//app修改尿酸记录
+			paramArray = Const.APP_URIC_EDIT_PARAM_ARRY;
+			valueArray = Const.APP_URIC_EDIT_VALUE_ARRY;
+		}
+		else if(method == "findByIdUric") {//app查询尿酸记录
+			paramArray = Const.APP_URIC_FIND_PARAM_ARRY;
+			valueArray = Const.APP_URIC_FIND_VALUE_ARRY;
+		}
+		else if(method == "queryPageFat") {//app血脂四项记录分页查询
+			paramArray = Const.APP_FAT_QUERY_PAPE_PARAM_ARRY;
+			valueArray = Const.APP_FAT_QUERY_PAPE_VALUE_ARRY;
+		}
+		else if(method == "delFat") {//app删除一条血脂四项记录记录
+			paramArray = Const.APP_FAT_DEL_PARAM_ARRY;
+			valueArray = Const.APP_FAT_DEL_VALUE_ARRY;
+		}
+		else if(method == "addFat") {//APP增加血脂四项记录记录
+			paramArray = Const.APP_FAT_SAVE_PARAM_ARRY;
+			valueArray = Const.APP_FAT_SAVE_VALUE_ARRY;
+		}
+		else if(method == "editFat") {//app修改血脂四项记录记录
+			paramArray = Const.APP_FAT_EDIT_PARAM_ARRY;
+			valueArray = Const.APP_FAT_EDIT_VALUE_ARRY;
+		}
+		else if(method == "findByIdFat") {//APP查询血脂四项记录
+			paramArray = Const.APP_FAT_FIND_PARAM_ARRY;
+			valueArray = Const.APP_FAT_FIND_VALUE_ARRY;
+		}
+		else if(method == "queryPageSugar") {//app血糖记录分页查询
+			paramArray = Const.APP_SUGAR_QUERY_PAPE_PARAM_ARRY;
+			valueArray = Const.APP_SUGAR_QUERY_PAPE_VALUE_ARRY;
+		}
+		else if(method == "delSugar") {//app删除一条血糖记录
+			paramArray = Const.APP_SUGAR_DEL_PARAM_ARRY;
+			valueArray = Const.APP_SUGAR_DEL_VALUE_ARRY;
+		}
+		else if(method == "addSugar") {//APP增加血糖记录
+			paramArray = Const.APP_SUGAR_SAVE_PARAM_ARRY;
+			valueArray = Const.APP_SUGAR_SAVE_VALUE_ARRY;
+		}
+		else if(method == "editSugar") {//app修改血糖记录
+			paramArray = Const.APP_SUGAR_EDIT_PARAM_ARRY;
+			valueArray = Const.APP_SUGAR_EDIT_VALUE_ARRY;
+		}
+		else if(method == "findByIdSugar") {//app查询血糖记录
+			paramArray = Const.APP_SUGAR_FIND_PARAM_ARRY;
+			valueArray = Const.APP_SUGAR_FIND_VALUE_ARRY;
+		}
+		else if(method == "queryPageShape") {//app体型记录分页查询
+			paramArray = Const.APP_SHAPE_QUERY_PAPE_PARAM_ARRY;
+			valueArray = Const.APP_SHAPE_QUERY_PAPE_VALUE_ARRY;
+		}
+		else if(method == "delShape") {//app删除一条体型记录
+			paramArray = Const.APP_SHAPE_DEL_PARAM_ARRY;
+			valueArray = Const.APP_SHAPE_DEL_VALUE_ARRY;
+		}
+		else if(method == "addShape") {//APP增加体型记录
+			paramArray = Const.APP_SHAPE_SAVE_PARAM_ARRY;
+			valueArray = Const.APP_SHAPE_SAVE_VALUE_ARRY;
+		}
+		else if(method == "editShape") {//app修改体型记录
+			paramArray = Const.APP_SHAPE_EDIT_PARAM_ARRY;
+			valueArray = Const.APP_SHAPE_EDIT_VALUE_ARRY;
+		}
+		else if(method == "findByIdShape") {//app查询体型记录
+			paramArray = Const.APP_SHAPE_FIND_PARAM_ARRY;
+			valueArray = Const.APP_SHAPE_FIND_VALUE_ARRY;
+		}
+		else if(method == "queryPagePressure") {//app血压记录分页查询
+			paramArray = Const.APP_PRESSURE_QUERY_PAPE_PARAM_ARRY;
+			valueArray = Const.APP_PRESSURE_QUERY_PAPE_VALUE_ARRY;
+		}
+		else if(method == "delPressure") {//app删除一条血压记录
+			paramArray = Const.APP_PRESSURE_DEL_PARAM_ARRY;
+			valueArray = Const.APP_PRESSURE_DEL_VALUE_ARRY;
+		}
+		else if(method == "addPressure") {//APP增加血压记录
+			paramArray = Const.APP_PRESSURE_SAVE_PARAM_ARRY;
+			valueArray = Const.APP_PRESSURE_SAVE_VALUE_ARRY;
+		}
+		else if(method == "editPressure") {//app修改血压记录
+			paramArray = Const.APP_PRESSURE_EDIT_PARAM_ARRY;
+			valueArray = Const.APP_PRESSURE_EDIT_VALUE_ARRY;
+		}
+		else if(method == "findByIdPressure") {//app查询血压记录
+			paramArray = Const.APP_PRESSURE_FIND_PARAM_ARRY;
+			valueArray = Const.APP_PRESSURE_FIND_VALUE_ARRY;
+		}
+		else if(method == "delHealthType") {//app删除健康资讯类型
+			paramArray = Const.APP_HEALTHTYPE_DEL_PARAM_ARRY;
+			valueArray = Const.APP_HEALTHTYPE_DEL_VALUE_ARRY;
+		}
+		else if(method == "editHealthType") {//app修改健康资讯类型
+			paramArray = Const.APP_HEALTHTYPE_EDIT_PARAM_ARRY;
+			valueArray = Const.APP_HEALTHTYPE_EDIT_VALUE_ARRY;
+		}
+		else if(method == "addHealthType") {//app修改健康资讯类型
+			paramArray = Const.APP_HEALTHTYPE_SAVE_PARAM_ARRY;
+			valueArray = Const.APP_HEALTHTYPE_SAVE_VALUE_ARRY;
+		}
+		else if(method == "saveDeviceInformation") {//打开app保存设备消息
+			paramArray = Const.APP_DEVICEPUSH_SAVEDEVICE_PARAM_ARRY;
+			valueArray = Const.APP_DEVICEPUSH_SAVEDEVICE_VALUE_ARRY;
+		}
+		else if(method == "saveUserInformation") {//登录app获得用户信息
+			paramArray = Const.APP_DEVICEPUSH_SAVEUSER_PARAM_ARRY;
+			valueArray = Const.APP_DEVICEPUSH_SAVEUSER_VALUE_ARRY;
+		}
+		else if(method == "editFourMsgState") {//登录进来保存用户设置（站内信，官博）的状态
+			paramArray = Const.APP_DEVICEPUSH_SAVEFOURMSGTYPE_PARAM_ARRY;
+			valueArray = Const.APP_DEVICEPUSH_SAVEFOURMSGTYPE_VALUE_ARRY;
+		}
+		int size = paramArray.length;
+		for(int i=0;i<size;i++){
+			String param = paramArray[i];
+			if(!pd.containsKey(param)){
+				tempArray[falseCount] = valueArray[i]+"--"+param;
+				falseCount += 1;
+			}
+		}
+		if(falseCount>0){
+			logger.error(method+"接口，请求协议中缺少 "+falseCount+"个 参数");
+			for(int j=1;j<=falseCount;j++){
+				logger.error("   第"+j+"个："+ tempArray[j-1]);
+			}
+		} else {
+			result = true;
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * 设置分页的参数
+	 * @param pd
+	 * @return
+	 */
+	public static PageData setPageParam(PageData pd){
+		String page_now_str = pd.get("page_now").toString();
+		int pageNowInt = Integer.parseInt(page_now_str)-1;
+		String page_size_str = pd.get("page_size").toString(); //每页显示记录数
+		int pageSizeInt = Integer.parseInt(page_size_str);
+		String page_now = pageNowInt+"";
+		String page_start = (pageNowInt*pageSizeInt)+"";
+		pd.put("page_now", page_now);
+		pd.put("page_start", page_start);
+		return pd;
+	}
+	
+	/**设置list中的distance
+	 * @param list
+	 * @param pd
+	 * @return
+	 */
+	public static List<PageData>  setListDistance(List<PageData> list, PageData pd){
+		List<PageData> listReturn = new ArrayList<PageData>();
+		String user_longitude = "";
+		String user_latitude = "";
+		try{
+			user_longitude = pd.get("user_longitude").toString(); //"117.11811";
+			user_latitude  = pd.get("user_latitude").toString();  //"36.68484";
+		} catch(Exception e){
+			logger.error("缺失参数--user_longitude和user_longitude");
+			logger.error("lost param：user_longitude and user_longitude");
+		}
+		PageData pdTemp = new PageData();
+		int size = list.size();
+		for(int i=0;i<size;i++){
+			pdTemp = list.get(i);
+			String longitude = pdTemp.get("longitude").toString();
+			String latitude = pdTemp.get("latitude").toString();
+			String distance = MapDistance.getDistance(
+						user_longitude,	user_latitude,
+						longitude,		latitude
+					);
+			pdTemp.put("distance", distance);
+			pdTemp.put("size", distance.length());
+			listReturn.add(pdTemp);
+		}
+		return listReturn;
+	}
+	
+	/**
+	 * @param pd
+	 * @param map
+	 * @return
+	 */
+	@SuppressWarnings("rawtypes")
+	public static Object returnObject(PageData pd, Map map){
+		if(pd.containsKey("callback")){
+			String callback = pd.get("callback").toString();
+			return new JSONPObject(callback, map);
+		}else{
+			return map;
+		}
+	}
+}

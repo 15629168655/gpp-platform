@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MzjzjlMapper">
+	<!--表名 -->
+	<!-- 门诊就诊记录表 -->
+	<sql id="tableName">
+		TB_YL_MZ_MEDICAL_RECORD
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+	   	  yljgdm,
+		  jzlsh,
+		  kh,
+		  klx,
+		  hzxm,
+		  jzlx,
+		  txbz,
+		  jzksbm,
+		  jzksmc,
+		  jzksrq,
+		  zzysgh,
+		  zzysxm,
+		  jzzdbm,
+		  mzzdmc,
+		  bmlx,
+		  jzzdsm,
+		  xbs,
+		  zs,
+		  zzms,
+		  xgbz,
+		  sffz,
+		  sfyy,
+		  mj,
+		  ylyl1,
+		  ylyl2,
+		  ylfylylb,
+		  hzgsd,
+		  personid
+	</sql>
+	
+	<!-- 列表 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select 
+			<include refid="Field"></include> 
+		from 
+			<include refid="tableName"></include> 
+		<where>
+			<if test="pd.keywords != null and pd.keywords!= ''"><!-- 关键词检索 -->
+				HZXM = #{pd.keywords}
+				
+		</if>
+		</where>
+	</select>
+	
+	<!-- 通过门诊就诊记录表的患者ID获取流水号-->
+	<select id="findByPersonid" parameterType="pd" resultType="pd">
+		select 
+			<include refid="Field"></include> 
+		from 
+			<include refid="tableName"></include> 
+		<where>
+			 personid = #{personid,jdbcType=VARCHAR}
+		</where>
+	</select>
+	<!-- 新增-->
+	<insert id="save" parameterType="pd">
+		insert into <include refid="tableName"></include>
+		(
+			ID,YLJGDM,JZLSH,KH,KLX,HZXM,JZLX,TXBZ,JZKSBM,JZKSMC,
+			JZKSRQ,ZZYSGH,ZZYSXM,JZZDBM,MZZDMC,BMLX,JZZDSM,XBS,ZS,ZZMS,
+			XGBZ,SFFZ,SFYY,MJ,YLYL1,YLYL2,YLFYLYLB,HZGSD,PERSONID
+		) values (
+			#{ID,jdbcType=VARCHAR},
+			#{YLJGDM,jdbcType=VARCHAR},
+			#{JZLSH,jdbcType=VARCHAR},
+			#{KH,jdbcType=VARCHAR},
+			#{KLX,jdbcType=VARCHAR},
+			#{HZXM,jdbcType=VARCHAR},
+			#{JZLX,jdbcType=VARCHAR},
+			#{TXBZ,jdbcType=VARCHAR},
+			#{JZKSBM,jdbcType=VARCHAR},
+			#{JZKSMC,jdbcType=VARCHAR},
+			#{JZKSRQ,jdbcType=VARCHAR},
+			#{ZZYSGH,jdbcType=VARCHAR},
+			#{ZZYSXM,jdbcType=VARCHAR},
+			#{JZZDBM,jdbcType=VARCHAR},
+			#{MZZDMC,jdbcType=VARCHAR},
+			#{BMLX,jdbcType=VARCHAR},
+			#{JZZDSM,jdbcType=VARCHAR},
+			#{XBS,jdbcType=VARCHAR},
+			#{ZS,jdbcType=VARCHAR},
+			#{ZZMS,jdbcType=VARCHAR},
+			#{XGBZ},
+			#{SFFZ,jdbcType=VARCHAR},
+			#{SFYY,jdbcType=VARCHAR},
+			#{MJ,jdbcType=VARCHAR},
+			#{YLYL1,jdbcType=VARCHAR},
+			#{YLYL2,jdbcType=VARCHAR},
+			#{YLFYLYLB,jdbcType=VARCHAR},
+			#{HZGSD,jdbcType=VARCHAR},
+			#{PERSONID,jdbcType=VARCHAR}
+		)
+	</insert>
+</mapper>

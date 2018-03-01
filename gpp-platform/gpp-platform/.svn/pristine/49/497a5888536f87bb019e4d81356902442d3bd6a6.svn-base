@@ -1,0 +1,31 @@
+package com.tbyf.service.gp.index.score.impl;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
+
+import com.tbyf.dao.DaoSupport;
+import com.tbyf.service.gp.index.score.IndexScoreManager;
+import com.tbyf.util.PageData;
+/**
+ * 评分等级
+ * @author zanxc
+ * @创建日期2017年8月4日下午5:18:34
+ */
+@Service("indexScoreService")
+public class IndexScoreService implements IndexScoreManager{
+
+	@Resource(name = "daoSupport")
+	private DaoSupport dao;
+	@Override
+	public void save(PageData pd) throws Exception {
+		dao.update("IndexScoreMapper.save", pd);
+		
+	}
+
+	@Override
+	public PageData findByScreeningQuesId(PageData pd) throws Exception {
+		return (PageData) dao.findForObject("IndexScoreMapper.findByScreeningQuesId", pd);
+	}
+
+}

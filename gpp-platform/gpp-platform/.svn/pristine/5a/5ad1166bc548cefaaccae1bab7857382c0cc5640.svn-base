@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="IndexManagerMapper">
+	<!--表名 指标管理表 -->
+	<sql id="tableName">
+		GPP_INDEX_SCREENING
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		ID,
+		INDEX_CODE,
+		INDEX_NAME,
+		PY_CODE,
+		INDEX_ORDER,
+		RESULT_TYPE,
+		NORMAL_RESULT,
+		INDEX_COMPANY,
+		DEPARTMENT,
+		TEST_DEPARTMENT,
+		FIT_SEX,
+		INDEX_STATE,
+		CREAT_TIME,
+		EDIT_TIME,
+		RESULT_MODEL,
+		SCREENING_INDEX,
+		INDEX_SCORE
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{ID, jdbcType=VARCHAR},
+		#{INDEX_CODE, jdbcType=VARCHAR},
+		#{INDEX_NAME, jdbcType=VARCHAR},
+		#{PY_CODE, jdbcType=VARCHAR},
+		#{INDEX_ORDER, jdbcType=NUMERIC},
+		#{RESULT_TYPE, jdbcType=VARCHAR},
+		#{NORMAL_RESULT, jdbcType=VARCHAR},
+		#{INDEX_COMPANY, jdbcType=VARCHAR},
+		#{DEPARTMENT, jdbcType=VARCHAR},
+		#{TEST_DEPARTMENT, jdbcType=VARCHAR},
+		#{FIT_SEX, jdbcType=VARCHAR},
+		#{INDEX_STATE, jdbcType=VARCHAR},
+		to_date(#{CREAT_TIME},'yyyy-mm-dd HH24:mi:ss'),
+		to_date(#{EDIT_TIME},'yyyy-mm-dd HH24:mi:ss'),
+		#{RESULT_MODEL, jdbcType=VARCHAR},
+		#{SCREENING_INDEX, jdbcType=VARCHAR},
+		#{INDEX_SCORE, jdbcType=VARCHAR}
+	</sql>
+	<!-- 查询全部 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select <include refid="Field"></include> from
+		<include refid="tableName"></include>
+		where 1=1 and INDEX_STATE=#{pd.INDEX_STATE, jdbcType=VARCHAR}
+        <if test="pd.keywords != null and pd.keywords !=''">
+        	and(
+        		 INDEX_NAME LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				 or
+				 INDEX_COMPANY LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				 or 
+				 INDEX_STATE LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%') 
+        	)
+        </if>
+        order by INDEX_ORDER desc
+	</select>
+	<!-- 查看详情 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+			<include refid="Field"></include>
+		from 
+			<include refid="tableName"></include>
+		where 
+			ID = #{ID,jdbcType=VARCHAR}
+	</select>
+	<!-- 编辑 -->
+	<update id="edit" parameterType="pd">
+		update
+			<include refid="tableName"></include>
+		set 
+			ID=#{ID, jdbcType=VARCHAR},
+			INDEX_CODE=#{INDEX_CODE, jdbcType=VARCHAR},
+			INDEX_NAME=#{INDEX_NAME, jdbcType=VARCHAR},
+			PY_CODE=#{PY_CODE, jdbcType=VARCHAR},
+			INDEX_ORDER=#{INDEX_ORDER, jdbcType=NUMERIC},
+			RESULT_TYPE=#{RESULT_TYPE, jdbcType=VARCHAR},
+			NORMAL_RESULT=#{NORMAL_RESULT, jdbcType=VARCHAR},
+			INDEX_COMPANY=#{INDEX_COMPANY, jdbcType=VARCHAR},
+			DEPARTMENT=#{DEPARTMENT, jdbcType=VARCHAR},
+			TEST_DEPARTMENT=#{TEST_DEPARTMENT, jdbcType=VARCHAR},
+			FIT_SEX=#{FIT_SEX, jdbcType=VARCHAR},
+			INDEX_STATE=#{INDEX_STATE, jdbcType=VARCHAR},
+			CREAT_TIME=to_date(#{CREAT_TIME},'yyyy-mm-dd HH24:mi:ss'),
+			EDIT_TIME=to_date(#{EDIT_TIME},'yyyy-mm-dd HH24:mi:ss'),
+			RESULT_MODEL=#{RESULT_MODEL, jdbcType=VARCHAR},
+			SCREENING_INDEX=#{SCREENING_INDEX, jdbcType=VARCHAR}
+		where
+			ID=#{ID, jdbcType=VARCHAR}
+	</update>
+	<!-- 删除 -->
+	<update id="delete" parameterType="pd">
+		update
+			<include refid="tableName"></include>
+		set
+			EDIT_TIME=to_date(#{EDIT_TIME},'yyyy-mm-dd HH24:mi:ss'),
+			INDEX_STATE=#{INDEX_STATE, jdbcType=VARCHAR}
+		where
+			ID=#{ID, jdbcType=VARCHAR}
+	</update>
+	<!-- 批量删除 -->
+	<update id="deleteAll" parameterType="pd">
+		update 
+		<include refid="tableName"></include>
+		set
+			EDIT_TIME=to_date(#{EDIT_TIME},'yyyy-mm-dd HH24:mi:ss'),
+			INDEX_STATE=#{INDEX_STATE, jdbcType=VARCHAR}
+		where 
+			ID in
+				${IDS}
+	</update>
+	<!-- 增加-->
+	<insert id="save" parameterType="pd">
+		insert into 
+	<include refid="tableName"></include>
+	<trim prefix="(" suffix=")" suffixOverrides="," >
+		<if test="INDEX_CODE != null" >INDEX_CODE,</if>
+		<if test="INDEX_NAME != null" >INDEX_NAME,</if>
+		<if test="PY_CODE != null" >PY_CODE,</if>
+		<if test="INDEX_ORDER != null" >INDEX_ORDER,</if>
+		<if test="RESULT_TYPE != null" >RESULT_TYPE,</if>
+		<if test="NORMAL_RESULT != null" >NORMAL_RESULT,</if>
+		<if test="INDEX_COMPANY != null" >INDEX_COMPANY,</if>
+		<if test="DEPARTMENT != null" >DEPARTMENT,</if>
+		<if test="TEST_DEPARTMENT != null" >TEST_DEPARTMENT,</if>
+		<if test="FIT_SEX != null" >FIT_SEX,</if>
+		<if test="INDEX_STATE != null" >INDEX_STATE,</if>
+		<if test="CREAT_TIME != null" >CREAT_TIME,</if>
+		<if test="EDIT_TIME != null" >EDIT_TIME,</if>
+		<if test="RESULT_MODEL != null" >RESULT_MODEL,</if>
+		<if test="SCREENING_INDEX != null" >SCREENING_INDEX,</if>
+		ID
+       </trim>
+            VALUES
+     <trim prefix="(" suffix=")" suffixOverrides="," >
+     	<if test="INDEX_CODE != null" >#{INDEX_CODE, jdbcType=VARCHAR},</if>
+		<if test="INDEX_NAME != null" >#{INDEX_NAME, jdbcType=VARCHAR},</if>
+		<if test="PY_CODE != null" >#{PY_CODE, jdbcType=VARCHAR},</if>
+		<if test="INDEX_ORDER != null" >#{INDEX_ORDER, jdbcType=NUMERIC},</if>
+		<if test="RESULT_TYPE != null" >#{RESULT_TYPE, jdbcType=VARCHAR},</if>
+		<if test="NORMAL_RESULT != null" >#{NORMAL_RESULT, jdbcType=VARCHAR},</if>
+		<if test="INDEX_COMPANY != null" >#{INDEX_COMPANY, jdbcType=VARCHAR},</if>
+		<if test="DEPARTMENT != null" >#{DEPARTMENT, jdbcType=VARCHAR},</if>
+		<if test="TEST_DEPARTMENT != null" >#{TEST_DEPARTMENT, jdbcType=VARCHAR},</if>
+		<if test="FIT_SEX != null" >#{FIT_SEX, jdbcType=VARCHAR},</if>
+		<if test="INDEX_STATE != null" >#{INDEX_STATE, jdbcType=VARCHAR},</if>
+		<if test="CREAT_TIME != null" >to_date(#{CREAT_TIME},'yyyy-mm-dd HH24:mi:ss'),</if>
+		<if test="EDIT_TIME != null" >to_date(#{EDIT_TIME},'yyyy-mm-dd HH24:mi:ss'),</if>
+		<if test="RESULT_MODEL != null" >#{RESULT_MODEL, jdbcType=VARCHAR},</if>
+		<if test="SCREENING_INDEX != null" >#{SCREENING_INDEX, jdbcType=VARCHAR},</if>
+        #{ID,jdbcType=VARCHAR}
+      </trim>
+	</insert>
+	<update id="renew" parameterType="pd">
+		update
+			<include refid="tableName"></include>
+		set 
+			<if test="INDEX_CODE != null and INDEX_CODE != ''">
+				INDEX_CODE=#{INDEX_CODE, jdbcType=VARCHAR},
+			</if>
+			<if test="INDEX_NAME != null and INDEX_NAME != ''">
+				INDEX_NAME=#{INDEX_NAME, jdbcType=VARCHAR},	
+			</if>
+			<if test="PY_CODE != null and PY_CODE != ''">
+				PY_CODE=#{PY_CODE, jdbcType=VARCHAR},
+			</if>	
+			<if test="INDEX_ORDER != null and INDEX_ORDER != ''">
+				INDEX_ORDER=#{INDEX_ORDER, jdbcType=NUMERIC},
+			</if>
+			<if test="RESULT_TYPE != null and RESULT_TYPE != ''">
+				RESULT_TYPE=#{RESULT_TYPE, jdbcType=VARCHAR},
+			</if>
+			<if test="INDEX_COMPANY != null and INDEX_COMPANY != ''">
+				INDEX_COMPANY=#{INDEX_COMPANY, jdbcType=VARCHAR},
+			</if>
+			<if test="DEPARTMENT != null and DEPARTMENT != ''">
+				DEPARTMENT=#{DEPARTMENT, jdbcType=VARCHAR},
+			</if>
+			<if test="TEST_DEPARTMENT != null and TEST_DEPARTMENT != ''">
+		    	TEST_DEPARTMENT=#{TEST_DEPARTMENT, jdbcType=VARCHAR},
+		    </if>
+		    <if test="FIT_SEX != null and FIT_SEX != ''">
+		    	FIT_SEX=#{FIT_SEX, jdbcType=VARCHAR},
+		    </if>
+		    <if test="INDEX_STATE != null and INDEX_STATE != ''">
+		    	INDEX_STATE=#{INDEX_STATE, jdbcType=VARCHAR},
+		    </if>
+		    <if test="CERAT_TIME != null and CERAT_TIME != ''">
+		    	CREAT_TIME=to_date(#{CREAT_TIME},'yyyy-mm-dd HH24:mi:ss'),
+		    </if>
+		    <if test="EDIT_TIME != null and EDIT_TIME != ''">
+		    	EDIT_TIME=to_date(#{EDIT_TIME},'yyyy-mm-dd HH24:mi:ss'),
+		    </if>
+		     <if test="RESULT_MODEL != null and RESULT_MODEL != ''">
+		    	RESULT_MODEL=#{RESULT_MODEL, jdbcType=VARCHAR},
+		    </if>
+		     <if test="SCREENING_INDEX != null and SCREENING_INDEX != ''">
+		    	SCREENING_INDEX=#{SCREENING_INDEX, jdbcType=VARCHAR},
+		    </if>
+		    ID=#{ID, jdbcType=VARCHAR}
+		where
+			ID=#{ID, jdbcType=VARCHAR}
+	</update>	
+
+</mapper>

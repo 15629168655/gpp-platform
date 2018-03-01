@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MzzdwhMapper">
+	<!-- 门诊诊断字典表 -->
+	<!--表名 -->
+	<sql id="tableName">
+		"GPP_DIC_DIAGNOSIS"
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		"BM",	
+		"MC",	
+		"JM",	
+		"ICDCODE",	
+		"CZY",	
+		"XGSJ",	
+		"ORG_CODE",
+		"GUID",
+		"TBYF_SYS_GUID",
+		"ENTERPRISE_ID",
+		"CRB",
+		"SFCFB",
+		"MXB",
+		"NHDBZ",
+		"YLDE",
+		"HZZF",
+		"LX"
+	</sql>
+	
+	<!-- 新增字段 -->
+	<sql id="FieldAddMzzd">
+		"BM",	
+		"MC",		
+		"ICDCODE",	
+		"CZY",	
+		"XGSJ",	
+		"GUID",
+		"TBYF_SYS_GUID",
+		"ENTERPRISE_ID",
+		"CRB",
+		"MXB",
+		"LX",
+		"SFCFB",
+		"ORG_CODE",  <!-- 单位机构 -->
+		"NHDBZ",
+		"YLDE",
+		"HZZF"
+	</sql>
+	
+	<!-- 新增字段值 -->
+	<sql id="FieldValue">
+		#{ICDCODE},	
+		#{MC},		
+		#{ICDCODE},	
+		#{CZY},	
+		sysdate,
+		#{GUID},
+		#{TBYF_SYS_GUID},
+		#{ENTERPRISE_ID},
+		#{CRB},
+		#{MXB},
+		#{LX},
+		#{SFCFB},
+		#{ORG_CODE,jdbcType=VARCHAR},
+		#{NHDBZ},
+		#{YLDE},
+		#{HZZF}
+	</sql>
+	
+	<!-- 列表 -->
+	<select id="mzxxlistPage" parameterType="page" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include>
+		where 1=1
+		<if test="pd.ORG_CODE != null and pd.ORG_CODE != ''"> <!-- ORG_CODE -->
+			and ORG_CODE = #{pd.ORG_CODE}
+		</if> 
+		<if test="pd.keywords != null and pd.keywords!= ''"><!-- 关键词检索 -->
+			and
+				MC LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')	
+		</if>
+	
+	</select>
+	
+	<!-- 通过BM和单位机构获取数据(验证是否存在) -->
+	<select id="findByBM" parameterType="pd" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from
+		<include refid="tableName"></include>
+		where
+		BM = #{BM}
+			and 
+		ORG_CODE = #{ORG_CODE,jdbcType=VARCHAR}
+	</select>
+	
+	
+	<!-- 新增-->
+	<insert id="saveMzzd" parameterType="pd">
+		insert into
+		<include refid="tableName"></include>
+		(
+		<include refid="FieldAddMzzd"></include>
+		) values (
+		<include refid="FieldValue"></include>
+		)
+	</insert>
+	
+</mapper>

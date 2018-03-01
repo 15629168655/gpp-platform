@@ -1,0 +1,9 @@
+#\u865a\u62df\u76ee\u5f55
+system.photo.realDir = D:/gpp/files/photos/
+system.attachment.realDir = D:/gpp/files/attachments/
+tomcat.photo.virtualDir = /gpp-back/photoDir/
+tomcat.attachmentDir.virtualDir =/gpp-back/attachmentDir/
+#\u751f\u6210\u7528\u6237\u9ed8\u8ba4\u5bc6\u7801
+defaultPwd = 123456
+health_url =59.174.242.35:10011/health/service/QueryService
+#health_url =http://172.16.0.5:8082/health/service/QueryService

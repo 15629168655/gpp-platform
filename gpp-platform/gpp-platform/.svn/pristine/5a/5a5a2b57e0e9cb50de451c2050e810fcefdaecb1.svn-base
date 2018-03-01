@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="JbzdMapper">
+	<!-- 疾病字典表 -->
+	<!--表名 -->
+	<sql id="tableName">
+		"HM_DISEASECODE"
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		"JBBM",	
+		"JBMC",	
+		"JBLB",	
+		"PYZJM",	
+		"YLZD",	
+		"DISEASECODE_ID"
+	</sql>
+	
+	<!-- 列表 -->
+	<select id="jbzdlistPage" parameterType="page" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include>
+		where 1=1
+		<if test="pd.keywords!= null and pd.keywords != ''"><!-- 关键词检索 -->
+			and
+				(
+					"JBBM" LIKE CONCAT(CONCAT('%', UPPER(#{pd.keywords})),'%')
+					or
+					"JBMC" LIKE CONCAT(CONCAT('%', UPPER(#{pd.keywords})),'%')
+					or
+					"PYZJM" LIKE CONCAT(CONCAT('%', UPPER(#{pd.keywords})),'%')
+				)
+		</if>
+	</select>
+	
+	<!-- 通过疾病编码获取数据 -->
+	<select id="findByBM" parameterType="pd" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from
+		<include refid="tableName"></include>
+		where
+		"JBBM" = #{BM}
+	</select>
+	
+</mapper>

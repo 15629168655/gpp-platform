@@ -1,0 +1,291 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>gpp-back</artifactId>
+    <packaging>war</packaging>
+    <name>GPP Back</name>
+    <parent>
+        <groupId>com.tbyf</groupId>
+        <artifactId>gpp</artifactId>
+        <version>0.0.1</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+    <build>
+        <plugins>
+	         <plugin>
+	            <groupId>org.apache.maven.plugins</groupId>
+	            <artifactId>maven-compiler-plugin</artifactId>
+	            <configuration>
+	                <source>1.7</source>
+	                <target>1.7</target>
+	            </configuration>
+	         </plugin>
+             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>2.4</version>
+                <configuration>
+                    <warName>gpp-back</warName>
+                </configuration>
+            </plugin>
+             
+
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>install</phase>
+                        <configuration>
+                            <tasks>
+                                <delete dir="src/main/webapp/WEB-INF/classes"/>
+                                <delete dir="src/main/webapp/WEB-INF/log"/>
+                                <delete dir="src/main/webapp/WEB-INF/lib"/>
+                            </tasks>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+     
+    <dependencies>
+        <!-- axis-ant -->
+		<!-- <dependency>
+			<groupId>axis-ant</groupId>
+			<artifactId>axis-ant</artifactId>
+			<version>1.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/src/main/webapp/WEB-INF/lib/axis-ant.jar</systemPath>
+		</dependency> -->
+		<!-- fcexporter -->
+		<!-- <dependency>
+			<groupId>fcexporter</groupId>
+			<artifactId>fcexporter</artifactId>
+			<version>1.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/src/main/webapp/WEB-INF/lib/fcexporter.jar</systemPath>
+		</dependency> -->
+		<!-- fcexporthandler -->
+		<!-- <dependency>
+			<groupId>fcexporthandler</groupId>
+			<artifactId>fcexporthandler</artifactId>
+			<version>1.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/src/main/webapp/WEB-INF/lib/fcexporthandler.jar</systemPath>
+		</dependency>
+		 -->
+		<!-- fchelper -->
+		<!-- <dependency>
+			<groupId>fchelper</groupId>
+			<artifactId>fchelper</artifactId>
+			<version>1.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/src/main/webapp/WEB-INF/lib/fchelper.jar</systemPath>
+		</dependency> -->
+		<!-- fcsampleshelper -->
+	<!-- 	<dependency>
+			<groupId>fcsampleshelper</groupId>
+			<artifactId>fcsampleshelper</artifactId>
+			<version>1.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/src/main/webapp/WEB-INF/lib/fcsampleshelper.jar</systemPath>
+		</dependency> -->
+		<!-- fctl -->
+		<!-- <dependency>
+			<groupId>fctl</groupId>
+			<artifactId>fctl</artifactId>
+			<version>1.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/src/main/webapp/WEB-INF/lib/fctl.jar</systemPath>
+		</dependency> -->
+		<!-- json-lib-2.4-jdk15.jar -->
+		<!-- <dependency>
+			<groupId>jsonlib</groupId>
+			<artifactId>jsonlib</artifactId>
+			<version>1.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/src/main/webapp/WEB-INF/lib/json-lib-2.4-jdk15.jar</systemPath>
+		</dependency> -->
+		<!-- jackjson-all-1.7.6 -->
+		<!-- <dependency>
+			<groupId>jackson</groupId>
+			<artifactId>jackson</artifactId>
+			<version>1.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/src/main/webapp/WEB-INF/lib/jackson-all-1.7.6.jar</systemPath>
+		</dependency> -->
+		<!-- jpush-java-libraryV2 -->
+		<!-- <dependency>
+			<groupId>jpush</groupId>
+			<artifactId>jpush</artifactId>
+			<version>1.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/src/main/webapp/WEB-INF/lib/jpush-java-libraryV2.jar</systemPath>
+		</dependency> -->
+		<!-- mail -->
+		<!-- <dependency>
+			<groupId>mail</groupId>
+			<artifactId>mail</artifactId>
+			<version>1.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/src/main/webapp/WEB-INF/lib/mail.jar</systemPath>
+		</dependency> -->
+		<!--mybatis-ehcache-1.0.3 -->
+		<!-- <dependency>
+			<groupId>mybatis-ehcache</groupId>
+			<artifactId>mybatis-ehcache</artifactId>
+			<version>1.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/src/main/webapp/WEB-INF/lib/mybatis-ehcache-1.0.3.jar</systemPath>
+		</dependency> -->
+		<!-- mybatis-oscache-1.0 -->
+		<!-- <dependency>
+			<groupId>mybatis-oscache</groupId>
+			<artifactId>mybatis-oscache</artifactId>
+			<version>1.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/src/main/webapp/WEB-INF/lib/mybatis-oscache-1.0.1.jar</systemPath>
+		</dependency> -->
+		<!-- ojdbc6 -->
+		<!-- <dependency>
+			<groupId>ojdbc6</groupId>
+			<artifactId>ojdbc6</artifactId>
+			<version>1.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/src/main/webapp/WEB-INF/lib/ojdbc6.jar</systemPath>
+		</dependency> -->
+		<!-- pinyin4j-2.5.0 -->
+		<!-- <dependency>
+			<groupId>pinyin4j</groupId>
+			<artifactId>pinyin4j</artifactId>
+			<version>1.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/src/main/webapp/WEB-INF/lib/pinyin4j-2.5.0.jar</systemPath>
+		</dependency> -->
+		<!-- poi-3.11-20141221 -->
+		<!-- <dependency>
+			<groupId>poi</groupId>
+			<artifactId>poi	</artifactId>
+			<version>1.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/src/main/webapp/WEB-INF/lib/poi-3.11-20141221.jar</systemPath>
+		</dependency> -->
+		<!-- poi-examples-3.11-20141221 -->
+		<!-- <dependency>
+			<groupId>poi-examples</groupId>
+			<artifactId>poi-examples</artifactId>
+			<version>1.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/src/main/webapp/WEB-INF/lib/poi-examples-3.11-20141221.jar</systemPath>
+		</dependency> -->
+		<!--poi-excelant-3.11-20141221 -->
+		<!-- <dependency>
+			<groupId>poi-excelant</groupId>
+			<artifactId>poi-excelant</artifactId>
+			<version>1.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/src/main/webapp/WEB-INF/lib/poi-excelant-3.11-20141221.jar</systemPath>
+		</dependency> -->
+		<!--poi-ooxml-3.11-20141221 -->
+		<!-- <dependency>
+			<groupId>poi-ooxml</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>1.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/src/main/webapp/WEB-INF/lib/poi-ooxml-3.11-20141221.jar</systemPath>
+		</dependency> -->
+		<!-- poi-ooxml-schemas-3.11-20141221 -->
+		<!-- <dependency>
+			<groupId>poi-ooxml-schemas</groupId>
+			<artifactId>poi-ooxml-schemas</artifactId>
+			<version>1.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/src/main/webapp/WEB-INF/lib/poi-ooxml-schemas-3.11-20141221.jar</systemPath>
+		</dependency> -->
+		<!-- poi-scratchpad-3.11-20141221 -->
+		<!-- <dependency>
+			<groupId>poi-scratchpad</groupId>
+			<artifactId>poi-scratchpad</artifactId>
+			<version>1.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/src/main/webapp/WEB-INF/lib/poi-scratchpad-3.11-20141221.jar</systemPath>
+		</dependency> -->
+		<!--QRCode -->
+		<!-- <dependency>
+			<groupId>QRCode</groupId>
+			<artifactId>QRCode</artifactId>
+			<version>1.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/src/main/webapp/WEB-INF/lib/QRCode.jar</systemPath>
+		</dependency> -->
+		<!-- saaj -->
+		<!-- <dependency>
+			<groupId>saaj</groupId>
+			<artifactId>saaj</artifactId>
+			<version>1.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/src/main/webapp/WEB-INF/lib/saaj.jar</systemPath>
+		</dependency> -->
+		<!-- shiro-all -->
+		<!-- <dependency>
+			<groupId>shiro</groupId>
+			<artifactId>shiro</artifactId>
+			<version>1.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/src/main/webapp/WEB-INF/lib/shiro-all-1.2.3.jar</systemPath>
+		</dependency> -->
+		<!-- sun.misc.BASE64Decoder -->
+		<!-- <dependency>
+			<groupId>sun-misc</groupId>
+			<artifactId>sun-misc</artifactId>
+			<version>1.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/src/main/webapp/WEB-INF/lib/sun.misc.BASE64Decoder.jar</systemPath>
+		</dependency> -->
+		<!-- ueditor -->
+		<!-- <dependency>
+			<groupId>ueditor</groupId>
+			<artifactId>ueditor</artifactId>
+			<version>1.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/src/main/webapp/WEB-INF/lib/ueditor.jar</systemPath>
+		</dependency> -->
+		<!-- java_websocket -->
+		<!-- <dependency>
+			<groupId>java_websocket</groupId>
+			<artifactId>java_websocket</artifactId>
+			<version>1.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/src/main/webapp/WEB-INF/lib/java_websocket.jar</systemPath>
+		</dependency> -->
+		<!-- weixinapi -->
+		<!-- <dependency>
+			<groupId>weixinapi</groupId>
+			<artifactId>weixinapi</artifactId>
+			<version>1.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/src/main/webapp/WEB-INF/lib/weixinapi.jar</systemPath>
+		</dependency> -->
+		<!-- weaver-1.6.8.RELEASE.jar -->
+		<!-- <dependency>
+			<groupId>weaver-1.6.8</groupId>
+			<artifactId>weaver-1.6.8</artifactId>
+			<version>1.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/src/main/webapp/WEB-INF/lib/com.springsource.org.aspectj.weaver-1.6.8.RELEASE.jar</systemPath>
+		</dependency> -->
+    	<dependency>
+		  <groupId>com.tbyf</groupId>
+		  <artifactId>gpp-biz</artifactId>
+		</dependency>
+		<dependency>
+		  <groupId>com.tbyf</groupId>
+		  <artifactId>gpp-common</artifactId>
+		</dependency>
+		 
+	</dependencies>
+</project>

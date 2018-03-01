@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="YsflMapper">
+
+	<resultMap type="Ysfl" id="menuResultMap">
+		<id column="ID" property="ID"/>
+		<result column="MC" property="MC"/>
+		<result column="PID" property="PID"/>
+		<result column="PXH" property="PXH"/>
+		<result column="ZT" property="ZT"/>
+	</resultMap>
+	
+	<!-- ztree -->
+	<resultMap type="Ysfl" id="menuZtreeResultMap">
+		<id column="ID" property="ID"/>
+		<result column="MC" property="MC"/>
+		<result column="PID" property="PID"/>
+		<result column="PXH" property="PXH"/>
+		<result column="ZT" property="ZT"/>
+	</resultMap>
+	
+	<!--表名 -->
+	<sql id="tableName">
+		EMR_ELEMENT_CLASS
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		ID,
+		MC,
+		PID,
+		PXH,
+		ZT
+
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{ID,jdbcType=VARCHAR},
+ 		#{MC,jdbcType=VARCHAR},
+ 		#{PID,jdbcType=VARCHAR},
+ 		#{PXH,jdbcType=VARCHAR},
+ 		#{ZT,jdbcType=VARCHAR}
+	</sql>
+	
+	<!--通过ID获取其子一级菜单 -->
+	<select id="listSubMenuByParentIdlistPage" parameterType="page" resultMap="menuResultMap">
+		select  
+			<include refid="Field"></include>
+		from 
+			<include refid="tableName"></include>
+		where ZT &lt;&gt; 9 
+		<if test="pd.keywords != null and pd.keywords != ''"> <!-- 关键词检索  -->
+			and
+				 MC LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+		</if>
+		<if test="pd.PId != null and pd.PId != ''">
+		and  PID = #{pd.PId} order by PXH  
+		</if>
+	</select>
+	<!--通过ID获取其子一级菜单 -->
+	<select id="treeData" parameterType="java.lang.String" resultMap="menuResultMap">
+		select  
+			<include refid="Field"></include>
+		from 
+			<include refid="tableName"></include>
+		where ZT &lt;&gt; 9 and  PID = #{id} order by PXH  
+	</select>
+	
+	<!--通过菜单ID获取数据 -->
+	<select id="getMenuById" parameterType="pd" resultType="pd">
+		select  
+			<include refid="Field"></include>
+		 from 
+			<include refid="tableName"></include>
+		 where ID=#{ID} 
+	</select>
+	
+	<!--新增 -->
+	<insert id="insertMenu" parameterType="Menu">
+		insert into 
+			<include refid="tableName"></include> 
+		(
+			<include refid="Field"></include>
+		) values (
+			<include refid="FieldValue"></include>
+		)
+	</insert>
+	
+	<!--取最大ID-->
+	<select id="findMaxId" parameterType="pd" resultType="pd">
+		select MAX(cast(ID as int)) ID from 
+		<include refid="tableName"></include>
+	</select>
+	
+	<!--删除菜单-->
+	<delete id="deleteMenuById" parameterType="String">
+		update 
+		<include refid="tableName"></include> 
+		set 
+			ZT	= 9
+		where 
+			ID=#{ID}
+	</delete>
+	
+	<!--编辑 -->
+	<update id="updateMenu" parameterType="Menu">
+		update 
+		<include refid="tableName"></include> 
+		set 
+			MC 	=#{MC},
+			PXH	=#{PXH},
+			ZT	=#{ZT}
+		where 
+			ID=#{ID}
+	</update>
+	
+	<!--列出所有元素分类 -->
+	<select id="listAllYsfl" parameterType="pd" resultType="pd">
+		select  
+			ID,
+			MC
+		 from 
+			<include refid="tableName"></include>
+	</select>
+
+</mapper>

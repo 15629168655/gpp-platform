@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="JkzxMapper">
+	<!-- 健康咨询记录表 -->
+	
+	<select id="querylistPage" parameterType="page" resultType="pd">
+		SELECT * FROM GPP_CONSULTATION_INFO
+			where 1=1 
+			<if test="pd.keywords != null and pd.keywords!= ''"><!-- 关键词检索 -->
+			and (
+				PERSON_NAME LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				or
+				DOCTOR_NAME LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				or
+				PERSON_PHONE LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				or
+				DOCTOR_PHONE LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				)
+			</if>
+			<if test="pd.start!=null and pd.start!=''"> 
+				and "CREATETIME" &gt;=to_date(#{pd.start},'yyyy-mm-dd hh24:mi:ss')
+			</if>
+			<if test="pd.end!=null and pd.end!=''">
+				and "CREATETIME" &lt;=to_date(#{pd.end},'yyyy-mm-dd hh24:mi:ss')
+		</if>
+	</select>	
+	
+	<!-- 新增-->
+	<insert id="save" parameterType="pd">
+		insert into GPP_CONSULTATION_INFO
+		(
+			CONSULTATION_ID,PERSON_ID,PERSON_NAME,PERSON_PHONE,
+			DEPT_ID,DEPT_NAME,DOCTOR_ID,DOCTOR_NAME,DOCTOR_PHONE,ORG_CODE,
+			SEND_CONTENT
+			
+			<if test="SEND_FILE!=null and SEND_FILE!=''">
+			,SEND_FILE
+			</if>
+			,INFOTYPE,ISFINISH,SCORE,CREATETIME
+			<if test="SEND_FILE_URL!=null and SEND_FILE_URL!=''">
+			,SEND_FILE_URL
+			</if>
+		) values (
+			#{CONSULTATION_ID,jdbcType=VARCHAR},
+			#{PERSON_ID,jdbcType=VARCHAR},
+			#{PERSON_NAME,jdbcType=VARCHAR},
+			#{PERSON_PHONE,jdbcType=VARCHAR},
+			#{DEPT_ID,jdbcType=VARCHAR},
+			#{DEPT_NAME,jdbcType=VARCHAR},
+			#{DOCTOR_ID,jdbcType=VARCHAR},
+			#{DOCTOR_NAME,jdbcType=VARCHAR},
+			#{DOCTOR_PHONE,jdbcType=VARCHAR},
+			#{ORG_CODE,jdbcType=VARCHAR}, 
+			#{SEND_CONTENT,jdbcType=VARCHAR},
+			<if test="SEND_FILE!=null and SEND_FILE!=''">
+			#{SEND_FILE,jdbcType=VARCHAR},
+			</if>
+			#{INFOTYPE,jdbcType=VARCHAR},
+			#{ISFINISH,jdbcType=VARCHAR},
+			#{SCORE,jdbcType=VARCHAR},
+			sysdate
+			<if test="SEND_FILE_URL!=null and SEND_FILE_URL!=''">
+			,#{SEND_FILE_URL,jdbcType=VARCHAR}
+			</if>
+		)
+	</insert>
+	<delete id="delete" parameterType="pd">
+		delete from
+		GPP_CONSULTATION_INFO
+		where 
+			"CONSULTATION_ID" = #{CONSULTATION_ID}
+	</delete>
+	<update id="editObj" parameterType="pd">
+		update
+			GPP_CONSULTATION_INFO
+			<trim prefix="SET" suffixOverrides="," >
+				<if test="INFOTYPE!=null and INFOTYPE!=''">
+					"INFOTYPE" = #{INFOTYPE},	
+				</if>
+				<if test="REPLY_TIME!=null and REPLY_TIME!=''">
+					"REPLY_TIME" = to_date(#{REPLY_TIME},'yyyy-MM-dd hh24:mi:ss'),
+				</if>
+				<if test="ISFINISH!=null and ISFINISH!=''">
+					"ISFINISH" = #{ISFINISH},	
+				</if>
+				<if test="FINISH_TIME!=null and FINISH_TIME!=''">
+					"FINISH_TIME" = to_date(#{FINISH_TIME},'yyyy-MM-dd hh24:mi:ss'),	
+				</if>
+				<if test="SCORE!=null and SCORE!=''">
+					"SCORE" = #{SCORE},	
+				</if>
+			</trim>	
+			where 
+				"CONSULTATION_ID" = #{CONSULTATION_ID}
+	</update>
+	
+	<!--  -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select * from GPP_CONSULTATION_INFO 
+			where CONSULTATION_ID= #{CONSULTATION_ID}
+	</select>
+	
+	<!--  -->
+	<select id="findContent" parameterType="pd" resultType="pd">
+		select * from GPP_CONSULTATION_CONTENT 
+			where CONSULTATION_ID= #{CONSULTATION_ID}
+				order by SEND_TIME		
+	</select>
+	
+	<!-- APP 接口 -->
+	<insert id="saveContent" parameterType="pd">
+		insert into GPP_CONSULTATION_CONTENT
+		(
+			ID,CONSULTATION_ID,SEND_ROLE,SEND_ID,SEND_NAME,
+			SEND_CONTENT,SEND_TIME
+		) values (
+			#{ID,jdbcType=VARCHAR},
+			#{CONSULTATION_ID,jdbcType=VARCHAR},
+			#{SEND_ROLE,jdbcType=VARCHAR},
+			#{SEND_ID,jdbcType=VARCHAR},
+			#{SEND_NAME,jdbcType=VARCHAR},
+			#{SEND_CONTENT,jdbcType=VARCHAR},
+			sysdate
+		)
+	</insert>
+	
+	<select id="listForApp" parameterType="pd" resultType="pd">
+	    	SELECT *
+				  FROM ( SELECT ROWNUM AS rowno,  t.* from ( 
+   select * from GPP_CONSULTATION_INFO  where 1=1
+   <if test="PERSON_ID!=null and PERSON_ID!=''">
+       and PERSON_ID= #{PERSON_ID}
+   </if>
+   <if test="DOCTOR_ID!=null and DOCTOR_ID!=''">
+       and DOCTOR_ID=#{DOCTOR_ID}
+   </if>
+    order by CREATETIME desc
+    
+   ) t ) table_alias   WHERE table_alias.rowno BETWEEN 1 and 10
+	    
+	</select>
+</mapper>

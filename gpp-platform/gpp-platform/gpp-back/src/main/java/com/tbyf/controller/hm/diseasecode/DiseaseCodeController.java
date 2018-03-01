@@ -1,0 +1,300 @@
+package com.tbyf.controller.hm.diseasecode;
+
+import com.tbyf.controller.base.*;
+import com.tbyf.entity.enums.*;
+import com.tbyf.entity.system.Role;
+import com.tbyf.plugin.*;
+import com.tbyf.service.hm.diseasecode.*;
+import com.tbyf.util.*;
+
+import org.apache.shiro.crypto.hash.SimpleHash;
+import org.springframework.beans.propertyeditors.*;
+import org.springframework.stereotype.*;
+import org.springframework.web.bind.*;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.*;
+
+import javax.annotation.*;
+import javax.servlet.http.HttpServletResponse;
+
+import java.io.*;
+import java.text.*;
+import java.util.*;
+
+/** 
+ * 说明：疾病编码
+ * 创建人：
+ * 创建时间：2016-06-16
+ */
+@Controller
+@RequestMapping(value="/diseasecode")
+public class DiseaseCodeController extends BaseController {
+	
+	String menuUrl = "diseasecode/list.do"; //菜单地址(权限用)
+	@Resource(name="diseasecodeService")
+	private DiseaseCodeManager diseasecodeService;
+	
+	/**保存
+	 * @param
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/save")
+	public ModelAndView save() throws Exception{
+		logBefore(logger, Jurisdiction.getUsername()+"新增DiseaseCode");
+		if(!Jurisdiction.buttonJurisdiction(menuUrl, "add")){return null;} //校验权限
+		ModelAndView mv = this.getModelAndView();
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		pd.put("DISEASECODE_ID", this.get32UUID());	//主键
+		diseasecodeService.save(pd);
+		mv.addObject("msg","success");
+		mv.setViewName("save_result");
+		return mv;
+	}
+	
+	/**删除
+	 * @param out
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/delete")
+	public void delete(PrintWriter out) throws Exception{
+		logBefore(logger, Jurisdiction.getUsername()+"删除DiseaseCode");
+		if(!Jurisdiction.buttonJurisdiction(menuUrl, "del")){return;} //校验权限
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		diseasecodeService.delete(pd);
+		out.write("success");
+		out.close();
+	}
+	
+	/**修改
+	 * @param
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/edit")
+	public ModelAndView edit() throws Exception{
+		logBefore(logger, Jurisdiction.getUsername()+"修改DiseaseCode");
+		if(!Jurisdiction.buttonJurisdiction(menuUrl, "edit")){return null;} //校验权限
+		ModelAndView mv = this.getModelAndView();
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		diseasecodeService.edit(pd);
+		mv.addObject("msg","success");
+		mv.setViewName("save_result");
+		return mv;
+	}
+	
+	/**列表
+	 * @param page
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/list")
+	public ModelAndView list(Page page) throws Exception{
+		logBefore(logger, Jurisdiction.getUsername()+"列表DiseaseCode");
+		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "cha")){return null;} //校验权限(无权查看时页面会有提示,如果不注释掉这句代码就无法进入列表页面,所以根据情况是否加入本句代码)
+		ModelAndView mv = this.getModelAndView();
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		String keywords = pd.getString("keywords");				//关键词检索条件
+		if(null != keywords && !"".equals(keywords)){
+			pd.put("keywords", keywords.trim());
+		}
+		page.setPd(pd);
+		List<PageData>	varList = diseasecodeService.list(page);	//列出DiseaseCode列表
+		mv.setViewName("hm/diseasecode/diseasecode_list");
+		mv.addObject("varList", varList);
+		mv.addObject("pd", pd);
+		mv.addObject("QX",Jurisdiction.getHC());	//按钮权限
+		return mv;
+	}
+	
+	/**去新增页面
+	 * @param
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/goAdd")
+	public ModelAndView goAdd()throws Exception{
+		ModelAndView mv = this.getModelAndView();
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		pd.put("enumDiseaseType", EnumDiseaseType.toMap());
+		mv.setViewName("hm/diseasecode/diseasecode_edit");
+		mv.addObject("msg", "save");
+		mv.addObject("pd", pd);
+		return mv;
+	}	
+	
+	 /**去修改页面
+	 * @param
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/goEdit")
+	public ModelAndView goEdit()throws Exception{
+		ModelAndView mv = this.getModelAndView();
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		pd = diseasecodeService.findById(pd);	//根据ID读取
+		pd.put("enumDiseaseType", EnumDiseaseType.toMap());
+		mv.setViewName("hm/diseasecode/diseasecode_edit");
+		mv.addObject("msg", "edit");
+		mv.addObject("pd", pd);
+		return mv;
+	}	
+	
+	 /**批量删除
+	 * @param
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/deleteAll")
+	@ResponseBody
+	public Object deleteAll() throws Exception{
+		logBefore(logger, Jurisdiction.getUsername()+"批量删除DiseaseCode");
+		if(!Jurisdiction.buttonJurisdiction(menuUrl, "del")){return null;} //校验权限
+		PageData pd = new PageData();		
+		Map<String,Object> map = new HashMap<String,Object>();
+		pd = this.getPageData();
+		List<PageData> pdList = new ArrayList<PageData>();
+		String DATA_IDS = pd.getString("DATA_IDS");
+		if(null != DATA_IDS && !"".equals(DATA_IDS)){
+			String ArrayDATA_IDS[] = DATA_IDS.split(",");
+			diseasecodeService.deleteAll(ArrayDATA_IDS);
+			pd.put("msg", "ok");
+		}else{
+			pd.put("msg", "no");
+		}
+		pdList.add(pd);
+		map.put("list", pdList);
+		return AppUtil.returnObject(pd, map);
+	}
+
+	/**判断疾病编码是否存在
+	 * @return
+	 */
+	@RequestMapping(value="/hasC")
+	@ResponseBody
+	public Object hasC(){
+		Map<String,String> map = new HashMap<String,String>();
+		String errInfo = "success";
+		PageData pd = new PageData();
+		try{
+			pd = this.getPageData();
+			if(diseasecodeService.findByDiseaseCode(pd) != null){
+				errInfo = "error";
+			}
+		} catch(Exception e){
+			logger.error(e.toString(), e);
+		}
+		map.put("result", errInfo);				//返回结果
+		return AppUtil.returnObject(new PageData(), map);
+	}
+	
+	 /**导出到excel
+		 * @param
+		 * @throws Exception
+		 */
+		@RequestMapping(value="/excel")
+		public ModelAndView exportExcel() throws Exception{
+			logBefore(logger, Jurisdiction.getUsername()+"导出DiseaseCode到excel");
+			if(!Jurisdiction.buttonJurisdiction(menuUrl, "cha")){return null;}
+			ModelAndView mv = new ModelAndView();
+			PageData pd = new PageData();
+			pd = this.getPageData();
+			Map<String,Object> dataMap = new HashMap<String,Object>();
+			List<String> titles = new ArrayList<String>();
+			titles.add("疾病编码");	//1
+			titles.add("疾病名称");	//2
+			titles.add("疾病类别");	//3
+			titles.add("拼音助记码");	//4
+			titles.add("预留字段");	//5
+			titles.add("疾病描述建议");//6
+			dataMap.put("titles", titles);
+			List<PageData> varOList = diseasecodeService.listAll(pd);
+			List<PageData> varList = new ArrayList<PageData>();
+			for(int i=0;i<varOList.size();i++){
+				PageData vpd = new PageData();
+				vpd.put("var1", varOList.get(i).getString("JBBM"));	//1
+				vpd.put("var2", varOList.get(i).getString("JBMC"));	//2
+				vpd.put("var3", varOList.get(i).getString("JBLB"));	//3
+				vpd.put("var4", varOList.get(i).getString("PYZJM"));	//4
+				vpd.put("var5", varOList.get(i).getString("YLZD"));	//5
+				vpd.put("var6", varOList.get(i).getString("DISEASE_ADVICE"));	//5
+				varList.add(vpd);
+			}
+			dataMap.put("varList", varList);
+			ObjectExcelView erv = new ObjectExcelView();
+			mv = new ModelAndView(erv,dataMap);
+			return mv;
+		}
+	
+	/**打开上传EXCEL页面
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/goUploadExcel")
+	public ModelAndView goUploadExcel()throws Exception{
+		ModelAndView mv = this.getModelAndView();
+		mv.setViewName("hm/diseasecode/uploadexcel");
+		return mv;
+	}
+	
+	/**下载模版
+	 * @param response
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/downExcel")
+	public void downExcel(HttpServletResponse response)throws Exception{
+		FileDownload.fileDownload(response, PathUtil.getClasspath() + Const.FILEPATHFILE + "Diseasecode.xls", "Diseasecode.xls");
+	}
+	
+	/**从EXCEL导入到数据库
+	 * @param file
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/readExcel")
+	public ModelAndView readExcel(
+			@RequestParam(value="excel",required=false) MultipartFile file
+			) throws Exception{
+		ModelAndView mv = this.getModelAndView();
+		PageData pd = new PageData();
+		if(!Jurisdiction.buttonJurisdiction(menuUrl, "add")){return null;}
+		if (null != file && !file.isEmpty()) {
+			String filePath = PathUtil.getClasspath() + Const.FILEPATHFILE;								//文件上传路径
+			String fileName =  FileUpload.fileUp(file, filePath, "diseasecodeexcel");					//执行上传
+			List<PageData> listPd = (List)ObjectExcelRead.readExcel(filePath, fileName, 2, 0, 0);		//执行读EXCEL操作,读出的数据导入List 2:从第3行开始；0:从第A列开始；0:第0个sheet
+			/*存入数据库操作======================================*/
+			/**
+			 * var0 :疾病编码
+			 * var1 :疾病名称
+			 * var2 :疾病类别
+			 * var3 :拼音助记码
+			 * var4 :预留字段
+			 * var5 :疾病的描述建议
+			 */
+			for(int i=0;i<listPd.size();i++){	
+				
+				pd.put("JBBM", listPd.get(i).getString("var0"));  	//疾病编码
+				pd.put("JBMC", listPd.get(i).getString("var1"));	//疾病名称
+				pd.put("JBLB", listPd.get(i).getString("var2"));	//疾病类别
+				pd.put("PYZJM", listPd.get(i).getString("var3"));	//拼音助记码
+				pd.put("YLZD", listPd.get(i).getString("var4"));	//预留字段
+				pd.put("DISEASE_ADVICE", listPd.get(i).getString("var5"));
+				pd.put("DISEASECODE_ID", this.get32UUID());			//ID
+				
+				diseasecodeService.save(pd);
+				
+			}
+			/*存入数据库操作======================================*/
+			mv.addObject("msg","success");
+		}
+		mv.setViewName("save_result");
+		return mv;
+	}
+
+	@InitBinder
+	public void initBinder(WebDataBinder binder){
+		DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+		binder.registerCustomEditor(Date.class, new CustomDateEditor(format,true));
+	}
+}

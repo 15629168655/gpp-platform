@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="AttachmentMapper">
+
+    <!--表名 -->
+    <sql id="tableName">
+        "SYS_ATTACHMENT"
+    </sql>
+
+    <!-- 字段 -->
+    <sql id="Field">
+        "BUSINESS_ID",
+        "TYPE",
+        "NAME",
+        "PATH",
+        "SIZE",
+        "CONTENTTYPE",
+        "OPERATER",
+        "OPERATEDATE",
+        "ATTACHMENT_ID"
+    </sql>
+
+    <!-- 字段值 -->
+    <sql id="FieldValue">
+        #{BUSINESS_ID},
+        #{TYPE},
+        #{NAME},
+        #{PATH},
+        #{SIZE},
+        #{CONTENTTYPE},
+        #{OPERATER},
+        to_date(#{OPERATEDATE},'yyyy-mm-dd HH24:mi:ss'),
+        #{ATTACHMENT_ID}
+    </sql>
+
+    <!-- 新增-->
+    <insert id="save" parameterType="pd">
+        insert into
+        <include refid="tableName"></include>
+        (
+        <include refid="Field"></include>
+        ) values (
+        <include refid="FieldValue"></include>
+        )
+    </insert>
+
+    <!-- 删除-->
+    <delete id="delete" parameterType="pd">
+        delete from
+        <include refid="tableName"></include>
+        where
+        "ATTACHMENT_ID" = #{ATTACHMENT_ID}
+    </delete>
+
+    <!-- 修改 -->
+    <update id="edit" parameterType="pd">
+        update
+        <include refid="tableName"></include>
+        set
+        "BUSINESS_ID" = #{BUSINESS_ID},
+        "TYPE" = #{TYPE},
+        "NAME" = #{NAME},
+        "PATH" = #{PATH},
+        "SIZE" = #{SIZE},
+        "CONTENTTYPE" = #{CONTENTTYPE},
+        "ATTACHMENT_ID" = "ATTACHMENT_ID"
+        where
+        "ATTACHMENT_ID" = #{ATTACHMENT_ID}
+    </update>
+
+    <!-- 通过ID获取数据 -->
+    <select id="findById" parameterType="pd" resultType="pd">
+        select
+        <include refid="Field"></include>
+        from
+        <include refid="tableName"></include>
+        where
+        "ATTACHMENT_ID" = #{ATTACHMENT_ID}
+    </select>
+
+    <!-- 通过业务获取数据 -->
+    <select id="findByBusiness" parameterType="pd" resultType="pd">
+        select
+        <include refid="Field"></include>
+        from
+        <include refid="tableName"></include>
+        where
+        "TYPE" = #{TYPE}
+        and
+        "BUSINESS_ID" = #{BUSINESS_ID}
+    </select>
+
+    <!-- 列表 -->
+    <select id="datalistPage" parameterType="page" resultType="pd">
+        select
+        <include refid="Field"></include>
+        from
+        <include refid="tableName"></include>
+        where 1=1
+        <if test="pd.keywords!= null and pd.keywords != ''"><!-- 关键词检索 -->
+            and
+            (
+            <!--	根据需求自己加检索条件
+                字段1 LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+                 or
+                字段2 LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+            -->
+            )
+        </if>
+    </select>
+
+    <!-- 列表(全部) -->
+    <select id="listAll" parameterType="pd" resultType="pd">
+        select
+        <include refid="Field"></include>
+        from
+        <include refid="tableName"></include>
+    </select>
+
+    <!-- 批量删除 -->
+    <delete id="deleteAll" parameterType="String">
+        delete from
+        <include refid="tableName"></include>
+        where
+        "ATTACHMENT_ID" in
+        <foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+
+	<!-- 通过ID获取附件表数据 -->
+	<select id="findByBusinessId" parameterType="pd" resultType="pd">
+		select 
+			<include refid="Field"></include>
+		from 
+			<include refid="tableName"></include>
+		where 
+			BUSINESS_ID = #{ID}
+	</select>
+	
+	<!-- 修改协议表时，更新附件表 -->
+    <update id="editForXywh" parameterType="pd">
+        update
+        <include refid="tableName"></include>
+        set
+        "TYPE" = #{TYPE,jdbcType=VARCHAR},
+        "NAME" = #{NAME,jdbcType=VARCHAR},
+        "PATH" = #{PATH,jdbcType=VARCHAR},
+        "SIZE" = #{SIZE,jdbcType=VARCHAR},
+        "CONTENTTYPE" = #{CONTENTTYPE},
+        "OPERATER" = #{OPERATER},
+        "OPERATEDATE" = to_date(#{OPERATEDATE},'yyyy-mm-dd HH24:mi:ss')
+        where
+        "ATTACHMENT_ID" = #{ATTACHMENT_ID,jdbcType=VARCHAR}
+    </update>
+</mapper>

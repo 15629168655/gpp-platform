@@ -1,0 +1,95 @@
+package com.tbyf.service.gp.provider.impl;
+
+import com.tbyf.dao.*;
+import com.tbyf.plugin.*;
+import com.tbyf.service.gp.provider.ProviderManager;
+import com.tbyf.service.hm.agreementApply.AgreementApplyManager;
+import com.tbyf.util.*;
+
+import org.springframework.stereotype.*;
+
+import javax.annotation.*;
+
+import java.util.*;
+
+/** 
+ * 说明： 预签约申请
+ * 创建人：zhangy
+ * 创建时间：2016-09-13
+ * @version
+ */
+@Service("providerService")
+public class ProviderService implements ProviderManager{
+
+	@Resource(name = "daoSupport")
+	private DaoSupport dao;
+	
+	/**新增
+	 * @param pd
+	 * @return 
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<PageData> queryPage(PageData pd)throws Exception{
+		return (List<PageData>)dao.findForList("ProviderMapper.queryPage", pd);
+	}
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<PageData> listPage(Page pd)throws Exception{
+		return (List<PageData>)dao.findForList("ProviderMapper.listPage", pd);
+	}
+	@Override
+	public PageData queryDataById(PageData pd)throws Exception{
+		return (PageData)dao.findForObject("ProviderMapper.queryDataById", pd);
+	}
+	/**
+	 * 同机构下医护人员查询接口
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<PageData> getProvider(PageData pd)throws Exception{
+		return (List<PageData>)dao.findForList("ProviderMapper.getProvider", pd);
+	}
+	/**
+	 * App医护人员查询接口
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<PageData> getProviderForApp(PageData pd)throws Exception{
+		return (List<PageData>)dao.findForList("ProviderMapper.getProviderForApp", pd);
+	}
+	/**
+	 * App根据当前医生机构查询医护人员接口 
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<PageData> getProviderByCode(PageData pd)throws Exception{
+		if(pd.getString("ORG_CODE").contains("A")){ //如果是社区医生，则搜索社区医生所在团队的医生
+			return (List<PageData>)dao.findForList("ProviderMapper.getProviderByOneCode", pd);
+		}else{                                      //如果是医院医生，则搜索当前医院的医生和下级机构的团队医生
+			return (List<PageData>)dao.findForList("ProviderMapper.getProviderByFollowCode", pd);
+		}
+	}
+	/**
+	 * 根基id查询
+	 * @param pd
+	 * @return
+	 * @throws Exception
+	 */
+	public PageData getProviderById(PageData pd) throws Exception {
+		return (PageData)dao.findForObject("ProviderMapper.getProvierById", pd);
+		
+	}
+	/**
+	 * 根基id查询
+	 * @param pd
+	 * @return
+	 * @throws Exception
+	 */
+	public PageData getProvierTeamById(PageData pd) throws Exception {
+		return (PageData)dao.findForObject("ProviderMapper.getProvierTeamById", pd);
+		
+	} 
+}
+

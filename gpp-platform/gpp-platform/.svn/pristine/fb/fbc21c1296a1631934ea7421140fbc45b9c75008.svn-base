@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="PressureMapper">
+<!-- 表名 -->
+<!-- 个人体型表 -->
+	<sql id="tableName">
+		 TB_USER_PRESSURE
+	</sql>
+	<!-- 字段 -->
+	<sql id="Field">
+		ID ,<!--居民体型记录表ID-->
+		USER_AGENT_ID,<!--居民关联的ID-->
+		SPRESSURE,<!--收缩压mmol/L-->
+		DIASTOLE,<!--舒张压mmol/L-->
+		BPM,<!--心率bpm-->
+		TEST_TIME ,<!--测试时间-->
+		CREAT_TIME <!--生成时间-->
+		
+	</sql>
+	<!-- app血压记录分页查询 -->
+	<select id="queryPage" parameterType="pd" resultType="pd">
+		select 
+			<include refid="Field"></include>
+		from 
+			(select <include refid="Field"></include>,ROWNUM AS rowno  from <include refid="tableName"></include>
+			where 1=1
+				<if test="testSTART != null and testSTART !=''">
+					and TEST_TIME &gt; to_date(#{testSTART},'yyyy-mm-dd')
+				</if>
+				<if test="testEND != null and testEND != ''">
+		            and TEST_TIME &lt;  to_date(#{testEND},'yyyy-mm-dd')
+		        </if>
+		        <if test="USER_AGENT_ID != null and USER_AGENT_ID !=''">
+		        	and USER_AGENT_ID=#{USER_AGENT_ID, jdbcType=VARCHAR}
+		        </if>
+			) t where t.rowno BETWEEN #{pageStart} and #{pageEnd}
+	</select>
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+			#{ID, jdbcType=VARCHAR},	
+			#{USER_AGENT_ID, jdbcType=VARCHAR},	
+			#{SPRESSURE, jdbcType=NUMERIC},	
+			#{DIASTOLE, jdbcType=NUMERIC},
+			#{BPM, jdbcType=NUMERIC},	
+			to_date(#{TEST_TIME},'yyyy-mm-dd HH24:mi:ss'),
+			to_date(#{CREAT_TIME},'yyyy-mm-dd HH24:mi:ss')
+	</sql>
+
+	<!-- 查询全部 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select * from
+		<include refid="tableName"></include>
+		where 1=1
+		<if test="pd.SPRESSURE != null and pd.SPRESSURE != ''"> <!-- 收缩压mmol/L-->
+			and SPRESSURE = #{pd.SPRESSURE, jdbcType=NUMERIC}
+		</if>
+		<if test="pd.DIASTOLE != null and pd.DIASTOLE != ''"><!--舒张压mmol/L-->
+			and	DIASTOLE = #{pd.DIASTOLE, jdbcType=NUMERIC} 
+		</if>
+		<if test="pd.BPM != null and pd.BPM != ''"><!--心率bpm-->
+			and	BPM = #{pd.BPM, jdbcType=NUMERIC} 
+		</if>
+		<if test="pd.testSTART != null and pd.testSTART !=''">
+			and TEST_TIME &gt; to_date(#{pd.testSTART},'yyyy-mm-dd')
+		</if>
+		<if test="pd.testEND != null and pd.testEND != ''">
+            and TEST_TIME &lt;  to_date(#{pd.testEND},'yyyy-mm-dd')
+        </if>
+        	and USER_AGENT_ID=#{pd.USER_AGENT_ID, jdbcType=VARCHAR}
+	</select>
+	<!-- 查看详情 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+			<include refid="Field"></include>
+		from 
+			<include refid="tableName"></include>
+		where 
+			ID = #{ID,jdbcType=VARCHAR}
+	</select>
+	<!-- 编辑 -->
+	<update id="edit" parameterType="pd">
+		update
+			<include refid="tableName"></include>
+		set 
+			ID=#{ID, jdbcType=VARCHAR},	
+			USER_AGENT_ID=#{USER_AGENT_ID, jdbcType=VARCHAR},	
+			SPRESSURE=#{SPRESSURE, jdbcType=NUMERIC},	
+			DIASTOLE=#{DIASTOLE, jdbcType=NUMERIC},
+			BPM=#{BPM, jdbcType=NUMERIC},	
+			TEST_TIME=to_date(#{TEST_TIME},'yyyy-mm-dd HH24:mi:ss'),
+			CREAT_TIME=to_date(#{CREAT_TIME},'yyyy-mm-dd HH24:mi:ss')
+		where
+			ID=#{ID, jdbcType=VARCHAR}
+	</update>
+	<!-- app更新 -->
+	<update id="renew" parameterType="pd">
+		update
+			<include refid="tableName"></include>
+		set 
+		    
+			<if test="USER_AGENT_ID != null and USER_AGENT_ID != ''">
+				USER_AGENT_ID=#{USER_AGENT_ID, jdbcType=VARCHAR},
+			</if>
+			<if test="SPRESSURE != null and SPRESSURE != ''">
+				SPRESSURE=#{SPRESSURE, jdbcType=NUMERIC},	
+			</if>
+			<if test="DIASTOLE != null and DIASTOLE != ''">
+				DIASTOLE=#{DIASTOLE, jdbcType=NUMERIC},
+			</if>	
+			<if test="BMI != null and BMI != ''">
+				BPM=#{BPM, jdbcType=NUMERIC},
+			</if>
+			<if test="TEST_TIME != null and TEST_TIME != ''">
+				TEST_TIME=to_date(#{TEST_TIME},'yyyy-mm-dd HH24:mi:ss'),
+			</if>
+			<if test="CREAT_TIME != null and CREAT_TIME != ''">
+				CREAT_TIME=to_date(#{CREAT_TIME},'yyyy-mm-dd HH24:mi:ss'),
+			</if>
+			<if test="ID != null and ID != ''">
+		    	ID=#{ID, jdbcType=VARCHAR}
+		    </if>
+		where
+			ID=#{ID, jdbcType=VARCHAR}
+	</update>
+	<!-- 删除 -->
+	<delete id="delete" parameterType="pd">
+		delete 
+		from
+			<include refid="tableName"></include>
+		where
+			ID=#{ID, jdbcType=VARCHAR}
+	</delete>
+	<!-- 批量删除 -->
+	<delete id="deleteAll" parameterType="String">
+		delete from
+		<include refid="tableName"></include>
+		where 
+			ID in
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                 #{item}
+		</foreach>
+	</delete>
+	<!-- 增加-->
+	<insert id="save" parameterType="pd">
+		insert into 
+	<include refid="tableName"></include>
+		(
+	<include refid="Field"></include>
+		) values (
+	<include refid="FieldValue"></include>
+		)
+	</insert>
+</mapper>

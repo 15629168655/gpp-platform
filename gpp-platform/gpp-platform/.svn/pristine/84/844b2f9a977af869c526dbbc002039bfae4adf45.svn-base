@@ -1,0 +1,342 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="TreateCaseMapper">
+	<!--治疗方案表-->
+	<sql id="tableName">
+		GPP_TREATE_CASE
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		CASE_ID,
+		CASE_NAME,
+		RESIDENT_ID,
+		RESIDENT_NAME,
+		CASE_CONTENT,
+		TREATE_COUNT,
+		MODEL_ID,
+		MODEL_NAME,
+		DISEASE_NAME,
+		PEOPLE_TYPE,
+		INTERVAL_TIME,
+		INTERVAL_COMPANY,
+		PROVIDER_ID,
+		PROVIDER_NAME,
+		ORG_CODE,
+		TIME_ID,
+		ORG_NAME,
+		START_TIME,
+		REMIND_TIME,
+		IMPL_COUNT,
+		IMPL_EFFECT,
+		IMPL_SUGGESTION,
+		IMPL_STATE,
+		OPERATOR_ID,
+		OPERATOR_NAME,
+		CREATE_TIME,
+		EDIT_TIME
+	</sql>
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{CASE_ID, jdbcType=VARCHAR},
+		#{CASE_NAME, jdbcType=VARCHAR},
+		#{RESIDENT_ID, jdbcType=VARCHAR},
+		#{RESIDENT_NAME, jdbcType=VARCHAR},
+		#{CASE_CONTENT,jdbcType=NUMERIC},
+		#{TREATE_COUNT, jdbcType=NUMERIC},
+		#{MODEL_ID, jdbcType=VARCHAR},
+		#{MODEL_NAME, jdbcType=VARCHAR},
+		#{DISEASE_NAME, jdbcType=VARCHAR},
+		#{PEOPLE_TYPE, jdbcType=VARCHAR},
+		#{INTERVAL_TIME, jdbcType=VARCHAR},
+		#{INTERVAL_COMPANY, jdbcType=VARCHAR},
+		#{PROVIDER_ID, jdbcType=VARCHAR},
+		#{PROVIDER_NAME, jdbcType=VARCHAR},
+		#{ORG_CODE, jdbcType=VARCHAR},
+		#{TIME_ID, jdbcType=VARCHAR},
+		#{ORG_NAME, jdbcType=VARCHAR},
+		to_date(#{START_TIME},'yyyy-mm-dd'),
+		#{REMIND_TIME, jdbcType=NUMERIC},
+		#{IMPL_COUNT, jdbcType=NUMERIC},
+		#{IMPL_EFFECT, jdbcType=VARCHAR},
+		#{IMPL_SUGGESTION, jdbcType=NUMERIC},
+		#{IMPL_STATE, jdbcType=VARCHAR},
+		#{OPERATOR_ID, jdbcType=VARCHAR},
+		#{OPERATOR_NAME, jdbcType=VARCHAR},
+		to_date(#{CREAT_TIME},'yyyy-mm-dd HH24:mi:ss'),
+		to_date(#{EDIT_TIME},'yyyy-mm-dd HH24:mi:ss')
+	</sql>
+	<!-- 查询全部 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select <include refid="Field"></include> from
+		<include refid="tableName"></include>
+		where 1=1
+			<if test = "pd.ORG_NAME != null and pd.ORG_NAME != ''">
+				and ORG_NAME LIKE CONCAT(CONCAT('%', #{pd.ORG_NAME}),'%')
+			</if>
+			<if test="pd.PROVIDER_NAME != null and pd.PROVIDER_NAME !=''" >
+				and PROVIDER_NAME LIKE CONCAT(CONCAT('%', #{pd.PROVIDER_NAME}),'%')
+			</if>
+			<if test="pd.SUIT_PEOPLE != null and pd.SUIT_PEOPLE !=''" >
+				and PEOPLE_TYPE = #{pd.PEOPLE_TYPE}
+			</if>
+			<if test="pd.DISEASE_NAME != null and pd.DISEASE_NAME!=''" >
+				and DISEASE_NAME LIKE CONCAT(CONCAT('%', #{pd.DISEASE_NAME}),'%')
+			</if>
+	</select>
+	<!-- 查看详情 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+			<include refid="Field"></include>
+		from 
+			<include refid="tableName"></include>
+		where 
+			CASE_ID = #{CASE_ID,jdbcType=VARCHAR}
+	</select>
+	<!-- 根据治疗方案模板ID查询治疗方案 --> 
+	<select id="findByModelId" parameterType="pd" resultType="pd">
+		select 
+			<include refid="Field"></include>
+		from 
+			<include refid="tableName"></include>
+		where 
+			MODEL_ID = #{TREATE_MODEL_ID,jdbcType=VARCHAR}
+	</select>
+	<!-- 编辑治疗方案 -->
+	<select id="edit">
+		update
+			<include refid="tableName"></include>
+		set 
+			<if test = "CASE_NAME != null and CASE_NAME != ''">
+				CASE_NAME=#{CASE_NAME, jdbcType=VARCHAR},
+			</if>
+			<if test = "RESIDENT_ID != null and RESIDENT_ID != ''">
+				RESIDENT_ID=#{RESIDENT_ID, jdbcType=VARCHAR},
+			</if>
+			<if test = "RESIDENT_NAME != null and RESIDENT_NAME != ''">
+				RESIDENT_NAME=#{RESIDENT_NAME, jdbcType=VARCHAR},
+			</if>
+			<if test = "CASE_CONTEN != null and CASE_CONTEN != ''">
+				CASE_CONTEN=#{CASE_CONTEN,jdbcType=NUMERIC},
+			</if>
+			<if test = "TREATE_COUNT != null and TREATE_COUNT != ''">
+				TREATE_COUNT=#{TREATE_COUNT, jdbcType=NUMERIC},
+			</if>
+			<if test = "MODEL_ID != null and MODEL_ID != ''">
+				MODEL_ID=#{MODEL_ID, jdbcType=VARCHAR},
+			</if>
+			<if test = "MODEL_NAME != null and MODEL_NAME != ''">
+				MODEL_NAME=#{MODEL_NAME, jdbcType=VARCHAR},
+			</if>
+			<if test = "DISEASE_NAME != null and DISEASE_NAME != ''">
+				DISEASE_NAME=#{DISEASE_NAME, jdbcType=VARCHAR},
+			</if>
+			<if test = "PEOPLE_TYPE != null and PEOPLE_TYPE != ''">
+				PEOPLE_TYPE=#{PEOPLE_TYPE, jdbcType=VARCHAR},
+			</if>
+			<if test = "INTERVAL_TIME != null and INTERVAL_TIME != ''">
+				INTERVAL_TIME=#{INTERVAL_TIME, jdbcType=VARCHAR},
+			</if>
+			<if test = "INTERVAL_COMPANY != null and INTERVAL_COMPANY != ''">
+				INTERVAL_COMPANY=#{INTERVAL_COMPANY, jdbcType=VARCHAR},
+			</if>
+			<if test = "PROVDER_ID != null and PROVDER_ID != ''">
+				PROVIDER_ID=#{PROVDER_ID, jdbcType=VARCHAR},
+			</if>
+			<if test = "PROVDER_NAME != null and PROVDER_NAME != ''">
+				PROVIDER_NAME=#{PROVDER_NAME, jdbcType=VARCHAR},
+			</if>
+			<if test = "ORG_ID != null and ORG_ID != ''">
+				ORG_ID=#{ORG_ID, jdbcType=VARCHAR},
+			</if>
+			<if test = "TIME_ID != null and TIME_ID != ''">
+				TIME_ID=#{TIME_ID, jdbcType=VARCHAR},
+			</if>
+			<if test = "ORG_NAME != null and ORG_NAME != ''">
+				ORG_NAME=#{ORG_NAME, jdbcType=VARCHAR},
+			</if>
+			<if test = "START_TIME != null and START_TIME != ''">
+				START_TIME=to_date(#{START_TIME},'yyyy-mm-dd'),
+			</if>
+			<if test = "REMIND_TIME != null and REMIND_TIME != ''">
+				REMIND_TIME=#{REMIND_TIME, jdbcType=NUMERIC},
+			</if>
+			<if test = "IMPL_COUNT != null and IMPL_COUNT != ''">
+				IMPL_COUNT=#{IMPL_COUNT, jdbcType=NUMERIC},
+			</if>
+			<if test = "IMPL_EFFECT != null and IMPL_EFFECT != ''">
+				IMPL_EFFECT=#{IMPL_EFFECT, jdbcType=VARCHAR},
+			</if>
+			<if test = "IMPL_SUGGESTION != null and IMPL_SUGGESTION != ''">
+				IMPL_SUGGESTION=#{IMPL_SUGGESTION, jdbcType=NUMERIC},
+			</if>
+			<if test = "IMPL_STATE != null and IMPL_STATE != ''">
+				IMPL_STATE=#{IMPL_STATE, jdbcType=VARCHAR},
+			</if>
+			<if test = "CREAT_TIME != null and CREAT_TIME != ''">
+				CREAT_TIME=to_date(#{CREAT_TIME},'yyyy-mm-dd HH24:mi:ss'),
+			</if>
+			<if test = "EDIT_TIME != null and EDIT_TIME != ''">
+				EDIT_TIME=to_date(#{EDIT_TIME},'yyyy-mm-dd HH24:mi:ss'),
+			</if>
+			<if test = "OPERATOR_ID != null and OPERATOR_ID != ''">
+				OPERATOR_ID=#{{OPERATOR_ID, jdbcType=VARCHAR},
+			</if>
+			<if test = "OPERATOR_NAME != null and OPERATOR_NAME != ''">
+				OPERATOR_NAME=#{OPERATOR_NAME, jdbcType=VARCHAR},
+			</if>
+				CASE_ID=#{CASE_ID, jdbcType=VARCHAR}
+		where 
+			CASE_ID = #{CASE_ID,jdbcType=VARCHAR}
+	</select>
+	<!-- 通过居民ID查询治疗方案 -->
+	<select id="findByResidentId" parameterType="pd" resultType="pd">
+		select 
+		CASE_ID,
+		CASE_NAME,
+		RESIDENT_ID,
+		RESIDENT_NAME,
+		<if test="CASE_CONTENT != null and CASE_CONTENT != ''">
+			CASE_CONTENT,
+		</if>
+		TREATE_COUNT,
+		MODEL_ID,
+		MODEL_NAME,
+		DISEASE_NAME,
+		PEOPLE_TYPE,
+		INTERVAL_TIME,
+		INTERVAL_COMPANY,
+		PROVIDER_ID,
+		PROVIDER_NAME,
+		ORG_CODE,
+		TIME_ID,
+		ORG_NAME,
+		START_TIME,
+		REMIND_TIME,
+		IMPL_COUNT,
+		IMPL_EFFECT,
+		<if test="IMPL_SUGGESTION != null and IMPL_SUGGESTION != ''">
+			IMPL_SUGGESTION,
+		</if>
+		IMPL_STATE,
+		OPERATOR_ID,
+		OPERATOR_NAME,
+		CREATE_TIME,
+		EDIT_TIME
+		from 
+			<include refid="tableName"></include>
+		where 
+			RESIDENT_ID = #{RESIDENT_ID,jdbcType=VARCHAR}
+	</select>
+	<!-- 改变执行的状态 -->
+	<update id="changCaseState" parameterType="pd">
+		update 
+			<include refid="tableName"></include>
+			set
+				IMPL_STATE=#{IMPL_STATE, jdbcType=VARCHAR},
+				CREAT_TIME=to_date(#{CREAT_TIME},'yyyy-mm-dd HH24:mi:ss')	
+		where
+			CASE_ID=#{CASE_ID, jdbcType=VARCHAR}
+	</update>
+	<!-- 改变执行的次数-->
+	<update id="changCaseCount" parameterType="pd">
+		update 
+			<include refid="tableName"></include>
+			set
+				IMPL_COUNT=#{IMPL_COUNT, jdbcType=NUMERIC},
+				IMPL_STATE=#{IMPL_STATE, jdbcType=VARCHAR},
+				EDIT_TIME=to_date(#{EDIT_TIME},'yyyy-mm-dd HH24:mi:ss'),
+				OPERATOR_ID=#{OPERATOR_ID, jdbcType=VARCHAR},
+				OPERATOR_NAME=#{IMPL_STATE, jdbcType=VARCHAR}
+		where
+			CASE_ID=#{CASE_ID, jdbcType=VARCHAR}
+	</update>
+	<!-- 删除 -->
+	<update id="delete" parameterType="pd">
+		update 
+			<include refid="tableName"></include>
+			set
+				IMPL_STATE=#{IMPL_STATE, jdbcType=VARCHAR},
+				CREAT_TIME=to_date(#{CREAT_TIME},'yyyy-mm-dd HH24:mi:ss')	
+		where
+			CASE_ID=#{CASE_ID, jdbcType=VARCHAR}
+	</update>
+	<!-- 批量删除 -->
+	<update id="deleteAll" parameterType="pd">
+		update
+			<include refid="tableName"></include>
+		set
+			IMPL_STATE=to_date(#{IMPL_STATE},'yyyy-mm-dd HH24:mi:ss'),
+			STATE=#{STATE, jdbcType=VARCHAR}
+		where
+			CASE_ID in ${IDS}
+	</update>
+	<!--  保存-->
+	<insert id="save" parameterType="pd">
+		insert into 
+	<include refid="tableName"></include>
+	(CASE_ID,
+		CASE_NAME,
+		RESIDENT_ID,
+		RESIDENT_NAME,
+		<if test="CASE_CONTENT != null and CASE_CONTENT != ''">
+			CASE_CONTENT,
+		</if>
+		TREATE_COUNT,
+		MODEL_ID,
+		MODEL_NAME,
+		DISEASE_NAME,
+		PEOPLE_TYPE,
+		INTERVAL_TIME,
+		INTERVAL_COMPANY,
+		PROVIDER_ID,
+		PROVIDER_NAME,
+		ORG_CODE,
+		TIME_ID,
+		ORG_NAME,
+		START_TIME,
+		REMIND_TIME,
+		IMPL_COUNT,
+		IMPL_EFFECT,
+		<if test="IMPL_SUGGESTION != null and IMPL_SUGGESTION != ''">
+			IMPL_SUGGESTION,
+		</if>
+		IMPL_STATE,
+		OPERATOR_ID,
+		OPERATOR_NAME,
+		CREATE_TIME,
+		EDIT_TIME)
+            VALUES
+     (#{CASE_ID, jdbcType=VARCHAR},
+		#{CASE_NAME, jdbcType=VARCHAR},
+		#{RESIDENT_ID, jdbcType=VARCHAR},
+		#{RESIDENT_NAME, jdbcType=VARCHAR},
+		<if test="CASE_CONTENT != null and CASE_CONTENT != ''">
+			#{CASE_CONTENT,jdbcType=NUMERIC},
+		</if>
+		#{TREATE_COUNT, jdbcType=NUMERIC},
+		#{MODEL_ID, jdbcType=VARCHAR},
+		#{MODEL_NAME, jdbcType=VARCHAR},
+		#{DISEASE_NAME, jdbcType=VARCHAR},
+		#{PEOPLE_TYPE, jdbcType=VARCHAR},
+		#{INTERVAL_TIME, jdbcType=VARCHAR},
+		#{INTERVAL_COMPANY, jdbcType=VARCHAR},
+		#{PROVIDER_ID, jdbcType=VARCHAR},
+		#{PROVIDER_NAME, jdbcType=VARCHAR},
+		#{ORG_CODE, jdbcType=VARCHAR},
+		#{TIME_ID, jdbcType=VARCHAR},
+		#{ORG_NAME, jdbcType=VARCHAR},
+		to_date(#{START_TIME},'yyyy-mm-dd'),
+		#{REMIND_TIME, jdbcType=NUMERIC},
+		#{IMPL_COUNT, jdbcType=NUMERIC},
+		#{IMPL_EFFECT, jdbcType=VARCHAR},
+		<if test="IMPL_SUGGESTION != null and IMPL_SUGGESTION != ''">
+			#{IMPL_SUGGESTION, jdbcType=NUMERIC},
+		</if>
+		#{IMPL_STATE, jdbcType=VARCHAR},
+		#{OPERATOR_ID, jdbcType=VARCHAR},
+		#{OPERATOR_NAME, jdbcType=VARCHAR},
+		to_date(#{CREAT_TIME},'yyyy-mm-dd HH24:mi:ss'),
+		to_date(#{EDIT_TIME},'yyyy-mm-dd HH24:mi:ss'))
+	</insert>
+</mapper>

@@ -1,0 +1,382 @@
+package com.tbyf.controller.app.appjkzx;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+
+import com.tbyf.controller.base.BaseController;
+import com.tbyf.entity.enums.EnumAttachmentType;
+import com.tbyf.entity.enums.EnumIsUrl;
+import com.tbyf.entity.enums.EnumMessageType;
+import com.tbyf.service.gp.jkzx.JkzxManager;
+import com.tbyf.service.hm.devicepush.DevicePushManager;
+import com.tbyf.service.system.appuser.AppuserManager;
+import com.tbyf.service.system.attachment.AttachmentManager;
+import com.tbyf.util.AppUtil;
+import com.tbyf.util.FileSizeFormatUtil;
+import com.tbyf.util.FileUpload;
+import com.tbyf.util.PageData;
+import com.tbyf.util.ResultMessageUtil;
+import com.tbyf.util.Tools;
+import com.tbyf.util.jpush.entity.MemberMessage;
+import com.tbyf.util.jpush.service.PushMessageService;
+
+/**
+ * APP健康咨询
+ * 
+ * 相关参数协议：
+ * 00	请求失败
+ * 01	请求成功
+ * 02	返回空值
+ * 03	请求协议参数不完整    
+ * 04  用户名或密码错误
+ * 05  FKEY验证失败
+*/
+@Controller
+@RequestMapping(value="/appjkzx")
+public class AppjkzxController extends BaseController {
+    
+	@Resource(name="jkzxService")
+	private JkzxManager jkzxService;
+
+	@Resource(name="devicePushService")
+	private DevicePushManager devicePushService;//推送关联Service
+	@Resource(name="pushMessageService")
+	private PushMessageService pushMessageService;//推送关联Service
+	@Resource(name="appuserService")
+	private AppuserManager appuserService;
+	
+	@Value("${system.photo.realDir}")
+	String attachmentRealDir;
+	@Value("${tomcat.photo.virtualDir}")
+	String attachmentVirtualDir;
+
+	@Resource(name="attachmentService")
+	private AttachmentManager attachmentService;
+	//上传文件类型
+	private Integer JKZX = EnumAttachmentType.JKZX.getCode();
+	
+
+ 	@RequestMapping(value="/saveObj",method=RequestMethod.POST)
+    @ResponseBody
+    public Object saveObj()
+    {
+        logBefore(logger, "app新增健康咨询接口");
+        Map<String,Object> map = new HashMap<String,Object>();
+        PageData pd = new PageData();
+        pd = this.getPageData();
+        String result = "00";
+        String message ="";
+        try{	
+        	if(Tools.checkKey("ID", pd.getString("FKEY"))){	//检验请求key值是否合法
+	        	if(AppUtil.checkParam("savejkzxinfo", pd)){	//检查参数
+	        		pd.put("CONSULTATION_ID", this.get32UUID());
+	        		pd.put("INFOTYPE", "0");
+	        		pd.put("ISFINISH", "0");
+	        		if(pd.containsKey("SEND_FILE")&& !pd.get("SEND_FILE").equals("")){
+            		   PageData attpd = new PageData();
+            		   attpd.put("ATTACHMENT_ID", pd.get("SEND_FILE"));
+            		   PageData attahmentPd = attachmentService.findById(attpd);
+            		   pd.put("SEND_FILE_URL", attahmentPd.get("PATH"));
+            	    }else{
+            		   pd.put("SEND_FILE", "");
+            		   pd.put("SEND_FILE_URL", "");
+            	    }
+	        		jkzxService.save(pd);
+	        		
+	        		//像医生发送健康咨询
+	        		
+		            result = "01";
+		            message = ResultMessageUtil.MESSAGE_1;
+	        	}else{
+	        		result = "03";
+		            message = ResultMessageUtil.MESSAGE_3;
+	        	}  
+        	}else{
+				result = "05";
+	            message = ResultMessageUtil.MESSAGE_5;
+			} 	
+        }catch (Exception e){
+            logger.error(e.toString(), e);
+            message = ResultMessageUtil.MESSAGE_0;
+        }finally{
+            map.put("result", result);
+            map.put("message", message);
+            logAfter(logger);
+        }
+        return AppUtil.returnObject(new PageData(), map);
+    }
+ 	/**
+ 	 * 查询咨询记录列表
+ 	 * @return
+ 	 */
+ 	@RequestMapping(value="/queryPage",method=RequestMethod.GET)
+    @ResponseBody
+    public Object queryPage()
+    {
+        logBefore(logger, "app健康咨询发送信息接口");
+        Map<String,Object> map = new HashMap<String,Object>();
+        PageData pd = new PageData();
+        pd = this.getPageData();
+        String result = "00";
+        String message ="";
+        try{	
+        	if(Tools.checkKey("JKZX", pd.getString("FKEY"))){	//检验请求key值是否合法
+        		if(pd.get("PERSON_ID")==null ||   pd.get("DOCTOR_ID")==null){	//检查参数
+        			int pageSize=1;//页码
+	        		int pageCount=10;//页数
+	               	if(null !=pd.get("PAGESIZE") && null !=pd.get("PAGECOUNT") ){
+	               		pd.put("pageStart", (Integer.parseInt(pd.get("PAGESIZE").toString())-1)*Integer.parseInt(pd.get("PAGECOUNT").toString())+1);
+	               		pd.put("pageEnd", Integer.parseInt(pd.get("PAGESIZE").toString()) * Integer.parseInt(pd.get("PAGECOUNT").toString()));
+	               	}else{
+	               		pd.put("pageStart", (pageSize-1)* pageCount+1);
+	               		pd.put("pageEnd", pageSize * pageCount);
+	               	}
+	        		List<PageData> list = jkzxService.listForApp(pd);
+		            map.put("pd",list);
+		            result = "01";
+		            message = ResultMessageUtil.MESSAGE_1;
+	        	}else{
+	        		result = "03";
+	        		message = ResultMessageUtil.MESSAGE_3;
+	        		
+	        	}    
+        	}else{
+				result = "05";
+        		message = ResultMessageUtil.MESSAGE_5;
+			}	
+        }catch (Exception e){
+            logger.error(e.toString(), e);
+    		message = ResultMessageUtil.MESSAGE_0;
+        }finally{
+            map.put("result", result);
+            map.put("message", message);
+            logAfter(logger);
+        }
+        return AppUtil.returnObject(new PageData(), map);
+    }
+ 	@RequestMapping(value="/message",method=RequestMethod.POST)
+    @ResponseBody
+    public Object message()
+    {
+        logBefore(logger, "app健康咨询发送信息接口");
+        Map<String,Object> map = new HashMap<String,Object>();
+        PageData pd = new PageData();
+        pd = this.getPageData();
+        String result = "00";
+        String message ="";
+        try{	
+        	if(Tools.checkKey("SEND_ROLE", pd.getString("FKEY"))){	//检验请求key值是否合法
+        		if(AppUtil.checkParam("savejkzxcontent", pd)){	//检查参数
+	        		pd.put("ID", this.get32UUID());
+	        		//修改记录状态
+	        		PageData data = new PageData();
+	        		data.put("CONSULTATION_ID", pd.getString("CONSULTATION_ID"));
+	        		data.put("REPLY_TIME", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+	        		if(pd.get("SEND_ROLE")=="1" || pd.get("SEND_ROLE").equals("1")){ 
+	        			data.put("INFOTYPE", "1");
+	        		}else{
+	        			data.put("INFOTYPE", "0");
+	        		}
+	        		jkzxService.saveContent(pd);
+	        		jkzxService.editObj(data);
+	        		//判断发送者的情况判断发送者的状态
+	        		if(pd.get("SEND_ROLE")=="1" || pd.get("SEND_ROLE").equals("1")) {
+	        			pd.put("PROVIDER_ID", pd.get("SEND_ID"));
+		        		pd = appuserService.findByProviderId(pd);
+		        		pd.put("USERID", pd.get("USER_ID"));
+		        		PageData pdDevicePush = devicePushService.findByUserID(pd);//获得用户设备的推送ID
+		        		if(null != pdDevicePush) {
+		        			MemberMessage memberMessage = new MemberMessage();
+		        			memberMessage.setIsUrl(EnumIsUrl.NO.getCode());//带连接的
+		        			memberMessage.setType(EnumMessageType.CONSULT.getCode());
+		        			memberMessage.setDeviceId(pdDevicePush.get("DEVUSERID").toString());//设备的推送ID
+		        			memberMessage.setContent("来自" + pd.get("SEND_NAME").toString() + "");//推送的内容
+		        			memberMessage.setTitle("咨询消息");
+		        			memberMessage.setCONSULTATION_ID(pd.get("CONSULTATION_ID").toString());
+		        			pushMessageService.sentConsultMessage(memberMessage);
+		        		}
+	        		}
+	        		else {
+	        			pd.put("USERID", pd.get("SEND_ID"));
+	        			PageData pdDevicePush = devicePushService.findByUserID(pd);//获得用户设备的推送ID
+		        		if(null != pdDevicePush) {
+		        			MemberMessage memberMessage = new MemberMessage();
+		        			memberMessage.setIsUrl(EnumIsUrl.YES.getCode());//带连接的
+		        			memberMessage.setType(EnumMessageType.CONSULT.getCode());
+		        			memberMessage.setDeviceId(pdDevicePush.get("DEVUSERID").toString());//设备的推送ID
+		        			memberMessage.setContent("来自" + pd.get("PERSON_NAME").toString() + "咨询");//推送的内容
+		        			memberMessage.setTitle("咨询消息回复");
+		        			memberMessage.setCONSULTATION_ID(pd.get("CONSULTATION_ID").toString());
+		        			pushMessageService.sentConsultMessage(memberMessage);
+		        		}
+	        		}
+		            result = "01";
+		            message =ResultMessageUtil.MESSAGE_1;
+	        	}else{
+	        		result = "03";
+		            message =ResultMessageUtil.MESSAGE_3;
+	        	}    
+        	}else{
+				result = "05";
+	            message =ResultMessageUtil.MESSAGE_5;
+			}	
+        }catch (Exception e){
+            logger.error(e.toString(), e);
+            message =ResultMessageUtil.MESSAGE_0;
+        }finally{
+            map.put("result", result);
+            map.put("message",message);
+            logAfter(logger);
+        }
+        return AppUtil.returnObject(new PageData(), map);
+    }
+ 	
+ 	@RequestMapping(value="/queryData",method=RequestMethod.GET)
+    @ResponseBody
+    public Object queryData()
+    {
+        logBefore(logger, "app信息查询接口");
+        Map<String,Object> map = new HashMap<String,Object>();
+        PageData pd = new PageData();
+        pd = this.getPageData();
+        String result = "00";
+        String message ="";
+        try{	
+        	if(Tools.checkKey("CONSULTATION_ID", pd.getString("FKEY"))){	//检验请求key值是否合法
+        		if(AppUtil.checkParam("queryJkzxContent", pd)){	//检查参数
+	        		List<PageData> list = jkzxService.findContent(pd);
+	        		map.put("pd",list);
+		            result = "01";
+		            message = ResultMessageUtil.MESSAGE_1;
+	        	}else{
+	        		result = "03";
+	        		message = ResultMessageUtil.MESSAGE_3;
+	        	}
+        	}else{
+				result = "05";
+				message = ResultMessageUtil.MESSAGE_5;
+			}	
+        }catch (Exception e){
+            logger.error(e.toString(), e);
+            message = ResultMessageUtil.MESSAGE_0;
+        }finally{
+            map.put("result", result);
+            map.put("message", message);
+            logAfter(logger);
+        }
+        return AppUtil.returnObject(new PageData(), map);
+    }
+ 	/**
+ 	 * 咨询完结评分接口
+ 	 * @return
+ 	 */
+ 	@RequestMapping(value="/finish",method=RequestMethod.POST)
+    @ResponseBody
+    public Object finish()
+    {
+        logBefore(logger, "app健康咨询完结评分接口");
+        Map<String,Object> map = new HashMap<String,Object>();
+        PageData pd = new PageData();
+        pd = this.getPageData();
+        String result = "00";
+        String message ="";
+        try{	
+        	if(Tools.checkKey("CONSULTATION_ID", pd.getString("FKEY"))){	//检验请求key值是否合法
+        		if(AppUtil.checkParam("editJkzx", pd)){	//检查参数
+        			//
+        			pd.put("ISFINISH","1");
+        			pd.put("FINISH_TIME", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+        			jkzxService.editObj(pd);
+		            result = "01";
+		            message = ResultMessageUtil.MESSAGE_1;
+	        	}else{
+	        		result = "03";
+	        	    message = ResultMessageUtil.MESSAGE_3;
+	        	}
+        	}else{
+				result = "05";
+			    message = ResultMessageUtil.MESSAGE_5;
+			}	
+        }catch (Exception e){
+            logger.error(e.toString(), e);
+            message = ResultMessageUtil.MESSAGE_0;
+        }finally{
+            map.put("result", result);
+            map.put("message",message);
+            logAfter(logger);
+        }
+        return AppUtil.returnObject(new PageData(), map);
+    }
+	@RequestMapping(value = "/uploadImage")
+	@ResponseBody
+	public Object upFile(MultipartHttpServletRequest request,
+			@RequestParam(value = "FILE", required = false) MultipartFile file)
+			throws Exception {
+		Map<String, Object> map = new HashMap<String, Object>();
+		String result ="00";
+		String message ="";
+		try {
+			if(Tools.checkKey("FILE", request.getParameter("FKEY"))){	//检验请求key值是否合法  
+				//文件上传路径，保存到服务器项目下。
+				if(file.getSize() !=0 ){
+					if(!file.isEmpty()){
+						String uuid = this.get32UUID();
+						String realName = FileUpload.fileUp(file, attachmentRealDir, uuid );
+						String attachmentVirtualPath = attachmentVirtualDir + realName;
+	
+						PageData attachmentPd = new PageData();
+						attachmentPd.put("ATTACHMENT_ID", uuid);	//主键
+						attachmentPd.put("BUSINESS_ID", "");
+						attachmentPd.put("TYPE", JKZX);
+						attachmentPd.put("NAME", file.getOriginalFilename());
+						attachmentPd.put("PATH", attachmentVirtualPath);
+						attachmentPd.put("SIZE", FileSizeFormatUtil.formatFileSize(file.getSize()));
+						attachmentPd.put("CONTENTTYPE", file.getContentType());
+						attachmentPd.put("OPERATER",request.getParameter("PERSON_ID"));	//上传人
+						attachmentPd.put("OPERATEDATE", Tools.date2Str(new Date()));	//上传时间
+						attachmentService.save(attachmentPd);
+						PageData pd = new PageData();
+						pd.put("FILE_ID", uuid);
+						pd.put("FILE_URL", attachmentVirtualPath);
+						map.put("pd", pd);
+						result="01";
+						message = ResultMessageUtil.MESSAGE_1;
+					}else{
+						result="00";
+						message = ResultMessageUtil.MESSAGE_0;
+					}
+				} else { 
+					result="00";
+					message = ResultMessageUtil.MESSAGE_0;
+				}
+			}else{
+				 result = "05";
+					message = ResultMessageUtil.MESSAGE_5;
+			}
+		} catch (Exception e) {
+			logger.error(e.toString(), e);
+			message = ResultMessageUtil.MESSAGE_0;
+		} finally {
+			map.put("result", result);
+			map.put("message", message);
+			logAfter(logger);
+		}
+		return AppUtil.returnObject(new PageData(), map);
+	}
+}
+	
+ 

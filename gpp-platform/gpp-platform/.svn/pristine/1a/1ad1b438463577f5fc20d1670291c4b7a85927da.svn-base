@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="TeamMemberMapper">
+	
+	
+	<!--团队成员表 -->
+	<sql id="tableName">
+		GPP_TEAM_MEMBER
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		ID,
+  		TEAM_ID,
+  		TEAM_MEMBER_ID,
+  		TEAM_MEMBER_NAME,
+  		TEAM_MEMBER_PHONE,
+  		ROLE_NAME,
+  		ORDER_ID,
+  		STATUS,
+  		TEAM_MEMBER_CODE,
+  		ORG_CODE,
+  		REGION_CODE,
+  		OPERATOR_ID,
+  		OPERATOR_NAME,
+  		GMT_CREATED,
+  		GMT_MODIFIED
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{ID,jdbcType=VARCHAR},
+  		#{TEAM_ID,jdbcType=VARCHAR},
+  		#{TEAM_MEMBER_ID,jdbcType=VARCHAR},
+  		#{TEAM_MEMBER_NAME,jdbcType=VARCHAR},
+  		#{TEAM_MEMBER_PHONE,jdbcType=VARCHAR},
+  		#{ROLE_NAME,jdbcType=VARCHAR},
+  		#{ORDER_ID,jdbcType=NUMERIC},
+  		#{STATUS,jdbcType=VARCHAR},
+  		#{TEAM_MEMBER_CODE,jdbcType=VARCHAR},
+  		#{ORG_CODE,jdbcType=VARCHAR},
+  		#{REGION_CODE,jdbcType=VARCHAR},
+  		#{OPERATOR_ID,jdbcType=VARCHAR},
+  		#{OPERATOR_NAME,jdbcType=VARCHAR},
+  		sysdate,
+  		sysdate
+	</sql>
+	
+	<!-- 列表 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include> 
+			<where>
+				STATUS != 1
+	            <if test="pd.keywords != null and pd.keywords!= ''"><!-- 关键词检索 -->
+				and (
+					TEAM_MEMBER_NAME LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+					)
+				</if>
+				<if test="pd.TEAM_ID != null and pd.TEAM_ID!= ''"><!-- 关键词检索 -->
+				and 
+					TEAM_ID = #{pd.TEAM_ID}
+				</if>
+			 </where>
+	</select>
+	<select id="getlistByMemberId" parameterType="page" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include> 
+			<where>
+				STATUS != '1'
+	            <if test="TEAM_MEMBER_ID != null and TEAM_MEMBER_ID!= ''"><!-- 关键词检索 -->
+				and (
+					TEAM_MEMBER_ID =#{TEAM_MEMBER_ID}
+					)
+				</if>
+				<if test="TEAM_ID != null and TEAM_ID!= ''"><!-- 关键词检索 -->
+				and 
+					TEAM_ID = #{TEAM_ID}
+				</if>
+			 </where>
+	</select>
+	<select id="getlistByMemberIdOther" parameterType="page" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include> 
+			<where>
+				STATUS != '1'
+	            <if test="TEAM_MEMBER_ID != null and TEAM_MEMBER_ID!= ''"><!-- 关键词检索 -->
+				and (
+					TEAM_MEMBER_ID =#{TEAM_MEMBER_ID}
+					)
+				</if>
+				<if test="TEAM_ID != null and TEAM_ID!= ''"><!-- 关键词检索 -->
+				and 
+					TEAM_ID != #{TEAM_ID}
+				</if>
+			 </where>
+	</select>
+	<select id="getListForApp" parameterType="pd" resultType="pd">
+	  SELECT *
+				  FROM ( SELECT ROWNUM AS rowno,ID,
+  		TEAM_ID,
+  		TEAM_MEMBER_ID,
+  		TEAM_MEMBER_NAME,
+  		TEAM_MEMBER_PHONE,
+  		ROLE_NAME, 
+  		STATUS, 
+  		ORG_CODE FROM <include refid="tableName"></include>
+  		WHERE TEAM_ID=#{TEAM_ID} and STATUS!='1'  ) table_alias
+				 WHERE  table_alias.rowno BETWEEN #{pageStart} and #{pageEnd}
+	    
+	</select>
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include> 
+		where
+			ID = #{ID}
+	</select>
+	
+	
+	
+	<!-- 增加-->
+	<insert id="save" parameterType="pd">
+		insert into 
+	<include refid="tableName"></include>
+		(
+	<include refid="Field"></include>
+		) values (
+	<include refid="FieldValue"></include>
+		)
+	</insert>
+	
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+		update
+		<include refid="tableName"></include>
+		set 
+		<if test="TEAM_MEMBER_ID!=null and TEAM_MEMBER_ID!=''">
+			TEAM_MEMBER_ID =  #{TEAM_MEMBER_ID,jdbcType=VARCHAR},
+		</if>
+		<if test="TEAM_MEMBER_NAME!=null and TEAM_MEMBER_NAME!=''">
+		TEAM_MEMBER_NAME = #{TEAM_MEMBER_NAME,jdbcType=VARCHAR},
+		</if>
+		<if test="TEAM_MEMBER_PHONE!=null and TEAM_MEMBER_PHONE!=''">
+		TEAM_MEMBER_PHONE = #{TEAM_MEMBER_PHONE,jdbcType=VARCHAR},
+		</if>
+		<if test="ROLE_NAME!=null and ROLE_NAME!=''">
+		ROLE_NAME = #{ROLE_NAME,jdbcType=VARCHAR},
+		</if>
+		<if test="STATUS!=null and STATUS!=''">
+		STATUS = #{STATUS,jdbcType=VARCHAR},
+		</if>
+		GMT_MODIFIED=sysdate
+		where 1=1 
+		<if test="ID!=null and ID!=''">
+		and ID = #{ID}
+		</if>
+		<if test="TEAM_ID!=null and TEAM_ID!=''">
+		and TEAM_ID=#{TEAM_ID}
+		</if>
+	</update>
+	<!-- APP修改 -->
+	<update id="editForApp" parameterType="pd">
+		update
+		<include refid="tableName"></include>
+		set 
+		<if test="TEAM_MEMBER_ID!=null and TEAM_MEMBER_ID!=''">
+			TEAM_MEMBER_ID =  #{TEAM_MEMBER_ID,jdbcType=VARCHAR},
+		</if>
+		<if test="TEAM_MEMBER_NAME!=null and TEAM_MEMBER_NAME!=''">
+		TEAM_MEMBER_NAME = #{TEAM_MEMBER_NAME,jdbcType=VARCHAR},
+		</if>
+		<if test="TEAM_MEMBER_PHONE!=null and TEAM_MEMBER_PHONE!=''">
+		TEAM_MEMBER_PHONE = #{TEAM_MEMBER_PHONE,jdbcType=VARCHAR},
+		</if>
+		<if test="ROLE_NAME!=null and ROLE_NAME!=''">
+		ROLE_NAME = #{ROLE_NAME,jdbcType=VARCHAR},
+		</if>
+		<if test="STATUS!=null and STATUS!=''">
+		STATUS = #{STATUS,jdbcType=VARCHAR},
+		</if>
+		GMT_MODIFIED=sysdate
+		where 1=1 
+		<if test="ID!=null and ID!=''">
+		and ID = #{ID}
+		</if>
+		<if test="TEAM_MEMBER_ID!=null and TEAM_MEMBER_ID!=''">
+		and TEAM_MEMBER_ID = #{TEAM_MEMBER_ID}
+		</if>
+		<if test="TEAM_ID!=null and TEAM_ID!=''">
+		and TEAM_ID=#{TEAM_ID}
+		</if>
+	</update>
+	<!-- 通过医生ID 获取数据 -->
+	<select id="findByTeamMemberId" parameterType="pd" resultType="pd">
+		select 
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include> 
+		where
+			TEAM_MEMBER_ID = #{TEAM_MEMBER_ID} and STATUS!='1'
+	</select>
+	<!-- 删除成员-->
+	<delete id="deleteMember" parameterType="pd">
+		delete from <include refid="tableName"></include> 
+		where TEAM_ID=#{ID}
+	</delete>
+</mapper>

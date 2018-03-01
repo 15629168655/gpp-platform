@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="emrformMapper">
+	
+	<!--表名 -->
+	<sql id="tableName">
+		EMR_FORM
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		ID,
+  		FID,
+  		TEMPLATE_NAME,
+  		TEMPLATE_TYPE,
+  		YWTYPE_ID,
+  		SEX,
+  		MUST,
+  		BZ,        
+  		YSNR,
+  		ZHNR,
+  		CREATE_TIME,
+  		MODIFY_TIME,
+  		OPERATION_NAME,
+  		STATUS
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{ID},
+  		#{FID},
+  		#{TEMPLATE_NAME},      
+  		#{TEMPLATE_TYPE,jdbcType=VARCHAR},
+  		#{YWTYPE_ID,jdbcType=VARCHAR},
+  		#{SEX,jdbcType=VARCHAR},
+  		#{MUST,jdbcType=VARCHAR},
+  		#{BZ,jdbcType=VARCHAR},
+  		#{YSNR,jdbcType=VARCHAR},
+  		#{ZHNR,jdbcType=VARCHAR},
+  		to_date(#{CREATED_TIME},'yyyy-mm-dd'),
+  		to_date(#{MODIFY_TIME},'yyyy-mm-dd'),
+  		#{OPERATION_NAME,jdbcType=VARCHAR},
+  		#{STATUS,jdbcType=VARCHAR}
+	</sql>
+	
+	<!-- 列表 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include>
+		<where>
+			STATUS !='9'
+            <if test="pd.keywords != null and pd.keywords!= ''"><!-- 关键词检索 -->
+			and (
+				TEMPLATE_NAME LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				)
+			</if>
+			<if test="pd.TEMPLATE_TYPE != null and pd.TEMPLATE_TYPE != ''"><!-- 模板类型 -->
+				and TEMPLATE_TYPE=#{pd.TEMPLATE_TYPE} 
+			</if>
+			<if test="pd.MUST != null and pd.MUST != ''"><!-- 模板类型 -->
+				and MUST=#{pd.MUST} 
+			</if>
+        </where>
+	</select>
+	
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include> 
+		where
+			ID = #{ID}
+	</select>
+	
+	<!-- 增加-->
+	<insert id="save" parameterType="pd">
+		insert into 
+	<include refid="tableName"></include>
+		(
+		ID,FID,TEMPLATE_NAME,TEMPLATE_TYPE,
+  		YWTYPE_ID,SEX,MUST,BZ,        
+  		YSNR,ZHNR,CREATE_TIME,
+  		OPERATION_NAME,STATUS
+		) values (
+		#{ID},#{FID},#{TEMPLATE_NAME,jdbcType=VARCHAR},      
+  		#{TEMPLATE_TYPE,jdbcType=VARCHAR},#{YWTYPE_ID,jdbcType=VARCHAR},#{SEX,jdbcType=VARCHAR},
+  		#{MUST,jdbcType=VARCHAR},#{BZ,jdbcType=VARCHAR},#{YSNR,jdbcType=VARCHAR},#{ZHNR,jdbcType=VARCHAR},
+  		sysdate,#{OPERATION_NAME,jdbcType=VARCHAR},#{STATUS,jdbcType=VARCHAR}
+		)
+	</insert>
+	
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+		update
+		<include refid="tableName"></include>
+		set 
+		"TEMPLATE_NAME" = #{TEMPLATE_NAME},
+  		"TEMPLATE_TYPE" = #{TEMPLATE_TYPE},   
+  		"SEX" = #{SEX},
+  		"MUST" = #{MUST},
+  		"BZ" = #{BZ},
+		"YSNR" = #{YSNR},
+		"ZHNR" = #{ZHNR},
+  		"MODIFY_TIME" =to_date(#{MODIFY_TIME},'YYYY-MM-DD HH24:MI:SS')
+		where
+		"ID" = #{ID}
+	</update>
+	
+	<!-- 删除-->
+	<delete id="del" parameterType="pd">
+		update 
+		<include refid="tableName"></include>
+		set
+		STATUS = '9'
+		where 
+			ID = #{ID}
+	</delete>
+	
+	<!-- 批量删除 -->
+	<delete id="deleteAll" parameterType="String">
+		delete from
+		<include refid="tableName"></include>
+		where 
+			ID in
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                 #{item}
+		</foreach>
+	</delete>
+	<!-- 修改 表单样式-->
+	<update id="editForm" parameterType="pd">
+		update
+		<include refid="tableName"></include>
+		set 
+		"YSNR" = #{YSNR},
+  		"MODIFY_TIME" =sysdate
+		where
+		"ID" = #{ID}
+	</update>
+</mapper>

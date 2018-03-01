@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="DistrictMapper">
+	
+	<resultMap type="District" id="distResultMap">
+		<id column="REGICODE" property="REGICODE"/>
+		<result column="REGINAME" property="REGINAME"/>
+		<result column="P_REGICODE" property="P_REGICODE"/>
+	</resultMap>
+	
+	<!--表名 -->
+	<sql id="tableName">
+		HM_DISTRICT
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		REGICODE,	
+		P_REGICODE,	
+		REGINAME,	
+		REGINO,
+		F_ENTEFSGUID,
+		FINANCELEVEL,
+		ORDERNUM,
+		YLZD
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{REGICODE},	
+		#{P_REGICODE},	
+		#{REGINAME},	
+		#{REGINO,jdbcType=VARCHAR},
+		#{F_ENTEFSGUID,jdbcType=VARCHAR},
+		#{FINANCELEVEL},
+		#{ORDERNUM},
+		#{YLZD,jdbcType=VARCHAR}
+	</sql>
+	
+	<!-- 新增-->
+	<insert id="save" parameterType="pd">
+		insert into 
+	<include refid="tableName"></include>
+		(
+	<include refid="Field"></include>
+		) values (
+	<include refid="FieldValue"></include>
+		)
+	</insert>
+	
+	<!-- 删除-->
+	<delete id="delete" parameterType="pd">
+		delete from
+		<include refid="tableName"></include>
+		where 
+			REGICODE = #{REGICODE}
+	</delete>
+	
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+		update
+		<include refid="tableName"></include>
+		set 
+			REGICODE = #{REGICODE},
+			REGINAME = #{REGINAME},
+			P_REGICODE = #{P_REGICODE}
+		where 
+			REGICODE = #{REGICODE}
+	</update>
+	
+	<!-- 通过REGICODE获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include>
+		where 
+			REGICODE = #{REGICODE}
+	</select>
+	<!-- 通过上级行政区划获取数据 -->
+	<!-- 列表 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include>
+		where
+			1=1
+		<if test="pd.REGICODE!= null and pd.REGICODE != ''"><!-- 检索  -->
+		and P_REGICODE = #{pd.REGICODE}
+		</if>
+		<if test="pd.keywords != null and pd.keywords != ''"> <!-- 关键词检索  -->
+			and
+				(
+				 REGINAME LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				)
+		</if>
+		<!-- order by ORDER_BY -->
+	</select>
+	
+	<!-- 通过P_REGICODE获取其子级列表 -->
+	<select id="listSubDistBySjxzqhdm" parameterType="String" resultMap="distResultMap">
+		select 
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include>
+		where 
+			P_REGICODE = #{P_REGICODE} <!-- order by ORDER_BY --> 
+	</select>
+	<!-- 通过fID获取其子级列表 -->
+	<select id="listSubDistByFid" parameterType="String" resultMap="distResultMap">
+		select 
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include>
+		where 
+			P_REGICODE = #{REGICODE} <!-- order by ORDER_BY --> 
+	</select>
+	<!-- 排查表检查是否被占用 -->
+	<select id="findFromTbs" parameterType="pd" resultType="pd">
+		select
+			count(*) zs
+		from 
+			${thisTable}
+		where
+			REGICODE = #{REGICODE}
+	</select>
+	
+    <select id="queryDistrictByLevel" parameterType="String" resultMap="distResultMap">
+        select
+        <include refid="Field"></include>
+        from
+        <include refid="tableName"></include>
+        where
+        FINANCELEVEL = #{financelevel}
+    </select>
+     <select id="queryAppDistrictByLevel" parameterType="String" resultType="pd">
+        select REGICODE,REGINAME 
+        from
+        <include refid="tableName"></include>
+        where
+        FINANCELEVEL = #{financelevel}
+    </select>
+    	<!-- 通过REGICODE获取数据 -->
+	<select id="getAppDisTree" parameterType="pd" resultType="pd">
+		   select REGICODE,REGINAME 
+		from 
+		<include refid="tableName"></include>
+		where 
+			P_REGICODE = #{REGICODE}
+	</select>
+</mapper>

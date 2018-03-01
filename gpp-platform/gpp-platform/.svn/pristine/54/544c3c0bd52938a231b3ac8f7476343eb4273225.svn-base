@@ -1,0 +1,107 @@
+package com.tbyf.service.gp.jmxx;
+
+import java.util.List;
+
+import com.tbyf.entity.gp.resident.Jmxx;
+import com.tbyf.plugin.Page;
+import com.tbyf.util.PageData;
+
+/**
+ * 居民信息管理接口
+ * @author lizk
+ *2016-09-03
+ */
+public interface JmxxManager {
+	/**列出辖区所有居民信息
+	 * @param page
+	 * @return
+	 * @throws Exception
+	 */
+	public List<PageData> listAlljmxx(Page page) throws Exception;
+	
+	/**列出辖区居民信息
+	 * @param pd
+	 * @return
+	 * @throws Exception
+	 */
+	public List<Jmxx> listAllJmxxs(PageData pd) throws Exception;
+	
+	/**根据医保卡号查询居民信息
+	 * @param pd
+	 * @return
+	 * @throws Exception
+	 */
+	public PageData jmxxByMi_card(PageData pd) throws Exception;
+	
+	/**根据身份证号查询居民信息
+	 * @param pd
+	 * @return
+	 * @throws Exception
+	 */
+	public PageData jmxxByIdcard(PageData pd) throws Exception;
+	
+	/**保存新增用户
+	 * @param pd
+	 * @throws Exception
+	 */
+	public void saveU(PageData pd)throws Exception;
+	
+	/**
+	 * 通过id获取数据
+	 * @param pd
+	 * @return
+	 */
+	public PageData findById(PageData pd) throws Exception;
+	
+	/**修改居民信息
+	 * @param pd
+	 * @throws Exception
+	 */
+	public void editJmxx(PageData pd)throws Exception;
+	
+	/**删除居民信息(协议状态改为2 ）
+	 * @param pd
+	 * @throws Exception
+	 */
+	public void deleteJmxx(PageData pd)throws Exception;
+
+	void saveForApp(PageData pd) throws Exception;
+
+	void editPW(PageData pd) throws Exception;
+
+	PageData findByTel(PageData pd) throws Exception;
+	/**
+	 * 根据用户id查询居民简单数据
+	 * @param pd
+	 * @return
+	 * @throws Exception
+	 */
+	PageData findUserInfoById(PageData pd) throws Exception;
+ 
+
+	void editForApp(PageData pd) throws Exception;
+	
+	/**
+	 * 居民登陆查询
+	 * @param pd
+	 * @return
+	 * @throws Exception
+	 */
+	PageData findByLoginInfo(PageData pd) throws Exception;
+	
+	/**
+	 * 居民搜索分页查询
+	 * @param pd
+	 * @return
+	 * @throws Exception
+	 */
+	List<PageData> jmxxlistforApp(PageData pd) throws Exception;
+	
+	/**
+	 * 更改居民签约状态
+	 * @param pd
+	 * @throws Exception
+	 */
+	public void editJmxxSign(PageData pd) throws Exception;
+	
+}

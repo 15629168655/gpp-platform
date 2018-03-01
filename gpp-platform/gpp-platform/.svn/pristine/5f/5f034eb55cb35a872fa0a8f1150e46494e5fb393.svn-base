@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="BloodSugarMapper">
+	
+	
+
+	<select id="querylistPage" parameterType="page" resultType="pd">
+				SELECT *
+				  FROM GPP_BLOODSUGAR
+				  where 1=1 
+			<if test="pd.keywords != null and pd.keywords!= ''"><!-- 关键词检索 -->
+			and (
+				"PERSON_NAME" LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				)
+			</if>
+			<if test="pd.start!=null and pd.start!=''">
+			and "MEASURING_TIME" &gt;=#{pd.start}
+		</if>
+		<if test="pd.end!=null and pd.end!=''">
+			and "MEASURING_TIME" &lt;=#{pd.end}
+		</if>
+			<if test="pd.timeClass != null and pd.timeClass!= ''">
+			and 
+				"TIME_CLASS" =#{pd.timeClass}
+			</if>
+	</select>	
+	<delete id="delete" parameterType="pd">
+		delete from
+		GPP_BLOODSUGAR
+		where 
+			"ID" = #{ID}
+	</delete>
+	
+	<insert id="saveObj" parameterType="pd">
+		insert into GPP_BLOODSUGAR ("ID",
+			"PERSON_ID","PERSON_NAME","TIME_CLASS",
+			"VALUE","MEASURING_TIME","INPUT_NAME","ORG_CODE",
+			"GMT_CREATED","INPUT_ID",GMT_MODIFIED,"REGION_CODE"
+		) values (#{ID},
+			#{PERSON_ID},#{PERSON_NAME},#{TIME_CLASS},
+			#{VALUE},#{MEASURING_TIME},#{INPUT_NAME},#{ORG_CODE},
+			sysdate,#{INPUT_ID},sysdate,#{REGION_CODE}
+		)
+	</insert>
+	<select id="queryDataById" parameterType="pd" resultType="pd">
+				SELECT *
+				  FROM GPP_BLOODSUGAR where "ID" = #{ID}
+	</select>
+	
+	<update id="editObj" parameterType="pd">
+		update
+		GPP_BLOODSUGAR
+			set 
+			 <if test="PERSONID != null" >
+				"PERSON_ID" =#{PERSONID,jdbcType=VARCHAR},
+			 </if>	
+			  <if test="PERSON_NAME != null" >
+				"PERSON_NAME" = #{PERSON_NAME,jdbcType=VARCHAR},
+			 </if>
+			 <if test="TIME_CLASS != null" >		
+				"TIME_CLASS" = #{TIME_CLASS,jdbcType=VARCHAR},
+			  </if>		
+			  <if test="VALUE != null" >	
+				"VALUE" = #{VALUE,jdbcType=VARCHAR},	
+			   </if>
+			   <if test="MEASURING_TIME != null" >	
+				"MEASURING_TIME" = #{MEASURING_TIME,jdbcType=VARCHAR},
+				</if>	
+				"GMT_MODIFIED" = sysdate
+			where 
+				"ID" = #{ID}
+	</update>
+	
+	<!-- APP接口 -->
+	<select id="queryPage" parameterType="pd" resultType="pd">
+				SELECT *
+				  FROM ( SELECT ROWNUM AS rowno, t.*
+				          FROM GPP_BLOODSUGAR t
+			where 1=1
+			<if test="personName != null and personName!= ''"><!-- 关键词检索 -->
+			and (
+				"PERSON_NAME" LIKE CONCAT(CONCAT('%', #{PERSONNAME}),'%')
+				)
+			</if>
+			<if test="start!=null and start!=''">
+			and "MEASURING_TIME" &gt;=#{START}
+		</if>
+		<if test="end!=null and end!=''">
+			and "MEASURING_TIME" &lt;=#{END}
+		</if>
+			<if test="timeClass != null and timeClass!= ''">
+			and 
+				"TIME_CLASS" =#{TIMECLASS}
+			</if>
+				           ) table_alias
+				 WHERE table_alias.rowno BETWEEN #{pageStart} and #{pageEnd}
+	</select>	
+</mapper>

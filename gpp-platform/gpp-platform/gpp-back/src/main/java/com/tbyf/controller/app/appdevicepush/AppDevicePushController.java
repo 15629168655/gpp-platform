@@ -1,0 +1,197 @@
+package com.tbyf.controller.app.appdevicepush;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.tbyf.controller.base.BaseController;
+import com.tbyf.service.hm.devicepush.DevicePushManager;
+import com.tbyf.util.AppUtil;
+import com.tbyf.util.DateUtil;
+import com.tbyf.util.PageData;
+import com.tbyf.util.ResultMessageUtil;
+import com.tbyf.util.Tools;
+
+/**推送配置接口管理
+ *  相关参数协议：
+ * 00	请求失败
+ * 01	请求成功
+ * 02	返回空值
+ * 03	请求协议参数不完整    
+ * 04  	用户名或密码错误
+ * 05  	FKEY验证失败
+ * @author zanxc
+ * @创建日期2017年8月11日上午11:09:33
+ */
+@Controller
+@RequestMapping(value="/appDevicePush")
+public class AppDevicePushController extends BaseController{
+
+	@Resource(name="devicePushService")
+	private DevicePushManager devicePushService;
+	
+	@RequestMapping(value="/queryUserPushInfo", method = RequestMethod.GET)
+    @ResponseBody
+    public Object queryUserPushInfo()
+    {
+        logBefore(logger, "app查询用户推送配置信息");
+        Map<String,Object> map = new HashMap<String,Object>();
+        PageData pd = new PageData();
+        String result = "00";
+        String message = "";
+        try{
+        	pd = this.getPageData();
+	        if(Tools.checkKey("DEVUSERID", pd.getString("FKEY"))){	//检验请求key值是否合法
+	           if(Tools.notEmpty(pd.getString("USERID"))){	//检查参数
+	        	   pd=devicePushService.findByUserID(pd);
+	        	   map.put("pd", pd);
+	               result = "01";//保存成功
+	               message=ResultMessageUtil.MESSAGE_1;
+	           }else {
+	               result = "03";//协议参数不完整
+	               message=ResultMessageUtil.MESSAGE_3;
+	           }
+	        }else{
+				result = "05";//key验证失败
+				message=ResultMessageUtil.MESSAGE_5;
+	        }
+        }catch (Exception e){
+            logger.error(e.toString(), e);
+            message=ResultMessageUtil.MESSAGE_0;//保存异常
+        }finally{
+            map.put("result", result);
+            map.put("message",message);
+            logAfter(logger);
+        }
+        return AppUtil.returnObject(new PageData(), map);
+    }
+	
+	@RequestMapping(value="/saveDeviceInformation", method = RequestMethod.GET)
+    @ResponseBody
+    public Object saveDeviceInformation()
+    {
+        logBefore(logger, "app开启通过传入推送ID(设备ID),设备类型");
+        Map<String,Object> map = new HashMap<String,Object>();
+        PageData pd = new PageData();
+        String result = "00";
+        String message = "";
+        try{
+        	pd = this.getPageData();
+	        if(Tools.checkKey("DEVUSERID", pd.getString("FKEY"))){	//检验请求key值是否合法
+	           if(AppUtil.checkParam("saveDeviceInformation", pd)){	//检查参数
+	        	   if(null == devicePushService.findByDeviceID(pd)) {//设备还未注册
+	        		   pd.put("GUID", this.get32UUID());
+		        	   devicePushService.saveDevice(pd);
+	        	   }
+	        	   else {//设备已经注册
+	        		   devicePushService.edit(pd); 
+	        	   }
+	               result = "01";//保存成功
+	               message=ResultMessageUtil.MESSAGE_1;
+	           }else {
+	               result = "03";//协议参数不完整
+	               message=ResultMessageUtil.MESSAGE_3;
+	           }
+	        }else{
+				result = "05";//key验证失败
+				message=ResultMessageUtil.MESSAGE_5;
+	        }
+        }catch (Exception e){
+            logger.error(e.toString(), e);
+            message=ResultMessageUtil.MESSAGE_0;//保存异常
+        }finally{
+            map.put("result", result);
+            map.put("message",message);
+            logAfter(logger);
+        }
+        return AppUtil.returnObject(new PageData(), map);
+    }
+	@RequestMapping(value="/saveUserInformation", method = RequestMethod.GET)
+    @ResponseBody
+    public Object saveUserInformation()
+    {
+        logBefore(logger, "app开启通过传入推送ID(设备ID),设备类型");
+        Map<String,Object> map = new HashMap<String,Object>();
+        PageData pd = new PageData();
+        String result = "00";
+        String message = "";
+        try{
+        	pd = this.getPageData();
+	        if(Tools.checkKey("DEVUSERID", pd.getString("FKEY"))){	//检验请求key值是否合法
+	           if(AppUtil.checkParam("saveUserInformation", pd)){	//检查参数
+	        	   //通过DeviceId(推送ID查询)
+	        	   PageData pdDevice = devicePushService.findByDeviceID(pd);
+	        	   PageData pdUser = devicePushService.findByUserID(pd);
+	        	   if(null == pdUser) {//没有绑定用户
+	        		   pd.put("BIND_DATE", DateUtil.getTime());
+	        		   devicePushService.edit(pd);
+	        	   }
+	        	   else if(pdDevice.equals(pdDevice)) {//一个用户用同一台手机登录
+	        		   devicePushService.edit(pd);
+	        	   }
+	        	   else {//同一用户不同的设备登录
+	        		   devicePushService.emptyUserId(pd);//清空其他设备上的userID
+	        		   devicePushService.edit(pd);//保存另一个设备 
+	        	   }
+	               result = "01";//保存成功
+	               message=ResultMessageUtil.MESSAGE_1;
+	           }else {
+	               result = "03";//协议参数不完整
+	               message=ResultMessageUtil.MESSAGE_3;
+	           }
+	        }else{
+				result = "05";//key验证失败
+				message=ResultMessageUtil.MESSAGE_5;
+	        }
+        }catch (Exception e){
+            logger.error(e.toString(), e);
+            message=ResultMessageUtil.MESSAGE_0;//保存异常
+        }finally{
+            map.put("result", result);
+            map.put("message",message);
+            logAfter(logger);
+        }
+        return AppUtil.returnObject(new PageData(), map);
+    }
+	@RequestMapping(value="/editFourMsgState", method = RequestMethod.GET)
+    @ResponseBody
+    public Object editFourMsgState()
+    {
+        logBefore(logger, "app开启通过传入推送ID(设备ID),设备类型");
+        Map<String,Object> map = new HashMap<String,Object>();
+        PageData pd = new PageData();
+        String result = "00";
+        String message = "";
+        try{
+        	pd = this.getPageData();
+	        if(Tools.checkKey("DEVUSERID", pd.getString("FKEY"))){	//检验请求key值是否合法
+	           if(AppUtil.checkParam("editFourMsgState", pd)){	//检查参数
+	        	   devicePushService.edit(pd);
+	               result = "01";//保存成功
+	               message=ResultMessageUtil.MESSAGE_1;
+	           }else {
+	               result = "03";//协议参数不完整
+	               message=ResultMessageUtil.MESSAGE_3;
+	           }
+	        }else{
+				result = "05";//key验证失败
+				message=ResultMessageUtil.MESSAGE_5;
+	        }
+        }catch (Exception e){
+            logger.error(e.toString(), e);
+            message=ResultMessageUtil.MESSAGE_0;//保存异常
+        }finally{
+            map.put("result", result);
+            map.put("message",message);
+            logAfter(logger);
+        }
+        return AppUtil.returnObject(new PageData(), map);
+    }
+	
+}

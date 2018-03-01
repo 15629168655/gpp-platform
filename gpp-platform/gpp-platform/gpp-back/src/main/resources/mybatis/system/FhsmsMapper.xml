@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="FhsmsMapper">
+	
+	<!--表名 -->
+	<sql id="tableName">
+		SYS_FHSMS
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		CONTENT,	
+		TYPE,	
+		TO_USERNAME,	
+		FROM_USERNAME,	
+		SEND_TIME,	
+		STATUS,	
+		FHSMS_ID,
+		SANME_ID,
+		TO_USERID,
+		FROM_USERID
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{CONTENT},	
+		#{TYPE},	
+		#{TO_USERNAME},	
+		#{FROM_USERNAME},	
+		#{SEND_TIME},	
+		#{STATUS},	
+		#{FHSMS_ID},
+		#{SANME_ID},
+		#{TO_USERID},
+		#{FROM_USERID}
+	</sql>
+	
+	<!-- 新增-->
+	<insert id="save" parameterType="pd">
+		insert into 
+	<include refid="tableName"></include>
+		(
+	<include refid="Field"></include>
+		) values (
+	<include refid="FieldValue"></include>
+		)
+	</insert>
+	
+	<!-- 删除-->
+	<delete id="delete" parameterType="pd">
+		update   
+		<include refid="tableName"></include>
+		set STATUS='3'
+		where 
+			FHSMS_ID = #{FHSMS_ID}
+	</delete>
+	
+	<!-- 修改 状态-->
+	<update id="edit" parameterType="pd">
+		update
+		<include refid="tableName"></include>
+		set 
+			STATUS = '1'
+		where 
+		SANME_ID = #{SANME_ID}
+	</update>
+	
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include>
+		where 
+			FHSMS_ID = #{FHSMS_ID}
+	</select>
+	
+	<!-- 列表 -->
+	<select id="datalistPage" parameterType="pd" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include>
+		where 1=1
+		<if test="pd.FROM_USERID!=null and pd.FROM_USERID!=''">
+			and FROM_USERID = #{pd.FROM_USERID}
+		</if>
+		<if test="pd.TO_USERID!=null and pd.TO_USERID!=''">
+		  and  TO_USERID=#{pd.TO_USERID}
+		</if>	
+		 
+		<if test="pd.keywords!= null and pd.keywords != ''"><!-- 关键词检索 -->
+			and
+				(
+					FROM_USERNAME LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+					 or 
+					TO_USERNAME LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+					 or 
+					CONTENT LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%') 
+				)
+		</if>
+		<if test="pd.lastLoginStart!=null and pd.lastLoginStart!=''"><!-- 开始时间检索 -->
+			and SEND_TIME &gt;= #{pd.lastLoginStart} 
+		</if>
+		<if test="pd.lastLoginEnd!=null and pd.lastLoginEnd!=''"><!-- 结束时间检索 -->
+			and SEND_TIME &lt;= #{pd.lastLoginEnd} 
+		</if>
+		<if test="pd.TYPE != null and pd.TYPE != ''">
+		    and TYPE = #{pd.TYPE}
+		 </if>
+		<if test="pd.STATUS != null and pd.STATUS != ''"><!-- 状态检索 -->
+			and STATUS = #{pd.STATUS} 
+		</if>
+		 and STATUS != 3  
+		order by STATUS desc
+	</select>
+	<!-- 列表 -->
+	<select id="listForApp" parameterType="page" resultType="pd">
+			SELECT *
+				  FROM ( SELECT ROWNUM AS rowno,
+		t.* FROM (SELECT t.* FROM (SELECT CONTENT,	 
+		TO_USERNAME,	
+		FROM_USERNAME,	
+		SEND_TIME,	
+		STATUS,	
+		FHSMS_ID,
+		SANME_ID,
+		TO_USERID,
+		FROM_USERID
+		from 
+		<include refid="tableName"></include>
+		where 1=1
+		<if test="FROM_USERID!=null and FROM_USERID!=''">
+			and FROM_USERID = #{FROM_USERID}
+		</if>
+		<if test="TO_USERID!=null and TO_USERID!=''">
+		  and  TO_USERID=#{TO_USERID}
+		</if>	
+		 
+		<if test="keywords!= null and keywords != ''"><!-- 关键词检索 -->
+			and
+				(
+					FROM_USERNAME LIKE CONCAT(CONCAT('%', #{keywords}),'%')
+					 or 
+					TO_USERNAME LIKE CONCAT(CONCAT('%', #{keywords}),'%')
+					 or 
+					CONTENT LIKE CONCAT(CONCAT('%', #{keywords}),'%') 
+				)
+		</if>
+		<if test="TYPE != null and TYPE != ''">
+		    and TYPE = #{TYPE}
+		 </if>
+		<if test="STATUS != null and STATUS != ''"><!-- 状态检索 -->
+			and STATUS = #STATUS} 
+		</if>
+		 and STATUS != 3  
+	   order by SEND_TIME  desc) t order by STATUS desc ) t
+		    ) table_alias
+				 WHERE table_alias.rowno BETWEEN #{pageStart} and #{pageEnd}
+	</select>
+	<!-- 列表(全部) -->
+	<select id="listAll" parameterType="pd" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include>
+		where 
+			  STATUS != 3  
+	</select>
+	
+	<!-- 获取未读总数 -->
+	<select id="findFhsmsCount" parameterType="String" resultType="pd">
+		select 
+			count(FHSMS_ID) fhsmsCount
+		from 
+		<include refid="tableName"></include>
+		where 
+			STATUS = '2'
+		and
+			TYPE = '1'
+		and
+			FROM_USERNAME = #{USERNAME} 
+	</select>
+	
+	<!-- 批量删除 -->
+	<delete id="deleteAll" parameterType="String">
+		update 
+		<include refid="tableName"></include>
+		set STATUS='3'
+		where 
+			FHSMS_ID in
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                 #{item}
+		</foreach>
+	</delete>
+	 
+	
+	
+	
+</mapper>

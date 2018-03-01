@@ -1,0 +1,703 @@
+package com.tbyf.controller.app.appteam;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.tbyf.controller.base.BaseController;
+import com.tbyf.service.gp.provider.impl.ProviderService;
+import com.tbyf.service.gp.team.TeamManager;
+import com.tbyf.util.AppUtil;
+import com.tbyf.util.DateUtil;
+import com.tbyf.util.PageData;
+import com.tbyf.util.ResultMessageUtil;
+import com.tbyf.util.Tools;
+
+
+/**
+ * 相关参数协议：
+ * 00	请求失败
+ * 01	请求成功
+ * 02	返回空值
+ * 03	请求协议参数不完整    
+ * 04  用户名或密码错误
+ * 05  FKEY验证失败
+*/
+
+@Controller
+@RequestMapping(value="/appTeam")
+public class IntTeamController extends BaseController{
+		
+	@Resource(name="teamService")
+	private TeamManager teamService;	
+	@Resource(name="providerService")
+	private ProviderService providerService;
+	private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");		
+	 /**
+     * app签约团队查询 
+     * @param pageSize 页码 ，pageCount 当前页数，TEAM_ID 团队ID TEAM_NAME 团队名称
+     * @return
+     */
+    @RequestMapping(value="/getTeamById", method = RequestMethod.GET)
+    @ResponseBody
+    public Object getTeamById()
+    {
+        logBefore(logger, "app通过过滤条件（团队ID、团队名称）对签约团队（GPP_TEAM）分页查询接口");
+        Map<String,Object> map = new HashMap<String,Object>();
+        PageData pd = new PageData();
+        pd = this.getPageData();
+        String result = "00";
+        String message="";
+        try{	
+        	if(Tools.checkKey("KEYWORDS", pd.getString("FKEY"))){	//检验请求key值是否合法
+        		//如果不传分页参数，给默认值。
+        		int pageSize=1;//页码
+        		int pageCount=10;//页数
+        		if(null !=pd.get("PAGESIZE") && null !=pd.get("PAGECOUNT") ){
+               		pd.put("pageStart", (Integer.parseInt(pd.get("PAGESIZE").toString())-1)*Integer.parseInt(pd.get("PAGECOUNT").toString())+1);
+               		pd.put("pageEnd", Integer.parseInt(pd.get("PAGESIZE").toString()) * Integer.parseInt(pd.get("PAGECOUNT").toString()));
+               	}else{
+               		pd.put("pageStart", (pageSize-1)* pageCount+1);
+               		pd.put("pageEnd", pageSize * pageCount);
+               	}
+              if(AppUtil.checkParam("TeamQueryPage", pd)){	//检查参数
+        		List<PageData> list=teamService.queryPage(pd);
+        			map.put("pd", list);
+            		result = "01";
+    	            message =ResultMessageUtil.MESSAGE_1;
+	          }else {
+                  result = "03";
+	              message =ResultMessageUtil.MESSAGE_3;
+              }
+           	}else{
+				result = "05";
+	            message =ResultMessageUtil.MESSAGE_5;
+			}
+        }catch (Exception e){
+            message =ResultMessageUtil.MESSAGE_0;
+            logger.error(e.toString(), e);
+        }finally{
+            map.put("result", result);
+            map.put("message",message);
+            logAfter(logger);
+        }
+        return AppUtil.returnObject(new PageData(), map);
+    }
+    
+    
+    /**
+     * app根据医生签约团队
+     * @param 
+     * @return
+     */
+    @RequestMapping(value="/getTeamByProvider", method = RequestMethod.GET)
+    @ResponseBody
+    public Object getTeamByProvider()
+    {
+    	logBefore(logger, "app通过过滤条件对签约团队（GPP_TEAM）分页查询接口");
+    	Map<String,Object> map = new HashMap<String,Object>();
+    	PageData pd = new PageData();
+    	pd = this.getPageData();
+    	String result = "00";
+    	String message="";
+    	try{	
+    		if(Tools.checkKey("KEYWORDS", pd.getString("FKEY"))){	//检验请求key值是否合法
+    			//如果不传分页参数，给默认值。
+    			int pageSize=1;//页码
+    			int pageCount=10;//页数
+    			if(null !=pd.get("PAGESIZE") && null !=pd.get("PAGECOUNT") ){
+               		pd.put("pageStart", (Integer.parseInt(pd.get("PAGESIZE").toString())-1)*Integer.parseInt(pd.get("PAGECOUNT").toString())+1);
+               		pd.put("pageEnd", Integer.parseInt(pd.get("PAGESIZE").toString()) * Integer.parseInt(pd.get("PAGECOUNT").toString()));
+               	}else{
+               		pd.put("pageStart", (pageSize-1)* pageCount+1);
+               		pd.put("pageEnd", pageSize * pageCount);
+               	}
+    			if(AppUtil.checkParam("TeamQueryPageByProvider", pd)){	//检查参数
+    				List<PageData> list=teamService.queryPageByProvider(pd);
+    				map.put("pd", list);
+    				result = "01";
+    				message =ResultMessageUtil.MESSAGE_1;
+    			}else {
+    				result = "03";
+    				message =ResultMessageUtil.MESSAGE_3;
+    			}
+    		}else{
+    			result = "05";
+    			message =ResultMessageUtil.MESSAGE_5;
+    		}
+    	}catch (Exception e){
+    		message =ResultMessageUtil.MESSAGE_0;
+    		logger.error(e.toString(), e);
+    	}finally{
+    		map.put("result", result);
+    		map.put("message",message);
+    		logAfter(logger);
+    	}
+    	return AppUtil.returnObject(new PageData(), map);
+    }
+    
+    
+    
+    /**
+     * app签约团队新增
+     * @param TEAM_NAME 团队名称,
+     * @param PEOPLE 人数、
+     * @param LEADER_ID 负责人ID、
+     * @param LEADER_NAME 负责人姓名、
+     * @param LEADER_PHONE 负责人电话、
+     * @param ORG_CODE 机构ID、
+     * @param REGION_CODE 区划编码
+     * @param STATUS
+     * @return
+     */
+    @RequestMapping(value="/saveTeamApp", method = RequestMethod.POST)
+    @ResponseBody
+    public Object saveTeamApp()
+    {
+        logBefore(logger, "app通过传入签约团队新增信息（团队名称、人数、负责人ID、负责人姓名、负责人电话、状态、机构ID、区划编码）生成新增签约团队");
+        Map<String,Object> map = new HashMap<String,Object>();
+        PageData pd = new PageData();
+        String result = "00";
+        String message ="";
+        try{
+        	pd = this.getPageData();
+	        if(Tools.checkKey("TEAM_NAME", pd.getString("FKEY"))){	//检验请求key值是否合法
+	           if(AppUtil.checkParam("saveTeamApp", pd)){	//检查参数
+	        	   //查询医生信息
+	        	   PageData providerData = new PageData();
+	        	   providerData.put("id", pd.get("LEADER_ID"));
+	        	   providerData = providerService.getProviderById(providerData);
+	        	   if(providerData!=null){
+	            	   pd.put("ID",this.get32UUID());
+	            	   pd.put("ORG_CODE",providerData.get("ORG_CODE"));
+	            	   pd.put("REGION_CODE",providerData.get("REGIONCODE"));
+	            	   pd.put("STATUS","0");
+	            	   teamService.saveTeamApp(pd);
+	            	   result =  "01";
+	                   message =ResultMessageUtil.MESSAGE_1;
+	        	   }else{
+	        		   result = "02";
+	 	               message =ResultMessageUtil.MESSAGE_2;
+	        	   }
+	           }else {
+	              result = "03";
+	              message =ResultMessageUtil.MESSAGE_3;
+	           }
+        	}else{
+			    result = "05";
+	            message =ResultMessageUtil.MESSAGE_5;
+        	}
+        }catch (Exception e){
+            message =ResultMessageUtil.MESSAGE_0;
+            logger.error(e.toString(), e);
+        }finally{
+            map.put("result", result);
+            map.put("message",message);
+            logAfter(logger);
+        }
+        return AppUtil.returnObject(new PageData(), map);
+    }
+    
+    /**
+     * app签约团队编辑
+     * @param ID  主键ID,
+     * @param TEAM_NAME 团队名称,
+     * @param PEOPLE 人数、
+     * @param LEADER_ID 负责人ID、
+     * @param LEADER_NAME 负责人姓名、
+     * @param LEADER_PHONE 负责人电话、
+     * @param STATUS  状态、
+     * @param ORG_CODE 机构ID、
+     * @param REGION_CODE 区划编码
+     * @return
+     */
+	 @RequestMapping(value="/editTeamApp", method = RequestMethod.POST)
+    @ResponseBody
+    public Object editTeamApp()
+    {
+        logBefore(logger, "app签约团队编辑");
+        Map<String,Object> map = new HashMap<String,Object>();
+        PageData pd = new PageData();
+        String result = "00";
+        String message="";
+        try{
+        	pd = this.getPageData();
+	        if(Tools.checkKey("ID", pd.getString("FKEY"))){	//检验请求key值是否合法
+	           if(AppUtil.checkParam("editTeamApp", pd)){	//检查参数
+	        	   if(pd.get("LEADER_ID")!=null){
+		        	   //查询医生信息
+		        	   PageData providerData = new PageData();
+		        	   providerData.put("id", pd.get("LEADER_ID"));
+		        	   providerData = providerService.getProviderById(providerData);
+		        	   if(providerData!=null){ 
+		            	   pd.put("ORG_CODE",providerData.get("ORG_CODE"));
+		            	   pd.put("REGION_CODE",providerData.get("REGIONCODE")); 
+		        	   }else{
+		        		   result = "02";
+		 	               message =ResultMessageUtil.MESSAGE_2;
+		        	   }
+	        	   }
+	        	    teamService.editTeamApp(pd);
+	        	    result= "01";
+	        	    message =ResultMessageUtil.MESSAGE_1;
+	           }else {
+	              result = "03";
+	              message =ResultMessageUtil.MESSAGE_3;
+	           }
+	        }else{
+				result = "05";
+				 message =ResultMessageUtil.MESSAGE_5;
+	        }
+        }catch (Exception e){
+        	 message =ResultMessageUtil.MESSAGE_0;
+            logger.error(e.toString(), e);
+        }finally{
+            map.put("result", result);
+            map.put("message", message);
+            logAfter(logger);
+        }
+        return AppUtil.returnObject(new PageData(), map);
+    }
+    
+    /**
+     * app签约团队名称唯一性判断
+     * @param ID  主键ID,
+     * @param TEAM_NAME 团队名称,
+     * @return
+     */
+	 @RequestMapping(value="/validateNameApp", method = RequestMethod.GET)
+    @ResponseBody
+    public Object validateNameApp()
+    {
+        logBefore(logger, "app签约团队名称唯一性判断");
+        Map<String,Object> map = new HashMap<String,Object>();
+        PageData pd = new PageData();
+        String result = "00";
+        String repeat = null;
+        String message="";
+        try{
+        	pd = this.getPageData();
+	        if(Tools.checkKey("KEYWORDS", pd.getString("FKEY"))){	//检验请求key值是否合法
+	           if(AppUtil.checkParam("validateTeamNameApp", pd)){	//检查参数
+	        	   List<PageData> list = teamService.getListByKEY(pd);
+	        	   if(null!=pd.getString("ID")&&!"".equals(pd.getString("ID"))){
+		        	   //修改时验证
+	        		   if(list!=null&&list.size()>0){
+	        			   if(list.size()==1){
+	        				   PageData page = list.get(0);
+	        				   if(page.get("ID").equals(pd.get("ID"))){
+	        					   repeat="01";
+	        				   }else{
+	        					   repeat="02";
+	        				   }
+	        			   }else{
+	        				   repeat="02";
+	        			   }
+	        		   }else{
+	        			   
+	        		   }
+	        	   }else{
+	        		   //新增时验证
+	        		   if(list!=null&&list.size()>0){
+	        			   repeat="02";
+	        		   }else{
+	        			   repeat="01";
+	        		   }
+	        	   }
+	        	    result= "01";
+	        	    message =ResultMessageUtil.MESSAGE_1;
+	           }else {
+	              result = "03";
+	              message =ResultMessageUtil.MESSAGE_3;
+	           }
+	        }else{
+				result = "05";
+				 message =ResultMessageUtil.MESSAGE_5;
+	        }
+        }catch (Exception e){
+        	 message =ResultMessageUtil.MESSAGE_0;
+            logger.error(e.toString(), e);
+        }finally{
+        	map.put("repeat", repeat);
+            map.put("result", result);
+            map.put("message", message);
+            logAfter(logger);
+        }
+        return AppUtil.returnObject(new PageData(), map);
+    } 
+	 
+	 /**
+	  * app签约团队成员唯一性判断
+	  * @param TEAM_MEMBER_ID  团队成员ID,
+	  * @return
+	  */
+	 @RequestMapping(value="/validateMemberApp", method = RequestMethod.GET)
+	 @ResponseBody
+	 public Object validateMemberApp()
+	 {
+		 logBefore(logger, "app签约团队成员唯一性判断");
+		 Map<String,Object> map = new HashMap<String,Object>();
+		 PageData pd = new PageData();
+		 String result = "00";
+		 String repeat = null;
+		 String message="";
+		 try{
+			 pd = this.getPageData();
+			 if(Tools.checkKey("KEYWORDS", pd.getString("FKEY"))){	//检验请求key值是否合法
+				 if(AppUtil.checkParam("validateMemberApp", pd)){	//检查参数
+					 List<PageData> list = teamService.findByTeamMemberId(pd);
+					 if(null!=pd.getString("ID")&&!"".equals(pd.getString("ID"))){
+						 //修改时验证
+						 if(list!=null&&list.size()>0){
+							 if(list.size()==1){
+								 PageData page = list.get(0);
+								 if(page.get("ID").equals(pd.get("ID"))){
+									 repeat="01";
+								 }else{
+									 repeat="02";
+								 }
+							 }else{
+								 repeat="02";
+							 }
+						 }else{
+							 
+						 }
+					 }else{
+						 //新增时验证
+						 if(list!=null&&list.size()>0){
+							 repeat="02";
+						 }else{
+							 repeat="01";
+						 }
+					 }
+					 result= "01";
+					 message =ResultMessageUtil.MESSAGE_1;
+				 }else {
+					 result = "03";
+					 message =ResultMessageUtil.MESSAGE_3;
+				 }
+			 }else{
+				 result = "05";
+				 message =ResultMessageUtil.MESSAGE_5;
+			 }
+		 }catch (Exception e){
+			 message =ResultMessageUtil.MESSAGE_0;
+			 logger.error(e.toString(), e);
+		 }finally{
+			 map.put("repeat", repeat);
+			 map.put("result", result);
+			 map.put("message", message);
+			 logAfter(logger);
+		 }
+		 return AppUtil.returnObject(new PageData(), map);
+	 } 
+	 
+    /**
+     * app签约团队更新状态
+     * @param STATUS  状态、
+     * @return
+     */
+    @RequestMapping(value="/statusTeamApp", method = RequestMethod.POST)
+    @ResponseBody
+    public Object statusTeamApp()
+    {
+        logBefore(logger, "app通过传入签约团队更新状态信息（团队ID,状态）更新状态签约团队信息");
+        Map<String,Object> map = new HashMap<String,Object>();
+        PageData pd = new PageData();
+        String result = "00";
+        String message="";
+        try{
+        	pd = this.getPageData();
+	        if(Tools.checkKey("STATUS", pd.getString("FKEY"))){	//检验请求key值是否合法
+	           if(AppUtil.checkParam("statusTeamApp", pd)){	//检查参数
+	        	   teamService.statusTeamApp(pd);
+	               result = "01";
+		           message =ResultMessageUtil.MESSAGE_1;
+	           }else {
+	              result = "03";
+	              message =ResultMessageUtil.MESSAGE_3;
+	           }
+		    }else{
+				 result = "05";
+				 message =ResultMessageUtil.MESSAGE_5;
+	        }
+        }catch (Exception e){
+        	 message =ResultMessageUtil.MESSAGE_0;
+            logger.error(e.toString(), e);
+        }finally{
+            map.put("result", result);
+            map.put("message", message);
+            logAfter(logger);
+        }
+        return AppUtil.returnObject(new PageData(), map);
+    }
+    
+    /**
+     * app签约团队删除
+     * @param TEAM_NAME 团队名称,
+     * @param PEOPLE 人数、
+     * @param LEADER_ID 负责人ID、
+     * @param LEADER_NAME 负责人姓名、
+     * @param LEADER_PHONE 负责人电话、
+     * @param STATUS  状态、
+     * @param ORG_CODE 机构ID、
+     * @param REGION_CODE 区划编码
+     * @return
+     */
+    @RequestMapping(value="/delTeamApp")
+    @ResponseBody
+    public Object delTeamApp()
+    {
+        logBefore(logger, "app通过传入签约团队删除信息（团队ID）删除签约团队信息");
+        Map<String,Object> map = new HashMap<String,Object>();
+        PageData pd = new PageData();
+        String result = "00";
+        try{
+        	pd = this.getPageData();
+        if(Tools.checkKey("STATUS", pd.getString("FKEY"))){	//检验请求key值是否合法
+           if(AppUtil.checkParam("delTeamApp", pd)){	//检查参数
+        	   pd.put("STATUS", "9");
+        	   teamService.delTeamApp(pd);
+              result = "01";
+           }else {
+              result = "03";
+           }
+	        }else{
+				result = "05";
+	        	}
+        }catch (Exception e){
+            logger.error(e.toString(), e);
+        }finally{
+            map.put("result", result);
+            logAfter(logger);
+        }
+        return AppUtil.returnObject(new PageData(), map);
+    }
+    
+    /**
+     * app签约团队成员列表
+     * @param STATUS  状态、
+     * @return
+     */
+    @RequestMapping(value="/getTeamMember", method = RequestMethod.GET)
+    @ResponseBody
+    public Object getTeamMemberList()
+    {
+        logBefore(logger, "app签约团队成员列表");
+        Map<String,Object> map = new HashMap<String,Object>();
+        PageData pd = new PageData();
+        String result = "00";
+        String message="";
+        try{
+        	pd = this.getPageData();
+	        if(Tools.checkKey("TEAM_ID", pd.getString("FKEY"))){	//检验请求key值是否合法
+	           if(pd.containsKey("TEAM_ID") && !"".equals(pd.getString("TEAM_ID"))){	//检查参数
+	        	   int pageSize=1;//页码
+	        	   int pageCount=10;//页数
+	               if(null !=pd.get("PAGESIZE") && null !=pd.get("PAGECOUNT") ){
+	               		pd.put("pageStart", (Integer.parseInt(pd.get("PAGESIZE").toString())-1)*Integer.parseInt(pd.get("PAGECOUNT").toString())+1);
+	               		pd.put("pageEnd", Integer.parseInt(pd.get("PAGESIZE").toString()) * Integer.parseInt(pd.get("PAGECOUNT").toString()));
+	               }else{
+	               		pd.put("pageStart", (pageSize-1)* pageCount+1);
+	               		pd.put("pageEnd", pageSize * pageCount);
+	               }
+	        	   List<PageData> list =teamService.getListForApp(pd);
+	        	   map.put("pd",list);
+	               result = "01";
+		           message =ResultMessageUtil.MESSAGE_1;
+	           }else {
+	              result = "03";
+	              message =ResultMessageUtil.MESSAGE_3;
+	           }
+		    }else{
+				 result = "05";
+				 message =ResultMessageUtil.MESSAGE_5;
+	        }
+        }catch (Exception e){
+        	 message =ResultMessageUtil.MESSAGE_0;
+            logger.error(e.toString(), e);
+        }finally{
+            map.put("result", result);
+            map.put("message", message);
+            logAfter(logger);
+        }
+        return AppUtil.returnObject(new PageData(), map);
+    }
+    
+    /**
+     * app新增团队成员
+     * @param STATUS  状态、
+     * @return
+     */
+    @RequestMapping(value="/addTeamMember", method = RequestMethod.POST)
+    @ResponseBody
+    public Object addTeamMember()
+    {
+        logBefore(logger, "app新增签约团队成员");
+        Map<String,Object> map = new HashMap<String,Object>();
+        PageData pd = new PageData();
+        String result = "00";
+        String message="";
+        try{
+        	pd = this.getPageData();
+	        if(Tools.checkKey("TEAM_ID", pd.getString("FKEY"))){	//检验请求key值是否合法
+	           if(AppUtil.checkParam("addTeamMemberApp", pd)){//检查参数
+	        	   //查询医生信息
+            	   PageData providerData = new PageData();
+            	   providerData.put("id", pd.get("TEAM_MEMBER_ID"));
+            	   providerData = providerService.getProviderById(providerData);
+            	   if(providerData!=null){
+            		   if(providerData.get("TEAM_ID")!=null && !"".equals(providerData.get("TEAM_ID"))){
+            			   //如果存在团队，则不允许增加
+            			   result="04";
+            			   message="添加成员已存在别的团队，不能增加该成员";
+            		   }else{
+	            		   pd.put("ID",this.get32UUID());
+	            		   pd.put("TEAM_MEMBER_NAME",providerData.get("PROVIDER_NAME"));
+			               pd.put("TEAM_MEMBER_PHONE",providerData.get("TELECOM"));
+		            	   pd.put("ORG_CODE",providerData.get("ORG_CODE"));
+		            	   pd.put("REGION_CODE",providerData.get("REGIONCODE"));
+		            	   pd.put("STATUS", "0");
+		            	   pd.put("GMT_CREATED", sdf.format(new Date()));
+		            	   //获取操作人名称
+		            	   PageData  operatorData = new PageData();
+		            	   operatorData.put("id", pd.get("OPERATOR_ID"));
+		            	   operatorData = providerService.getProviderById(operatorData);
+		            	   if(operatorData!=null){
+		            		   pd.put("OPERATOR _NAME", operatorData.get("PROVIDER_NAME"));
+		            	   }
+		            	   teamService.saveMember(pd);
+	            		   result="01";
+	            		   message=ResultMessageUtil.MESSAGE_1;
+            		   }
+            	   }else{
+            		   result="02";
+            		   message="成员id查询为空";
+            	   }
+	           }else {
+	              result = "03";
+	              message =ResultMessageUtil.MESSAGE_3;
+	           }
+		    }else{
+				 result = "05";
+				 message =ResultMessageUtil.MESSAGE_5;
+	        }
+        }catch (Exception e){
+        	 message =ResultMessageUtil.MESSAGE_0;
+            logger.error(e.toString(), e);
+        }finally{
+            map.put("result", result);
+            map.put("message", message);
+            logAfter(logger);
+        }
+        return AppUtil.returnObject(new PageData(), map);
+    }
+    
+    
+    /**
+     * app签约团队删除 
+     * @param TEAM_ID 团队id、
+     * @param TEAM_MEMBER_ID 成员id
+     * @return
+     */
+    @RequestMapping(value="/delTeamMemberApp")
+    @ResponseBody
+    public Object delTeamMemberApp()
+    {
+        logBefore(logger, "app删除团队成员");
+        Map<String,Object> map = new HashMap<String,Object>();
+        PageData pd = new PageData();
+        String message="";
+        String result = "00";
+        try{
+        	pd = this.getPageData();
+	        if(Tools.checkKey("TEAM_ID", pd.getString("FKEY"))){	//检验请求key值是否合法
+	           if(AppUtil.checkParam("delTeamMemberApp", pd)){	//检查参数
+	        	   pd.put("STATUS", "1");
+	        	   //获取操作人名称
+            	   PageData  operatorData = new PageData();
+            	   operatorData.put("id", pd.get("OPERATOR_ID"));
+            	   operatorData = providerService.getProviderById(operatorData);
+            	   if(operatorData!=null){
+            		   pd.put("OPERATOR _NAME", operatorData.get("PROVIDER_NAME"));
+            	   }
+	        	  teamService.editMemberForAPP(pd);
+	              result = "01";
+	         	  message =ResultMessageUtil.MESSAGE_1;
+	           }else {
+	              result = "03";
+	         	  message =ResultMessageUtil.MESSAGE_3;
+	           }
+	        }else{
+	        	message =ResultMessageUtil.MESSAGE_5;
+				result = "05";
+	        }
+        }catch (Exception e){
+       	    message =ResultMessageUtil.MESSAGE_0;
+            logger.error(e.toString(), e);
+        }finally{
+            map.put("result", result);
+            map.put("message", message);
+            logAfter(logger);
+        }
+        return AppUtil.returnObject(new PageData(), map);
+    }
+    /**
+     * app签约团队删除 
+     * @param TEAM_ID 团队id、
+     * @param TEAM_MEMBER_ID 成员id
+     * @return
+     */
+    @RequestMapping(value="/updateTeamMemberApp")
+    @ResponseBody
+    public Object updateTeamMemberApp()
+    {
+        logBefore(logger, "app修改团队成员");
+        Map<String,Object> map = new HashMap<String,Object>();
+        PageData pd = new PageData();
+        String message="";
+        String result = "00";
+        try{
+        	pd = this.getPageData();
+	        if(Tools.checkKey("TEAM_ID", pd.getString("FKEY"))){	//检验请求key值是否合法
+	           if(AppUtil.checkParam("updateTeamMemberApp", pd)){	//检查参数
+	        	   //获取操作人名称
+            	   PageData  operatorData = new PageData();
+            	   operatorData.put("id", pd.get("OPERATOR_ID"));
+            	   operatorData = providerService.getProviderById(operatorData);
+            	   if(operatorData!=null){
+            		   pd.put("OPERATOR _NAME", operatorData.get("PROVIDER_NAME"));
+            	   }
+	        	   teamService.editMemberForAPP(pd);
+	              result = "01";
+	         	  message =ResultMessageUtil.MESSAGE_1;
+	           }else {
+	              result = "03";
+	         	  message =ResultMessageUtil.MESSAGE_3;
+	           }
+	        }else{
+	        	message =ResultMessageUtil.MESSAGE_5;
+				result = "05";
+	        }
+        }catch (Exception e){
+       	    message =ResultMessageUtil.MESSAGE_0;
+            logger.error(e.toString(), e);
+        }finally{
+            map.put("result", result);
+            map.put("message", message);
+            logAfter(logger);
+        }
+        return AppUtil.returnObject(new PageData(), map);
+    }
+    
+    
+}

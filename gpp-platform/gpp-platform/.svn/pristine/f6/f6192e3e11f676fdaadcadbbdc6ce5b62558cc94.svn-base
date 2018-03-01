@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="IndexCombinationQuesMapper">
+	<!--表名指标问卷组合表  -->
+	<sql id="tableName">
+		GPP_INDEX_COMBINATION_QUES
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		ID,
+		SCREENING_QUESTIONNAIRE_ID,
+		INDEX_COMBINATION_ID
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{ID, jdbcType=VARCHAR},
+		#{SCREENING_QUESTIONNAIRE_ID, jdbcType=VARCHAR},
+		#{INDEX_COMBINATION_ID, jdbcType=VARCHAR}
+	</sql>
+	<!-- 查询全部 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select t.ID as RELATION_ID, a.* from
+		<include refid="tableName"></include> t,GPP_INDEX_COMBINATION a
+		where   t.INDEX_COMBINATION_ID=a.ID
+        <if test="pd.SCREENING_QUESTIONNAIRE_ID != null and pd.SCREENING_QUESTIONNAIRE_ID !=''">
+        	and t.SCREENING_QUESTIONNAIRE_ID = #{pd.SCREENING_QUESTIONNAIRE_ID, jdbcType=VARCHAR}
+        </if>
+       order by a.INDEX_COMBINATION_ORDER desc
+	</select>
+	<!-- 查看详情 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+			<include refid="Field"></include>
+		from 
+			<include refid="tableName"></include>
+		where 
+			ID = #{ID,jdbcType=VARCHAR}
+	</select>
+	<!-- 编辑 -->
+	<update id="edit" parameterType="pd">
+		update
+			<include refid="tableName"></include>
+		set 
+			ID=#{ID, jdbcType=VARCHAR},
+			SCREENING_QUESTIONNAIRE_ID=#{SCREENING_QUESTIONNAIRE_ID, jdbcType=VARCHAR},
+			INDEX_COMBINATION_ID=#{INDEX_COMBINATION_ID, jdbcType=VARCHAR}
+		where
+			ID=#{ID, jdbcType=VARCHAR}
+	</update>
+	<!-- 删除 -->
+	<delete id="delete" parameterType="pd">
+		delete 
+		from
+			<include refid="tableName"></include>
+		where
+			ID=#{ID, jdbcType=VARCHAR}
+	</delete>
+	<!-- 批量删除 -->
+	<delete id="deleteAll" parameterType="String">
+		delete from
+		<include refid="tableName"></include>
+		where 
+			ID in
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                 #{item}
+		</foreach>
+	</delete>
+	<!-- 增加-->
+	<insert id="save" parameterType="pd">
+		insert into 
+	<include refid="tableName"></include>
+		(
+	<include refid="Field"></include>
+		) values (
+	<include refid="FieldValue"></include>
+		)
+	</insert>
+	<update id="renew" parameterType="pd">
+		update
+			<include refid="tableName"></include>
+		set 
+			<if test="SCREENING_QUESTIONNAIRE_ID != null and SCREENING_QUESTIONNAIRE_ID != ''">
+				SCREENING_QUESTIONNAIRE_ID=#{SCREENING_QUESTIONNAIRE_ID, jdbcType=VARCHAR},
+			</if>
+			<if test="INDEX_COMBINATION_ID != null and INDEX_COMBINATION_ID != ''">
+				INDEX_COMBINATION_ID=#{INDEX_COMBINATION_ID, jdbcType=VARCHAR},
+			</if>
+		    ID=#{ID, jdbcType=VARCHAR}
+		where
+			ID=#{ID, jdbcType=VARCHAR}
+	</update>	
+	<!-- 通过筛选问卷的ID查询指标组合列表 -->
+	<select id = "findByScreeningId" parameterType="pd" resultType="pd">
+		select * from 
+			GPP_INDEX_COMBINATION 
+				where 
+					ID in (
+					select INDEX_COMBINATION_ID
+					from 
+					<include refid="tableName"></include>
+					where 
+						SCREENING_QUESTIONNAIRE_ID = #{ID, jdbcType=VARCHAR}
+			)
+	</select>
+	<!-- 查询全部 -->
+	<select id="datapage" parameterType="page" resultType="pd">
+	select a.* from GPP_INDEX_COMBINATION a WHERE 
+	<if test="pd.INDEX_COMBINATION_STATE != null and pd.INDEX_COMBINATION_STATE !=''">
+        a.INDEX_COMBINATION_STATE = #{pd.INDEX_COMBINATION_STATE} and 
+     </if>
+	a.ID not in 
+		(select INDEX_COMBINATION_ID from <include refid="tableName"></include> t where
+			1=1 
+			<if test="pd.QUESTIONNAIRE_ID != null and pd.QUESTIONNAIRE_ID !=''">
+        		and t.SCREENING_QUESTIONNAIRE_ID = #{pd.QUESTIONNAIRE_ID, jdbcType=VARCHAR}
+        	</if>
+		) 
+       order by a.INDEX_COMBINATION_ORDER desc
+	</select>
+
+</mapper>

@@ -1,0 +1,101 @@
+package com.tbyf.service.hm.pressure.impl;
+
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.*;
+
+import com.tbyf.dao.DaoSupport;
+import com.tbyf.plugin.Page;
+import com.tbyf.service.hm.pressure.PressureManager;
+import com.tbyf.util.PageData;
+
+/**血压测试详情
+ * 
+ * @author zanxc
+ *
+ */
+@Service("pressureService")
+public class PressureSrevice implements PressureManager{
+
+	
+	@Resource(name = "daoSupport")
+	private DaoSupport dao;
+	/**
+	 * app查询个人尿酸信息
+	 */
+	@Override
+	public List<PageData> queryPage(PageData pd) throws Exception {
+		return (List<PageData>)dao.findForList("PressureMapper.queryPage", pd);
+	}
+
+	/**显示
+	 * 
+	 */
+	@Override
+	public List<PageData> list(Page page) throws Exception {
+		
+		return (List<PageData>)dao.findForList("PressureMapper.datalistPage", page);
+	}
+
+	/**保存信息
+	 * 
+	 */
+	@Override
+	public void save(PageData pd) throws Exception {
+		dao.save("PressureMapper.save", pd);
+		
+	}
+
+	/**
+	 *修改信息 
+	 */
+	@Override
+	public void edit(PageData pd) throws Exception {
+		dao.update("PressureMapper.edit", pd);
+		
+	}
+
+	/**
+	 * 通过Id查询
+	 */
+	@Override
+	public PageData findById(PageData pd) throws Exception {
+		return (PageData) dao.findForObject("PressureMapper.findById", pd);
+	}
+	
+	/**
+	 * 根据用户ID查询最近一次记录
+	 */
+	@Override
+	public PageData findLastByUserID(PageData pd) throws Exception {
+		return (PageData) dao.findForObject("PressureMapper.findLastByUserID", pd);
+	}
+
+	/**
+	 * 删除
+	 */
+	@Override
+	public void delete(PageData pd) throws Exception {
+		dao.delete("PressureMapper.delete", pd);
+		
+	}
+
+	/**
+	 * 批量删除
+	 */
+	@Override
+	public void delAll(String[] ids) throws Exception {
+		dao.update("PressureMapper.deleteAll", ids);
+		
+	}
+	/**
+	 * app更新血压记录
+	 */
+	@Override
+	public void update(PageData pd) throws Exception {
+		dao.update("PressureMapper.renew", pd);
+		
+	}
+}

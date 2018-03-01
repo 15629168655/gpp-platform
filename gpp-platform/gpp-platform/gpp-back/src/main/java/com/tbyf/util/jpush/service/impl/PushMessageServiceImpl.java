@@ -1,0 +1,51 @@
+package com.tbyf.util.jpush.service.impl;
+
+import org.springframework.stereotype.Service;
+
+import com.tbyf.util.jpush.entity.MemberMessage;
+import com.tbyf.util.jpush.service.JPushService;
+import com.tbyf.util.jpush.service.PushMessageService;
+
+@Service("pushMessageService")
+public class PushMessageServiceImpl implements PushMessageService{
+
+	@SuppressWarnings("unused")
+	private JPushService jPushService;
+	/**
+	 * 发送广播消息
+	 */
+	@Override
+	public boolean sentBroadMessage(MemberMessage memberMessage) throws Exception {
+		return JPushService.jPushAllMessage(memberMessage);
+	}
+
+	/**
+	 * 发送站内信
+	 */
+	@Override
+	public boolean sentStopMessage(MemberMessage memberMessage) throws Exception {
+		return JPushService.jPushAllMessage(memberMessage);
+	}
+
+	/**
+	 * 发送咨询类消息
+	 */
+	@Override
+	public boolean sentConsultMessage(MemberMessage memberMessage) throws Exception {
+		return JPushService.jPushOneMessage(memberMessage);
+	}
+
+	/**
+	 * 发送任务提醒
+	 */
+	@Override
+	public boolean sentJobMessage(MemberMessage memberMessage) throws Exception {
+		if(memberMessage.getDeviceId() != null) {
+			return JPushService.jPushOneMessage(memberMessage);
+		}
+		else {
+			return JPushService.jPushAllMessage(memberMessage);
+		}
+	}
+
+}

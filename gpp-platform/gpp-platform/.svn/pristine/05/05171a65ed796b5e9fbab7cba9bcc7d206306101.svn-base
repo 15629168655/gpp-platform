@@ -1,0 +1,40 @@
+package com.tbyf.entity.enums;
+
+import java.util.Map;
+import java.util.TreeMap;
+
+public enum EnumAttachmentType {
+	    XYWH(0,"协议维护"),QYXY(1,"签约协议"),JMTJ(3,"居民体检"),JKZX(4,"健康咨询"),XWZX(5,"新闻资讯"),GGGL(6,"广告管理");
+
+	    private Integer code;
+	    private String name;
+
+	    EnumAttachmentType(Integer code, String name){
+	        this.code = code;
+	        this.name = name;
+	    }
+
+	    public Integer getCode() {
+	        return code;
+	    }
+
+	    public void setCode(Integer code) {
+	        this.code = code;
+	    }
+
+	    public String getName() {
+	        return name;
+	    }
+
+	    public void setName(String name) {
+	        this.name = name;
+	    }
+
+	    public static Map<Integer, String> toMap() {
+	        Map<Integer, String> enumDataMap = new TreeMap<Integer, String>();
+	        for (EnumApplyType type : EnumApplyType.values()) {
+	            enumDataMap.put(type.getCode(), type.getName());
+	        }
+	        return enumDataMap;
+	    }
+}

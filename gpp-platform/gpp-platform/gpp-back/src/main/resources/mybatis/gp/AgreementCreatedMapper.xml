@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="AgreementCreatedMapper">
+	
+	<!--表名 -->
+	<sql id="tableName">
+		GPP_AGREEMENT_CHANGE
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		ID,
+  		AGREEMENT_ID,
+  		SERVICE_PACK_OLD,
+  		SERVICE_PACK,
+  		OPERATOR_ID,
+  		OPERATOR_NAME,
+  		GMT_CHANGE
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{ID},
+  		#{AGREEMENT_ID},
+  		#{SERVICE_PACK_OLD},      
+  		#{SERVICE_PACK},
+  		#{OPERATOR_ID,jdbcType=VARCHAR},
+  		#{OPERATOR_NAME,jdbcType=VARCHAR},
+  		#{GMT_CHANGE}
+	</sql>
+	
+	<!-- 新增-->
+	<insert id="save" parameterType="pd">
+		insert into 
+	<include refid="tableName"></include>
+		(
+	<include refid="Field"></include>
+		) values (
+	<include refid="FieldValue"></include>
+		)
+	</insert>
+	
+	<!-- 通过id获取数据 -->
+	<select id="findByRenewId" parameterType="pd" resultType="pd">
+		select 
+			<include refid="Field"></include>
+		from 
+			<include refid="tableName"></include>
+		where 
+			ID = #{ID}
+	</select>
+	
+</mapper>

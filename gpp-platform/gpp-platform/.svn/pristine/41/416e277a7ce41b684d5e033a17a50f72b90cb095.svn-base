@@ -1,0 +1,127 @@
+package com.tbyf.util.jpush.service;
+
+import java.util.*;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Value;
+
+import com.tbyf.entity.enums.EnumIsUrl;
+import com.tbyf.entity.enums.EnumMessageType;
+import com.tbyf.util.jpush.entity.MemberMessage;
+
+import cn.jpush.api.JPushClient;
+import cn.jpush.api.push.PushResult;
+
+/**
+ * 极光推送
+ * @author zanxc
+ * @创建日期2017年8月11日下午3:24:19
+ */
+public class JPushService {
+
+
+    public static final int MAX = Integer.MAX_VALUE;
+	public static final int MIN = (int) MAX / 2;
+	@Value("#{systemConfigurer.appKey}")
+	String appkey;
+	@Value("#{systemConfigurer.masterSecret}")
+	String masterSecret;
+	@Value("#{systemConfigurer.maxRetryTime}")
+	Integer maxRetryTime;
+
+	private static JPushClient jpush = null;
+	//初始化
+	private  void init(){
+		jpush = new JPushClient(masterSecret, appkey, maxRetryTime);
+	}
+    /**
+     * 向所有设备推送消息
+     * 
+     * @param memberMessage
+     * @return
+     */
+    public static boolean jPushAllMessage(MemberMessage memberMessage) throws Exception{
+        // 设置环境：true生产环境，false开发环境
+        String title = "";
+        if (memberMessage.getTitle() != "") {
+            title = memberMessage.getTitle();
+        }
+        Map<String, String> extras  = new HashMap<String, String>();
+        extras.put("IS_URL", Integer.toString(memberMessage.getIsUrl()));//是否有链接
+        Integer messageType = memberMessage.getType();//消息的类型（链接的类型）
+        extras.put("URL_TYPE", Integer.toString(messageType));//链接的类型
+        if(memberMessage.getIsUrl() == EnumIsUrl.YES.getCode()) {//有链接
+        	if(messageType == EnumMessageType.NOTIFICTION.getCode()) {//如果是通知公告
+        		extras.put("ID", memberMessage.getnID());//参数通知公告ID
+        	}
+        	else if(messageType == EnumMessageType.STOP.getCode()) {//如果是站内信
+        		extras.put("FHSMS_ID", memberMessage.getFHSMS_ID());
+        	}
+        	else if(messageType == EnumMessageType.CONSULT.getCode()) {//咨询消息ID
+        		extras.put("CONSULTATION_ID", memberMessage.getCONSULTATION_ID());
+        	}
+        	else if(messageType == EnumMessageType.JOB.getCode()) {//任务ID
+        		extras.put("ID", memberMessage.getjID());//任务ID
+        	}
+        }
+        new JPushService().init();
+        PushResult pushResult = jpush.sendNotificationAll(title);
+        if(pushResult.isResultOK()) {
+        	System.out.println("消息号:" + pushResult.msg_id+"推送成功");
+        	return true;
+        }
+        else {
+        	System.out.println("消息号:" + pushResult.msg_id+"推送失败");
+        	return false;
+        }
+    }
+    /**
+     * 向单个用户推发消息
+     */
+    public static boolean jPushOneMessage(MemberMessage memberMessage) throws Exception{
+        String content = memberMessage.getContent();
+        // 设置环境：true生产环境，false开发环境
+        String title = "";
+        new JPushService().init();
+        String registrationID = memberMessage.getDeviceId();
+        if (memberMessage.getTitle() != "") {
+            title = memberMessage.getTitle();
+        }
+        Map<String, String> extras  = new HashMap<String, String>();
+        extras.put("IS_URL", Integer.toString(memberMessage.getIsUrl()));//是否有链接
+        Integer messageType = memberMessage.getType();//消息的类型（链接的类型）
+        extras.put("URL_TYPE", Integer.toString(messageType));//链接的类型
+        if(memberMessage.getIsUrl() == EnumIsUrl.YES.getCode()) {//有链接
+        	if(messageType == EnumMessageType.NOTIFICTION.getCode()) {//如果是通知公告
+        		extras.put("ID", memberMessage.getnID());//参数通知公告ID
+        	}
+        	else if(messageType == EnumMessageType.STOP.getCode()) {//如果是站内信
+        		extras.put("FHSMS_ID", memberMessage.getFHSMS_ID());
+        	}
+        	else if(messageType == EnumMessageType.CONSULT.getCode()) {//咨询消息ID
+        		extras.put("CONSULTATION_ID", memberMessage.getCONSULTATION_ID());
+        	}
+        	else if(messageType == EnumMessageType.JOB.getCode()) {//任务ID
+        		extras.put("ID", memberMessage.getjID());//任务ID
+        	}
+        }
+        PushResult pushResult = jpush.sendAndroidNotificationWithRegistrationID(title, content, extras, registrationID);
+        if(pushResult.isResultOK()) {
+        	System.out.println("消息号:" + pushResult.msg_id+"推送成功");
+        	return true;
+        }
+        else {
+        	System.out.println("消息号:" + pushResult.msg_id+"推送失败");
+        	return false;
+        }
+        
+        
+    }
+   public static void main(String[] args) throws Exception {
+	   MemberMessage memberMessage = new MemberMessage();
+	   memberMessage.setTitle("推送测试");
+	   memberMessage.setIsUrl(1);
+	   memberMessage.setType(1);
+	   jPushAllMessage(memberMessage);
+}        
+}

@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="LisIndicatorsMapper">
+
+<!--表名 -->
+	<sql id="tableName">
+		TB_LIS_INDICATORS
+	</sql>
+
+<!-- 字段 -->
+	<sql id="Field">
+		<if test="ID != null and ID != ''">
+			ID,
+		</if>
+			JYZBLSH,
+			YLJGDM,
+			BGDH,
+			BGRQ,
+			JCRGH,
+			JCRXM,
+			SHRGH,
+			SHRXM,
+			JCZBDM,
+			JCFF,
+			JCZBMC,
+			JCZBJG,
+			LOINC,
+			SBBM,
+			YQBH,
+			YQMC,
+			CKZ,
+			JLDW,
+			YCTS,
+			YZID,
+			DYXH,
+			PERSONID,
+			XGBZ,
+			YLYL1,
+			YLYL2
+
+	</sql>
+	
+<!-- 字段值 -->
+	<sql id="FieldValue">
+			#{ID,jdbcType=VARCHAR},
+			#{JYZBLSH,jdbcType=VARCHAR},
+			#{YLJGDM,jdbcType=VARCHAR},
+			#{BGDH,jdbcType=VARCHAR},
+			#{BGRQ,jdbcType=VARCHAR},
+			#{JCRGH,jdbcType=VARCHAR},
+			#{JCRXM,jdbcType=VARCHAR},
+			#{SHRGH,jdbcType=VARCHAR},
+			#{SHRXM,jdbcType=VARCHAR},
+			#{JCZBDM,jdbcType=VARCHAR},
+			#{JCFF,jdbcType=VARCHAR},
+			#{JCZBMC,jdbcType=VARCHAR},
+			#{JCZBJG,jdbcType=VARCHAR},
+			#{LOINC,jdbcType=VARCHAR},
+			#{SBBM,jdbcType=VARCHAR},
+			#{YQBH,jdbcType=VARCHAR},
+			#{YQMC,jdbcType=VARCHAR},
+			#{CKZ,jdbcType=VARCHAR},
+			#{JLDW,jdbcType=VARCHAR},
+			#{YCTS,jdbcType=VARCHAR},
+			#{YZID,jdbcType=VARCHAR},
+			#{DYXH,jdbcType=DOUBLE},
+			#{PERSONID,jdbcType=VARCHAR},
+			#{XGBZ,jdbcType=DOUBLE},
+			#{YLYL1,jdbcType=VARCHAR},
+			#{YLYL2,jdbcType=VARCHAR}
+
+	</sql>
+	
+	<!-- 列表 -->
+	<select id="listPage" parameterType="page" resultType="pd">
+		select
+		
+			a.JYZBLSH,
+			a.YLJGDM,
+			a.BGDH,
+			a.BGRQ,
+			a.JCRGH,
+			a.JCRXM,
+			a.SHRGH,
+			a.SHRXM,
+			a.JCZBDM,
+			a.JCFF,
+			a.JCZBMC,
+			a.JCZBJG,
+			a.LOINC,
+			a.SBBM,
+			a.YQBH,
+			a.YQMC,
+			a.CKZ,
+			a.JLDW,
+			a.YCTS,
+			a.YZID,
+			a.DYXH,
+			a.PERSONID,
+			a.XGBZ,
+			a.YLYL1,
+			a.YLYL2,
+			a.ID
+
+		from 
+			<include refid="tableName"></include> a
+		where 1 = 1 and a.XGBZ != 1
+		<if test="pd.JYZBLSH != null and pd.JYZBLSH != ''"><!-- 检验指标流水号 -->
+			and a.JYZBLSH=#{pd.JYZBLSH}
+		</if>
+		<if test="pd.JCRXM != null and pd.JCRXM != ''"><!-- 检测人姓名检索 -->
+			and a.JCRXM LIKE CONCAT(CONCAT('%', #{pd.JCRXM}),'%')
+		</if>
+		<if test="pd.BGDH != null and pd.BGDH != ''"><!-- 检验报告单号检索 -->
+			and a.BGDH=#{pd.BGDH} 
+		</if>
+		order by a.JYZBLSH
+		
+
+	</select>
+	
+	<!-- 通过id获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd" >
+		select 
+			<include refid="Field"></include>
+		from 
+			<include refid="tableName"></include>
+		where 
+			ID = #{ID}
+	</select>
+	
+	<!-- app分页查询-->
+	<select id="queryPage" parameterType="pd" resultType="pd">
+		SELECT *
+			 FROM ( 
+				    SELECT ROWNUM AS rowno, a.* 
+				           FROM 
+				          <include refid="tableName"></include>  a
+			where 1 = 1 
+		<if test="YLJGDM != null and YLJGDM != ''"><!-- 医疗机构代码检索 -->
+			and a.YLJGDM=#{YLJGDM}
+		</if>
+		<if test="BGDH != null and BGDH != ''"><!-- 检验报告单号检索 -->
+			and a.BGDH=#{BGDH} 
+		</if>
+		<if test="PERSONID != null and PERSONID != ''"><!-- 院内患者唯一ID号检索 -->
+			and a.PERSONID=#{PERSONID} 
+		</if>
+				           ) table_alias
+				           
+				 WHERE table_alias.rowno BETWEEN #{pageStart} and #{pageEnd}
+	</select>
+	
+		<!-- 保存 -->
+	<insert id="save" parameterType="pd">
+		insert into <include refid="tableName"></include> (
+			<include refid="Field"></include>
+		) values (
+			<include refid="FieldValue"></include>
+		)
+	</insert>
+	
+	<!-- 列表 -->
+	<select id="listbybgdh" parameterType="page" resultType="pd">
+		select
+		
+			a.JYZBLSH,
+			a.YLJGDM,
+			a.BGDH,
+			a.BGRQ,
+			a.JCRGH,
+			a.JCRXM,
+			a.SHRGH,
+			a.SHRXM,
+			a.JCZBDM,
+			a.JCFF,
+			a.JCZBMC,
+			a.JCZBJG,
+			a.LOINC,
+			a.SBBM,
+			a.YQBH,
+			a.YQMC,
+			a.CKZ,
+			a.JLDW,
+			a.YCTS,
+			a.YZID,
+			a.DYXH,
+			a.PERSONID,
+			a.XGBZ,
+			a.YLYL1,
+			a.YLYL2,
+			a.ID
+
+		from 
+			<include refid="tableName"></include> a
+		where 1 = 1  
+		<if test="pd.BGDH != null and pd.BGDH != ''"><!-- 检验报告单号检索 -->
+			and a.BGDH=#{pd.BGDH} 
+		</if>
+		order by a.JYZBLSH
+		
+	</select>
+
+</mapper>

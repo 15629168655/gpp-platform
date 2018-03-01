@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="GgglMapper">
+	
+	<!--表名 -->
+	<sql id="tableName">
+		GPP_ADVERTISEMENT
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		ID,
+  		GG_TYPE,
+  		MC,
+  		URL,
+  		IMG,
+  		START_TIME,
+  		END_TIME,
+  		DJS,        
+  		QY,
+  		PX,
+  		SL,
+  		IMG_URL,
+  		CREATE_TIME
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{ID,jdbcType=VARCHAR},
+  		#{GG_TYPE,jdbcType=VARCHAR},
+  		#{MC,jdbcType=VARCHAR},      
+  		#{URL,jdbcType=VARCHAR},
+  		#{IMG,jdbcType=VARCHAR},
+  		to_date(#{START_TIME,jdbcType=DATE},'YYYY-MM-DD HH24:MI:SS'),
+  		to_date(#{END_TIME,jdbcType=DATE},'YYYY-MM-DD HH24:MI:SS'),
+  		#{DJS,jdbcType=NUMERIC},
+  		#{QY,jdbcType=VARCHAR},
+	    #{PX,jdbcType=VARCHAR},
+	    #{SL,jdbcType=NUMERIC},
+	    #{IMG_URL,jdbcType=NUMERIC},
+  		to_date(#{END_TIME,jdbcType=DATE},'YYYY-MM-DD HH24:MI:SS')
+	</sql>
+	
+	<!-- APP查询 -->
+	<select id="queryPage" parameterType="pd" resultType="pd">
+				SELECT *
+				  FROM GPP_ADVERTISEMENT
+				where 1=1 and QY=#{QY}
+            <if test="GG_TYPE != null and GG_TYPE!= ''"><!-- 广告类型检索 -->
+				 and GG_TYPE= #{GG_TYPE}
+			</if>
+				
+				and to_char(START_TIME,'YYYY-MM-DD HH24:MI:SS')  &lt;=#{dateTime}
+				and to_char(END_TIME,'YYYY-MM-DD HH24:MI:SS')&gt;= #{dateTime}
+				order by PX asc
+	</select>
+	
+	<!-- 列表 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include>
+		<where>
+		1=1
+			<if test="pd.qy != null and pd.qy != ''"><!-- 启用状态检索 -->
+				and QY=#{pd.qy} 
+			</if>
+			<if test="pd.start_time!=null and pd.start_time!=''"><!-- 开始时间检索 -->
+				and to_char(START_TIME,'yyyymmdd') &gt;= to_char(to_date(#{pd.start_time},'YYYY-MM-DD HH24:MI:SS'),'yyyymmdd')
+			</if>
+			<if test="pd.end_time!=null and pd.end_time!=''"><!-- 结束时间检索   -->
+				and to_char(END_TIME,'yyyymmdd') &lt;= to_char(to_date(#{pd.end_time},'YYYY-MM-DD HH24:MI:SS'),'yyyymmdd')
+			</if>
+			order by PX DESC
+        </where>
+	</select>
+	
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include> 
+		where
+			ID = #{ID}
+	</select>
+	
+	<!-- 增加-->
+	<insert id="save" parameterType="pd">
+		insert into 
+	<include refid="tableName"></include>
+		(
+	<include refid="Field"></include>
+		) values (
+	<include refid="FieldValue"></include>
+		)
+	</insert>
+	
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+		update
+		<include refid="tableName"></include>
+		set 
+		
+		GG_TYPE = #{GG_TYPE,jdbcType=VARCHAR},
+  		MC = #{MC,jdbcType=VARCHAR},   
+  		URL = #{URL,jdbcType=VARCHAR},
+  		<if test="IMG!=null and IMG!=''">
+  		IMG = #{IMG,jdbcType=VARCHAR},
+  		</if>
+  		<if test="IMG_URL!=null and IMG_URL!=''">
+  		IMG_URL=#{IMG_URL,jdbcType=VARCHAR},
+  		</if>
+  		QY = #{QY,jdbcType=VARCHAR},
+  		END_TIME =to_date(#{END_TIME,jdbcType=DATE},'YYYY-MM-DD HH24:MI:SS')
+		where
+		ID = #{ID}
+	</update>
+	
+	<!-- 删除-->
+	<delete id="delete" parameterType="pd">
+		delete from
+		<include refid="tableName"></include>
+		where 
+			ID = #{ID}
+	</delete>
+	
+	<!-- 批量删除 -->
+	<delete id="deleteAll" parameterType="String">
+		delete from
+		<include refid="tableName"></include>
+		where 
+			ID in
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                 #{item}
+		</foreach>
+	</delete>
+	
+	<!-- 删除图片 -->
+	<update id="delTp" parameterType="pd">
+		update  <include refid="tableName"></include>
+			set 
+				IMG	= '' , IMG_URL=''
+			where 
+				ID = #{ID}
+	</update>
+</mapper>

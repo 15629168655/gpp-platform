@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="TeamMapper">
+	
+	<!--表名 -->
+	<sql id="tableName">
+		GPP_TEAM
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		ID,
+  		TEAM_NAME,
+  		GMT_BUILD,
+  		"NUMBER",
+  		LEADER_ID,
+  		LEADER_CODE,
+  		LEADER_NAME,
+  		LEADER_PHONE,
+  		ORG_CODE,        
+  		REGION_CODE,
+  		STATUS,
+  		OPERATOR_ID,
+  		OPERATOR_NAME,
+  		GMT_CREATED,
+  		GMT_MODIFIED
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{ID,jdbcType=VARCHAR},
+  		#{TEAM_NAME,jdbcType=VARCHAR},
+  		to_date(#{GMT_BUILD,jdbcType=DATE},'yyyy-mm-dd'),
+  		#{NUMBER,jdbcType=NUMERIC},
+  		#{LEADER_ID,jdbcType=VARCHAR},
+  		#{LEADER_CODE,jdbcType=VARCHAR},
+  		#{LEADER_NAME,jdbcType=VARCHAR},
+  		#{LEADER_PHONE,jdbcType=VARCHAR},
+  		#{ORG_CODE,jdbcType=VARCHAR},
+  		#{REGION_CODE},   
+  		#{STATUS,jdbcType=VARCHAR},
+  		#{OPERATOR_ID,jdbcType=VARCHAR},
+  		#{OPERATOR_NAME,jdbcType=VARCHAR}
+  		to_date(#{GMT_CREATED,jdbcType=DATE},'yyyy-mm-dd'),
+  		to_date(#{GMT_MODIFIED,jdbcType=DATE},'yyyy-mm-dd')
+	</sql>
+	
+	<select id="queryPage" parameterType="pd" resultType="pd">
+				SELECT *
+				  FROM ( SELECT ROWNUM AS rowno, t.ID,t.TEAM_NAME,t.GMT_CREATED,t.LEADER_ID,t.LEADER_NAME,t.LEADER_PHONE,t.ORG_CODE,t.REGION_CODE,t.STATUS,
+				  (select count(a.ID) from GPP_TEAM_MEMBER a where a.TEAM_ID = t.ID and a.STATUS!='1')  as PEOPLE
+				          FROM (SELECT t.* FROM GPP_TEAM t
+			where STATUS != '9'
+			 <if test="KEYWORDS != null and KEYWORDS!= ''"><!-- 关键词检索 -->
+			and (
+				TEAM_NAME LIKE CONCAT(CONCAT('%', #{KEYWORDS}),'%')
+				or
+				LEADER_NAME LIKE CONCAT(CONCAT('%', #{KEYWORDS}),'%')
+				)
+			</if>
+			<if test="STATUS != null and STATUS != ''"><!-- 状态检索 -->
+				and STATUS=#{STATUS} 
+			</if>
+				order by GMT_BUILD desc
+				           ) t)table_alias
+				 WHERE table_alias.rowno BETWEEN #{pageStart} and #{pageEnd}
+	</select>
+	
+	<!-- 新增-->
+	<insert id="saveApp" parameterType="pd">
+		insert into
+			GPP_TEAM
+		(
+			 "ID","TEAM_NAME", "GMT_BUILD", "NUMBER",
+			 "LEADER_ID","LEADER_NAME","LEADER_PHONE",
+			 "ORG_CODE","REGION_CODE","STATUS","OPERATOR_ID","OPERATOR_NAME","GMT_CREATED","GMT_MODIFIED"
+		) values (
+			#{ID,jdbcType=VARCHAR},#{TEAM_NAME,jdbcType=VARCHAR},to_date(#{GMT_BUILD,jdbcType=DATE},'yyyy-mm-dd'),#{NUMBER,jdbcType=NUMERIC},#{LEADER_ID,jdbcType=VARCHAR},
+			#{LEADER_NAME,jdbcType=VARCHAR},#{LEADER_PHONE,jdbcType=VARCHAR},#{ORG_CODE,jdbcType=VARCHAR},#{REGION_CODE,jdbcType=VARCHAR},#{STATUS,jdbcType=VARCHAR}
+			,#{STATUS,jdbcType=VARCHAR},#{STATUS,jdbcType=VARCHAR},sysdate,sysdate
+		)
+	</insert>
+	
+	
+	<!-- 逻辑删除 -->
+	<update id="delApp" parameterType="pd">
+		update
+		<include refid="tableName"></include>
+		set 
+ 		"STATUS" = #{STATUS,jdbcType=VARCHAR},
+ 		GMT_MODIFIED=sysdate
+		where
+		"ID" = #{ID}
+	</update>
+	
+	<!-- 修改 -->
+	<update id="editApp" parameterType="pd">
+		update
+		<include refid="tableName"></include>
+		set 
+		<if test="TEAM_NAME != null and TEAM_NAME != ''">
+		"TEAM_NAME" = #{TEAM_NAME,jdbcType=VARCHAR},
+		</if>
+		<if test="NUMBER != null and NUMBER != ''">
+  		"NUMBER" = #{NUMBER,jdbcType=NUMERIC},   
+  		</if>
+  		<if test="GMT_BUILD != null and GMT_BUILD != ''">
+  		"GMT_BUILD" = to_date(#{GMT_BUILD,jdbcType=DATE},'yyyy-mm-dd'),
+  		</if>
+  		<if test="ORG_CODE != null and ORG_CODE != ''">
+  		"ORG_CODE" = #{ORG_CODE,jdbcType=VARCHAR},
+  		</if>
+  		<if test="LEADER_ID != null and LEADER_ID != ''">
+  		"LEADER_ID" = #{LEADER_ID,jdbcType=VARCHAR},
+  		</if>
+  		<if test="LEADER_NAME != null and LEADER_NAME != ''">
+  		"LEADER_NAME" = #{LEADER_NAME,jdbcType=VARCHAR},
+  		</if>
+  		<if test="LEADER_PHONE != null and LEADER_PHONE != ''">
+  		"LEADER_PHONE" = #{LEADER_PHONE,jdbcType=VARCHAR},
+  		</if>
+  		<if test="STATUS != null and STATUS != ''">
+  		"STATUS" = #{STATUS,jdbcType=VARCHAR},
+  		</if>
+  		"GMT_MODIFIED" = sysdate
+		where
+		"ID" = #{ID}
+	</update>
+	
+	<!-- 修改 -->
+	<update id="updateStatusApp" parameterType="pd">
+		update
+		<include refid="tableName"></include>
+		set 
+ 		"STATUS" = #{STATUS,jdbcType=VARCHAR},
+ 		"GMT_MODIFIED" = sysdate
+		where
+		"ID" = #{ID}
+	</update>
+	
+	<!-- 列表 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include>
+		<where>
+			STATUS != '2'
+            <if test="pd.keywords != null and pd.keywords!= ''"><!-- 关键词检索 -->
+			and (
+				TEAM_NAME LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				or
+				LEADER_NAME LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				)
+			</if>
+			<if test="pd.STATUS != null and pd.STATUS != ''"><!-- 状态检索 -->
+				and STATUS=#{pd.STATUS} 
+				order by GMT_BUILD desc
+			</if>
+        </where>
+	</select>
+	
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select
+		ID,
+  		TEAM_NAME,
+  		GMT_BUILD,
+  		LEADER_ID,
+  		LEADER_CODE,
+  		LEADER_NAME,
+  		LEADER_PHONE,
+  		ORG_CODE,        
+  		REGION_CODE,
+  		STATUS,
+  		OPERATOR_ID,
+  		OPERATOR_NAME,
+  		GMT_CREATED,
+  		GMT_MODIFIED,
+  		(select count(a.ID) from GPP_TEAM_MEMBER a where a.TEAM_ID = #{ID} and a.STATUS!='1')  as PEOPLE
+		from 
+		<include refid="tableName"></include> 
+		where
+			ID = #{ID}
+	</select>
+	
+	<!-- 通过医生ID获取数据 -->
+	<select id="findByMemberId" parameterType="pd" resultType="pd">
+		select * from
+		(select
+		ROWNUM AS rowno,
+		t.*
+		from 
+		<include refid="tableName"></include> t left join GPP_TEAM_MEMBER m on t.ID=m.TEAM_ID
+		where
+			m.TEAM_MEMBER_ID=#{PROVIDER_ID}
+		)table_alias WHERE table_alias.rowno BETWEEN #{pageStart} and #{pageEnd}
+	</select>
+	<!-- 通过签约机构ORG_CODE获取数据 -->
+	<select id="findBySignCode" parameterType="pd" resultType="pd">
+		select * from
+		(select
+		ROWNUM AS rowno,
+		t.*
+		from 
+		<include refid="tableName"></include> t
+		where
+			t.ORG_CODE in (select SIGN_ORG_CODE from HM_WORKFLOW b where b.ORG_CODE=#{ORG_CODE})
+		)table_alias WHERE table_alias.rowno BETWEEN #{pageStart} and #{pageEnd}	
+	</select>
+	<!-- 通过ID增加人数 -->
+	<update id="addNumberById" parameterType="pd">
+		update
+		<include refid="tableName"></include>
+		set 
+  		"NUMBER" = "NUMBER" + 1
+		where
+		ID = #{TEAM_ID,jdbcType=VARCHAR}
+	</update>
+	<!-- 通过ID减少人数 -->
+	<update id="delNumberById" parameterType="pd">
+		update
+		<include refid="tableName"></include>
+		set 
+  		"NUMBER" = "NUMBER" - 1
+		where
+		ID = #{TEAM_ID,jdbcType=VARCHAR}
+	</update>
+	<!-- 通过关键字获取数据 -->
+	<select id="getListByKEY" parameterType="pd" resultType="pd">
+		select 
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include> 
+		where
+			TEAM_NAME = #{TEAM_NAME} AND STATUS!='2'
+	</select>
+	<!-- 增加团队信息-->
+	<insert id="save" parameterType="pd">
+		insert into 
+	<include refid="tableName"></include>
+		(
+	<include refid="Field"></include>
+		) values (
+	<include refid="FieldValue"></include>
+		)
+	</insert>
+	
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+		update
+		<include refid="tableName"></include>
+		set 
+		TEAM_NAME = #{TEAM_NAME,jdbcType=VARCHAR},
+  		"NUMBER" = #{NUMBER,jdbcType=NUMERIC},  
+  		LEADER_ID = #{LEADER_ID,jdbcType=VARCHAR},
+  		LEADER_CODE =#{LEADER_CODE,jdbcType=VARCHAR},
+  		LEADER_NAME = #{LEADER_NAME,jdbcType=VARCHAR},
+  		LEADER_PHONE = #{LEADER_PHONE,jdbcType=VARCHAR},
+  		ORG_CODE = #{ORG_CODE,jdbcType=VARCHAR},
+  		REGION_CODE = #{REGION_CODE,jdbcType=VARCHAR},
+  		"GMT_MODIFIED" = sysdate
+		where
+		ID = #{ID,jdbcType=VARCHAR}
+	</update>
+	
+	<!-- 删除-->
+	<update id="delete" parameterType="pd">
+		update
+		<include refid="tableName"></include>
+		set 
+ 		STATUS = #{STATUS,jdbcType=VARCHAR}
+		where
+		ID = #{ID}
+	</update>
+	
+	<!-- 批量删除 -->
+	<delete id="deleteAll" parameterType="String">
+		delete from
+		<include refid="tableName"></include>
+		where 
+			ID in
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                 #{item}
+		</foreach>
+	</delete>
+</mapper>

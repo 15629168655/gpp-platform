@@ -1,0 +1,440 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="AgreementServiceMapper">
+	
+	<!--表名 -->
+	<sql id="tableName">
+		GPP_AGREEMENT_SERVICE
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		ID,
+  		AGREEMENT_NAME,
+  		APPLICANT_CODE,
+  		TEAM_ID,
+  		GEN_PRACTITIONER_ID,
+  		GEN_PRACTITIONER_NAME,
+  		GEN_PRACTITIONER_PHONE,
+  		ORG_CODE,        
+  		REGION_CODE,
+  		 to_char(GMT_START,'yyyy-mm-dd') as GMT_START,
+  		  to_char(GMT_END,'yyyy-mm-dd') as GMT_END,
+  		GMT_SIGNED,
+  		MEMBER_ID,
+  		MEMBER_NAME,
+  		MI_CARD,
+  		ID_CARD,
+  		MEMBER_PHONE,
+  		ADDRESS,
+  		FILE_URL,
+  		FILE_ID,
+  		GMT_MODIFIED,
+  		STATUS,
+  		SERVICE_PACK,
+  		RESCIND_TYPE,
+  		GMT_RESCIND,
+  		RESCIND_REASON
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{ID,jdbcType=VARCHAR},
+  		#{AGREEMENT_NAME,jdbcType=VARCHAR},
+  		#{APPLICANT_CODE,jdbcType=VARCHAR},      
+  		#{TEAM_ID,jdbcType=VARCHAR},
+  		#{GEN_PRACTITIONER_ID,jdbcType=VARCHAR},
+  		#{GEN_PRACTITIONER_NAME,jdbcType=VARCHAR},
+  		#{GEN_PRACTITIONER_CODE,jdbcType=VARCHAR},
+  		#{GEN_PRACTITIONER_PHONE,jdbcType=VARCHAR},
+  		#{ORG_CODE,jdbcType=VARCHAR},
+  		#{REGION_CODE,jdbcType=VARCHAR},
+  		to_date(#{GMT_START,jdbcType=DATE},'yyyy-mm-dd'),
+  		to_date(#{GMT_END,jdbcType=DATE},'yyyy-mm-dd'),
+  		to_date(#{GMT_SIGNED},'yyyy-mm-dd hh24:mi:ss'),
+  		#{MEMBER_ID,jdbcType=VARCHAR},
+  		#{MEMBER_NAME,jdbcType=VARCHAR},
+  		#{MI_CARD,jdbcType=VARCHAR},
+  		#{ID_CARD,jdbcType=VARCHAR},
+  		#{MEMBER_PHONE,jdbcType=VARCHAR},
+  		#{ADDRESS,jdbcType=VARCHAR},
+  		#{FILE_URL,jdbcType=VARCHAR},
+  		#{FILE_ID,jdbcType=VARCHAR},
+  		to_date(#{GMT_MODIFIED,jdbcType=DATE},'yyyy-mm-dd'),
+  		#{STATUS,jdbcType=VARCHAR},
+  		#{SERVICE_PACK,jdbcType=VARCHAR},
+  		#{RESCIND_TYPE,jdbcType=VARCHAR},
+  		to_date(#{GMT_RESCIND,jdbcType=DATE},'yyyy-mm-dd'),
+  		#{RESCIND_REASON,jdbcType=VARCHAR},
+  		sysdate,#{OPERATOR_ID,jdbcType=VARCHAR},#{OPERATOR_NAME,jdbcType=VARCHAR}
+	</sql>
+	
+	<!-- 新增-->
+	<insert id="saveObj" parameterType="pd">
+		insert into 
+	<include refid="tableName"></include>
+		(
+			ID,AGREEMENT_NAME,APPLICANT_CODE,TEAM_ID,GEN_PRACTITIONER_ID,GEN_PRACTITIONER_NAME,GEN_PRACTITIONER_CODE,
+  			GEN_PRACTITIONER_PHONE,ORG_CODE,REGION_CODE,
+  		 GMT_START,GMT_END,GMT_SIGNED,MEMBER_ID,MEMBER_NAME,MI_CARD,ID_CARD,MEMBER_PHONE,
+  		ADDRESS,FILE_URL,FILE_ID,GMT_MODIFIED,STATUS,SERVICE_PACK
+		) values (
+			#{ID,jdbcType=VARCHAR},#{AGREEMENT_NAME,jdbcType=VARCHAR},#{APPLICANT_CODE,jdbcType=VARCHAR},      
+  			#{TEAM_ID,jdbcType=VARCHAR},#{GEN_PRACTITIONER_ID,jdbcType=VARCHAR},#{GEN_PRACTITIONER_NAME,jdbcType=VARCHAR},
+  			#{GEN_PRACTITIONER_CODE,jdbcType=VARCHAR},#{GEN_PRACTITIONER_PHONE,jdbcType=VARCHAR},#{ORG_CODE,jdbcType=VARCHAR},
+  			#{REGION_CODE,jdbcType=VARCHAR},
+	  		to_date(#{GMT_START},'yyyy-mm-dd hh24:mi:ss'),
+	  		to_date(#{GMT_END},'yyyy-mm-dd hh24:mi:ss'),
+	  		to_date(#{GMT_SIGNED},'yyyy-mm-dd hh24:mi:ss'),
+  			#{MEMBER_ID,jdbcType=VARCHAR},#{MEMBER_NAME,jdbcType=VARCHAR},#{MI_CARD,jdbcType=VARCHAR},
+  			#{ID_CARD,jdbcType=VARCHAR},#{MEMBER_PHONE,jdbcType=VARCHAR},#{ADDRESS,jdbcType=VARCHAR},
+  			#{FILE_URL,jdbcType=VARCHAR},#{FILE_ID,jdbcType=VARCHAR},
+  			sysdate,
+  			#{STATUS,jdbcType=VARCHAR},
+  			#{SERVICE_PACK,jdbcType=VARCHAR}
+		)
+	</insert>
+	<insert id="save" parameterType="pd">
+		insert into 
+	<include refid="tableName"></include>
+		(
+			<include refid="Field"></include>
+		) values (
+			<include refid="FieldValue"></include>
+					)
+	</insert>
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+		*
+		from 
+		<include refid="tableName"></include> 
+		where
+			ID = #{ID}
+	</select>
+	
+	<!-- 列表 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include>
+		<where>
+			1=1
+            <if test="pd.keywords != null and pd.keywords!= ''"><!-- 关键词检索 -->
+			and (
+				GEN_PRACTITIONER_ID LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				or
+				MEMBER_NAME LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				or
+				GEN_PRACTITIONER_NAME LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				)
+			</if>
+			<if test="pd.start!=null and pd.start!=''"><!-- 协议开始时间检索 -->
+				and to_char(GMT_SIGNED,'yyyymmdd')  &gt;= to_char(to_date(#{pd.start},'yyyy-MM-dd '),'yyyymmdd')
+			</if>
+			<if test="pd.end!=null and pd.end!=''"><!-- 协议结束时间检索 -->
+				and to_char(GMT_SIGNED,'yyyymmdd') &lt;= to_char(to_date(#{pd.end},'yyyy-MM-dd '),'yyyymmdd')
+			</if>
+			<if test="pd.STATUS != null and pd.STATUS != ''"><!-- 状态检索 -->
+				and STATUS=#{pd.STATUS} 
+			</if>
+			<if test="pd.orgId != null and pd.orgId != ''"><!-- 机构检索   -->
+				and ORG_CODE = #{pd.orgId}
+			</if>
+				and STATUS != '9' order by GMT_MODIFIED desc
+        </where>
+	</select>
+	
+	
+	<!-- 变更管理列表 -->
+	<select id="changelistPage" parameterType="page" resultType="pd">
+		select
+		*
+		from 
+		GPP_AGREEMENT_CHANGE_APPLY
+		<where>
+			1=1
+			 <if test="pd.keywords != null and pd.keywords!= ''"><!-- 关键词检索 -->
+			and (
+				GEN_PRACTITIONER_ID LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				or
+				APPLICANT_NAME LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				or
+				GEN_PRACTITIONER_NAME LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				)
+			</if>
+        </where>
+        order by "STATUS" asc
+	</select>
+	
+	
+	<!-- 编辑 -->
+	<update id="edit" parameterType="pd">
+		update
+		<include refid="tableName"></include>
+		set 
+		<if test="AGREEMENT_NAME != null" > 
+		"AGREEMENT_NAME" =#{AGREEMENT_NAME,jdbcType=VARCHAR},
+		</if>
+  		"GMT_START" = to_date(#{GMT_START,jdbcType=DATE},'yyyy-mm-dd hh24:mi:ss'),
+  		"GMT_END" = to_date(#{GMT_END,jdbcType=DATE},'yyyy-mm-dd hh24:mi:ss'),
+  		"GMT_SIGNED" = to_date(#{GMT_SIGNED,jdbcType=DATE},'yyyy-mm-dd hh24:mi:ss'),
+  		<if test="MEMBER_PHONE != null" > 
+  		"MEMBER_PHONE" = #{MEMBER_PHONE,jdbcType=VARCHAR},
+  		</if>
+  		<if test="ADDRESS != null" > 
+  		"ADDRESS" =#{ADDRESS,jdbcType=VARCHAR},
+  		</if>
+  		<if test="FILE_URL != null and FILE_URL!=''" > 
+  		"FILE_URL" = #{FILE_URL,jdbcType=VARCHAR},  
+  		</if> 
+  		<if test="FILE_ID != null and FILE_ID!=''" > 
+  		"FILE_ID" = #{FILE_ID,jdbcType=VARCHAR},  
+  		</if> 
+  		<if test="STATUS != null" > 
+  		"STATUS" = #{STATUS,jdbcType=VARCHAR},
+  		</if>
+  		<if test="SERVICE_PACK != null" > 
+  		"SERVICE_PACK" = #{SERVICE_PACK,jdbcType=VARCHAR},
+  		</if>
+  		"GMT_MODIFIED" =sysdate
+		where
+		"ID" = #{ID}
+	</update>
+	<!-- 修改状态 -->
+		<update id="editStatus" parameterType="pd">
+		update
+		<include refid="tableName"></include>
+		set "STATUS" = #{STATUS}
+		where
+		"ID" = #{ID}
+	</update>
+	<!-- 删除-->
+	<delete id="delete" parameterType="pd">
+		delete from
+		<include refid="tableName"></include>
+		where 
+			ID = #{ID}
+	</delete>
+	
+	<!-- 批量删除 -->
+	<delete id="deleteAll" parameterType="String">
+		delete from
+		<include refid="tableName"></include>
+		where 
+			ID in
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                 #{item}
+		</foreach>
+	</delete>
+	
+	<!-- 解约 -->
+	<update id="jieyue" parameterType="pd">
+		update
+		<include refid="tableName"></include>
+		set 
+		"STATUS" = 3,
+  		"RESCIND_TYPE" = #{RESCIND_TYPE},
+  		"GMT_RESCIND" = to_date(#{GMT_RESCIND},'yyyy-mm-dd hh24:mi:ss'),
+  		"RESCIND_REASON" = #{RESCIND_REASON}
+		where
+		"ID" = #{ID}
+	</update>
+		<!-- 通过ID获取数据
+		签约申请 -->
+	<select id="findChangeApplyById" parameterType="pd" resultType="pd">
+		select 
+		*
+		from 
+		GPP_AGREEMENT_CHANGE_APPLY
+		where
+			ID = #{ID}
+	</select>
+	<!-- 审批变更申请 -->
+	<update id="updateChangeApply" parameterType="pd">
+		update
+		GPP_AGREEMENT_CHANGE_APPLY
+		set 
+		"STATUS" = #{STATUS,jdbcType=VARCHAR},
+		"AUDITOR_ID"=#{AUDITOR_ID,jdbcType=VARCHAR},
+  		"AUDITOR_NAME" = #{AUDITOR_NAME,jdbcType=VARCHAR},
+  		"GMT_AUDIT" = to_date(#{GMT_AUDIT},'yyyy-mm-dd hh24:mi:ss')
+  		<if test="AUDITOR_COMMENT != null and AUDITOR_COMMENT!= ''">
+  		,"AUDITOR_COMMENT" = #{AUDITOR_COMMENT}
+  		</if>
+		where
+		"ID" = #{ID}
+	</update>
+	<!-- 变更历史纪录列表 -->
+	<select id="logslistPage" parameterType="page" resultType="pd">
+	select 
+		 t.*,s.MC as PACK_OLD_MC,p.MC as PACK_MC
+		from 
+		GPP_AGREEMENT_CHANGE t 
+        left join GPP_SERVICE_PACK s on t.SERVICE_PACK_OLD = s.ID
+        left join GPP_SERVICE_PACK p on t.SERVICE_PACK = p.ID
+		where AGREEMENT_ID =#{pd.AGREEMENT_ID}
+       order by t.GMT_CHANGE desc
+	</select>
+	<!-- 审批申请 作废-->
+	<update id="delApply" parameterType="pd">
+		update
+		GPP_AGREEMENT_CHANGE_APPLY
+		set 
+		"STATUS" = #{STATUS},
+		"AUDITOR_ID"=#{AUDITOR_ID},
+		"AUDITOR_NAME"=#{AUDITOR_NAME},
+		"GMT_AUDIT"=sysdate
+		where
+		"ID" = #{ID}
+	</update>
+	<!-- 转签 -->
+	<update id="updatetransfer" parameterType="pd">
+		update
+		<include refid="tableName"></include>
+		set 
+		<if test="GMT_START!=null and GMT_START!=''">
+  		"GMT_START" = to_date(#{GMT_START},'yyyy-MM-dd hh24:mi:ss'),    
+		</if>
+		<if test="GMT_END!=null and GMT_END!=''">
+  		"GMT_END" = to_date(#{GMT_END},'yyyy-MM-dd hh24:mi:ss'),
+  		</if>
+  		<if test="GMT_SIGNED!=null and GMT_SIGNED!=''">
+  		"GMT_SIGNED" = to_date(#{GMT_SIGNED},'yyyy-MM-dd hh24:mi:ss'),
+  		</if>
+  		<if test="GEN_PRACTITIONER_PHONE!=null and GEN_PRACTITIONER_PHONE!=''">
+  		"GEN_PRACTITIONER_PHONE" =#{GEN_PRACTITIONER_PHONE,jdbcType=VARCHAR},
+  		</if>
+  		<if test="GEN_PRACTITIONER_NAME!=null and GEN_PRACTITIONER_NAME!=''">
+  		"GEN_PRACTITIONER_NAME" = #{GEN_PRACTITIONER_NAME,jdbcType=VARCHAR},
+  		</if>
+  		   
+  		"GMT_MODIFIED" =sysdate,
+  		<if test="STATUS!=null and STATUS!=''">
+  		"STATUS" = #{STATUS,jdbcType=VARCHAR},
+  		</if>
+  		<if test="GEN_PRACTITIONER_ID!=null and GEN_PRACTITIONER_ID!=''">
+  		"GEN_PRACTITIONER_ID" = #{GEN_PRACTITIONER_ID,jdbcType=VARCHAR}
+  		</if>
+		where
+		"ID" = #{ID}
+	</update>
+	
+		<!--APP接口分页查询-->
+	<select id="queryPage" parameterType="pd" resultType="pd">
+				SELECT *
+				  FROM ( SELECT ROWNUM AS rowno, t.*
+				          FROM GPP_AGREEMENT_SERVICE t
+			where STATUS != '9'
+			<if test="KEYWORDS != null and KEYWORDS!= ''"><!-- 关键词检索 -->
+			and (
+				GEN_PRACTITIONER_ID LIKE CONCAT(CONCAT('%', #{KEYWORDS}),'%')
+				or
+				MEMBER_NAME LIKE CONCAT(CONCAT('%', #{KEYWORDS}),'%')
+				or
+				GEN_PRACTITIONER_NAME LIKE CONCAT(CONCAT('%', #{KEYWORDS}),'%')
+				)
+			</if>
+			<if test="START!=null and START!=''"><!-- 协议开始时间检索 -->
+				and GMT_SIGNED &gt;= to_date(#{START},'yyyy-mm-dd')
+			</if>
+			<if test="END!=null and END!=''"><!-- 协议结束时间检索 -->
+				and GMT_SIGNED &lt;= to_date(#{END},'yyyy-mm-dd')
+			</if>
+			<if test="STATUS != null and STATUS != ''"><!-- 状态检索 -->
+				and STATUS=#{STATUS} 
+			</if>
+				           ) table_alias
+				 WHERE table_alias.rowno BETWEEN #{pageStart} and #{pageEnd}
+	</select>	
+	<!-- 逻辑删除 -->
+		<update id="delObject" parameterType="pd">
+		update
+		GPP_AGREEMENT_SERVICE
+		set 
+		"STATUS" = #{STATUS}
+		where
+		"ID" = #{ID}
+	</update>
+	<update id="updateObject" parameterType="pd">
+		update
+		GPP_AGREEMENT_SERVICE
+		set 
+		<if test="AGREEMENT_NAME != null" >
+		"AGREEMENT_NAME"=#{AGREEMENT_NAME,jdbcType=VARCHAR},
+		 </if>
+		<if test="APPLICANT_CODE != null" > 
+		"APPLICANT_CODE"=#{APPLICANT_CODE,jdbcType=VARCHAR},
+		</if>
+		<if test="TEAM_ID != null" > 
+		"TEAM_ID"=#{TEAM_ID,jdbcType=VARCHAR},
+		</if>
+		<if test="GEN_PRACTITIONER_ID != null" > 
+		"GEN_PRACTITIONER_ID"=#{GEN_PRACTITIONER_ID,jdbcType=VARCHAR},
+		</if>
+		<if test="GEN_PRACTITIONER_PHONE != null" > 
+		"GEN_PRACTITIONER_PHONE" =#{GEN_PRACTITIONER_PHONE,jdbcType=VARCHAR},
+		</if>
+		<if test="GEN_PRACTITIONER_NAME != null" > 
+  		"GEN_PRACTITIONER_NAME" = #{GEN_PRACTITIONER_NAME,jdbcType=VARCHAR},
+  		</if>   
+  		<if test="ORG_CODE != null" > 
+  		"ORG_CODE"=#{ORG_CODE,jdbcType=VARCHAR},
+  		</if>
+  		<if test="REGION_CODE != null" > 
+  		"REGION_CODE"=#{REGION_CODE,jdbcType=VARCHAR},
+  		</if>
+  		<if test="GMT_START != null" >
+       "GMT_START" = to_date(#{GMT_START},'yyyy-mm-dd hh24:mi:ss'),
+      	</if>
+      	<if test="GMT_END != null" >
+        "GMT_END" = to_date(#{GMT_END},'yyyy-mm-dd hh24:mi:ss'),
+      	</if>
+     	<if test="GMT_SIGNED != null" > 
+  		"GMT_SIGNED" = to_date(#{GMT_SIGNED},'yyyy-mm-dd hh24:mi:ss'),
+  		</if>
+  		<if test="MEMBER_ID != null" > 
+  		"MEMBER_ID"=#{MEMBER_ID,jdbcType=VARCHAR},
+  		</if>
+  		<if test="MEMBER_NAME != null" > 
+  		"MEMBER_NAME"=#{MEMBER_NAME,jdbcType=VARCHAR},
+  		</if>
+  		<if test="MI_CARD != null" > 
+  		"MI_CARD"=#{MI_CARD,jdbcType=VARCHAR},
+  		</if>
+  		<if test="ID_CARD != null" > 
+  		"ID_CARD"=#{ID_CARD,jdbcType=VARCHAR},
+  		</if>
+  		<if test="MEMBER_PHONE != null" > 
+  		"MEMBER_PHONE"=#{MEMBER_PHONE,jdbcType=VARCHAR},
+  		</if>
+  		<if test="ADDRESS != null" > 
+  		"ADDRESS"=#{ADDRESS,jdbcType=VARCHAR},
+  		</if>
+  		<if test="FILE_URL != null and FILE_URL!=''" > 
+  		"FILE_URL"=#{FILE_URL,jdbcType=VARCHAR},
+  		</if>
+  		<if test="FILE_ID != null and FILE_ID!=''" > 
+  		"FILE_ID"=#{FILE_ID,jdbcType=VARCHAR},
+  		</if>
+  		<if test="SERVICE_PACK != null" > 
+  		"SERVICE_PACK"=#{SERVICE_PACK,jdbcType=VARCHAR},
+  		</if>
+  		<if test="RESCIND_TYPE != null" > 
+  		"RESCIND_TYPE"=#{RESCIND_TYPE,jdbcType=VARCHAR},
+  		</if>
+  		<if test="RESCIND_REASON != null" > 
+  		"RESCIND_REASON"=#{RESCIND_REASON,jdbcType=VARCHAR},
+  		</if>
+  		<if test="GMT_RESCIND != null" >
+       "GMT_START" = to_date(#{GMT_RESCIND},'yyyy-mm-dd'),
+      	</if>
+	      <if test="STATUS != null" > 
+	  		"STATUS" = #{STATUS,jdbcType=VARCHAR},
+	  	 </if>	
+  		"GMT_MODIFIED" =sysdate
+		where
+		"ID" = #{ID}
+	</update>
+</mapper>

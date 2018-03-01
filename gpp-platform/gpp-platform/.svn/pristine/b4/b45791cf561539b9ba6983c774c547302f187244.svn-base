@@ -1,0 +1,594 @@
+package com.tbyf.util;
+
+import org.springframework.context.ApplicationContext;
+/**
+ * 项目名称：
+ * 修改日期：2015/11/2
+*/
+public class Const {
+	public static final String SESSION_SECURITY_CODE = "sessionSecCode";//验证码
+	public static final String SESSION_USER = "sessionUser";			//session用的用户
+	public static final String SESSION_ROLE_RIGHTS = "sessionRoleRights";
+	public static final String sSESSION_ROLE_RIGHTS = "sessionRoleRights";
+	public static final String SESSION_menuList = "menuList";			//当前菜单
+	public static final String SESSION_allmenuList = "allmenuList";		//全部菜单
+	public static final String SESSION_QX = "QX";
+	public static final String SESSION_userpds = "userpds";			
+	public static final String SESSION_USERROL = "USERROL";				//用户对象
+	public static final String SESSION_USERNAME = "USERNAME";			//用户名
+	public static final String DISEASE_ADVICE_BY_DOCTOR = "BY_DOCTOR";//由医生用户添加的标志
+	public static final String TRUE = "T";
+	public static final String FALSE = "F";
+	public static final String LOGIN = "/login_toLogin.do";				//登录地址
+	public static final String SYSNAME = "admin/config/SYSNAME.txt";	//系统名称路径
+	public static final String PAGE	= "admin/config/PAGE.txt";			//分页条数配置路径
+	public static final String EMAIL = "admin/config/EMAIL.txt";		//邮箱服务器配置路径
+	public static final String SMS1 = "admin/config/SMS1.txt";			//短信账户配置路径1
+	public static final String SMS2 = "admin/config/SMS2.txt";			//短信账户配置路径2
+	public static final String FWATERM = "admin/config/FWATERM.txt";	//文字水印配置路径
+	public static final String IWATERM = "admin/config/IWATERM.txt";	//图片水印配置路径
+	public static final String WEIXIN	= "admin/config/WEIXIN.txt";	//微信配置路径
+	public static final String WEBSOCKET = "admin/config/WEBSOCKET.txt";//WEBSOCKET配置路径
+	public static final String FILEPATHIMG = "uploadFiles/uploadImgs/";	//图片上传路径
+	public static final String FILEPATHFILE = "uploadFiles/file/";		//文件上传路径
+	public static final String FILEPATHTWODIMENSIONCODE = "uploadFiles/twoDimensionCode/"; //二维码存放路径
+	public static final String NO_INTERCEPTOR_PATH = ".*/((tologin)|(login)|(logout)|(code)|(app)|(weixin)|(static)|(main)|(websocket)).*";	//不对匹配该值的访问路径拦截（正则）
+	public static ApplicationContext WEB_APP_CONTEXT = null; //该值会在web容器启动时由WebAppContextListener初始化
+	public static final String TREE_TOP_NODE = "AAA";
+	public static final int COUNT_NUMBER = 11;//用户登录补全显示的数量
+	public static final String NEXT_ORG_CODE = "A";//下级医生机构编码前缀
+	/**
+	 * APP Constants
+	 */
+	//app获取短信验证码
+	public static final String[] APP_GETMOBILECODE_PARAM_ARRAY = new String[]{"TELEPHONE"};
+	public static final String[] APP_GETMOBILECODE_VALUE_ARRAY = new String[]{"手机号"};
+	//app注册接口_请求协议参数)
+	public static final String[] APP_REGISTERED_PARAM_ARRAY = new String[]{"countries","uname","passwd","title","full_name","company_name","countries_code","area_code","telephone","mobile"};
+	public static final String[] APP_REGISTERED_VALUE_ARRAY = new String[]{"国籍","邮箱帐号","密码","称谓","名称","公司名称","国家编号","区号","电话","手机号"};
+	
+	//app根据用户名获取会员信息接口_请求协议中的参数
+	public static final String[] APP_GETAPPUSER_PARAM_ARRAY = new String[]{"USERNAME"};
+	public static final String[] APP_GETAPPUSER_VALUE_ARRAY = new String[]{"用户名"};
+	
+	public static final String[] APP_LOGIN_PARAM_ARRAY = { "USERNAME", "PASSWD", "IMEI", "TYPE" };
+	public static final String[] APP_LOGIN_VALUE_ARRAY = { "用户名", "密码", "手机序列号", "类型" };
+
+	//app机构注册接口_请求协议中的参数
+	public static final String[] APP_SAVEORG_PARAM_ARRAY = { "ORG_CODE", "ORG_NAME", "ORG_LOGIN_CODE", "P_ORG_CODE" };
+	public static final String[] APP_SAVEORG_VALUE_ARRAY = { "组织机构代码", "组织机构名称", "登记号", "上级机构代码" };
+
+	//app机构查询接口_请求协议中的参数
+	public static final String[] APP_QUERYORG_PARAM_ARRAY = { "ORG_CODE" };
+	public static final String[] APP_QUERYORG_VALUE_ARRAY = { "组织机构代码" };
+	
+	//app科室注册接口_请求协议中的参数
+	public static final String[] APP_SAVEDEP_PARAM_ARRAY = { "DEP_ID", "DEP_NAME", "PARENT_DEP_ID"};
+	public static final String[] APP_SAVEDEP_VALUE_ARRAY = { "科室标识", "科室名称", "上级科室标识" };
+
+	//app科室查询接口_请求协议中的参数
+	public static final String[] APP_QUERYDEP_PARAM_ARRAY = { "DEP_ID" };
+	public static final String[] APP_QUERYDEP_VALUE_ARRAY = { "科室标识" };
+
+	//app医护人员注册接口_请求协议中的参数
+	public static final String[] APP_SAVEDOC_PARAM_ARRAY = { "PROVIDER_ID", "PROVIDER_NAME", "ORG_CODE"};
+	public static final String[] APP_SAVEDOC_VALUE_ARRAY = { "医护人员ID", "医护人员姓名", "所属机构编码" };
+
+	//app医护人员查询接口_请求协议中的参数
+	public static final String[] APP_QUERYDOC_PARAM_ARRAY = { "PROVIDER_ID" };
+	public static final String[] APP_QUERYDOC_VALUE_ARRAY = { "医护人员ID" };
+	
+	//app预签约申请_请求协议中的参数
+	public static final String[] APP_ADDGPP_AGREEMENT_APPLY_PARAM_ARRAY = { "APPLICANT_ID", "APPLICANT_NAME","APPLICANT_PHONE", "GEN_PRACTITIONER_ID","GEN_PRACTITIONER_NAME","GEN_PRACTITIONER_PHONE","GEN_PRACTITIONER_CODE","ORG_CODE","REGION_CODE"};
+	public static final String[] APP_ADDGPP_AGREEMENT_APPLY_VALUE_ARRAY = { "申请人ID", "申请人姓名","申请人电话","签约医生ID","签约医生姓名","签约医生电话","签约医生编号","机构编号","行政区划"};
+	
+	//app协议维护新增接口_请求参数
+	public static final String[] GPP_AGREEMENT_CONTENT_PARAM_ARRAY = {  "AGREEMENT_NAME", "VERSIONS"};
+	public static final String[] GPP_AGREEMENT_CONTENT_VALUE_ARRAY = {  "协议名称", "历史版本"};
+	
+	//app协议维护修改接口_请求参数
+	public static final String[] GPP_AGREEMENT_CONTENT_PARAM_ARRAY_EDIT = { "ID"};
+	public static final String[] GPP_AGREEMENT_CONTENT_VALUE_ARRAY_EDIT = { "ID"};
+	//app新增预约管理中的参数
+	public static final String[] APP_ADDGPP_AGREEMENT_SERVICE_PARAM_ARRAY = { "AGREEMENT_NAME", "APPLICANT_CODE","GEN_PRACTITIONER_ID","GEN_PRACTITIONER_NAME","ORG_CODE",
+																				"GMT_START","GMT_END","GMT_SIGNED","MEMBER_ID","MEMBER_NAME","MI_CARD","ID_CARD","MEMBER_PHONE","ADDRESS","SERVICE_PACK"
+																				 };
+	public static final String[] APP_ADDGPP_AGREEMENT_SERVICE_VALUE_ARRAY  = { "协议名称", "协议编号" ,"签约医生ID","签约医生姓名","机构ID","协议开始时间","协议结束时间","签订时间","签约居民ID",
+																				  "签约居民","医保卡号","身份证","联系电话","家庭地址","服务包"};
+
+		//app签约管理--转签
+		public static final String[] APP_TRANSFER_GPP_AGREEMENT_SERVICE_PARAM_ARRAY = {"ID", "GEN_PRACTITIONER_ID","GEN_PRACTITIONER_NAME","GEN_PRACTITIONER_PHONE","OPERATOR_ID"};
+		public static final String[] APP_TRANSFER_GPP_AGREEMENT_SERVICE_VALUE_ARRAY = { "主键","签约医生ID","签约医生姓名","签约医生电话","操作人ID"};
+
+	//app修改预约管理中的参数
+	public static final String[] APP_EDITGPP_AGREEMENT_SERVICE_PARAM_ARRAY = {"ID"};
+	public static final String[] APP_EIDTGPP_AGREEMENT_SERVICE_VALUE_ARRAY  = {"主键"};
+	
+	//app签约团队新增_请求协议中的参数
+	public static final String[] APP_ADDGPP_TEAM_ADD_PARAM_ARRAY = {"TEAM_NAME","NUMBER","GMT_BUILD","LEADER_ID","LEADER_NAME"};
+	public static final String[] APP_ADDGPP_TEAM_ADD_VALUE_ARRAY = {"团队名称 ","团队人数","成立时间","负责人id","负责人名称"};
+	
+	//app签约团队修改_请求协议中的参数
+	public static final String[] APP_ADDGPP_TEAM_EDIT_PARAM_ARRAY = {"ID"};
+	public static final String[] APP_ADDGPP_TEAM_EDIT_VALUE_ARRAY = {"团队ID"};
+	
+	//app签约团队名称唯一性判断
+	public static final String[] APP_ADDGPP_TEAM_VALIDATE_PARAM_ARRAY = {"ID","TEAM_NAME"};
+	public static final String[] APP_ADDGPP_TEAM_VALIDATE_VALUE_ARRAY = {"团队ID","团队名称"};
+		
+	//app签约团队成员唯一性判断
+	public static final String[] APP_ADDGPP_TEAMMEMBER_VALIDATE_PARAM_ARRAY = {"ID","TEAM_MEMBER_ID"};
+	public static final String[] APP_ADDGPP_TEAMMEMBER_VALIDATE_VALUE_ARRAY = {"主键","成员ID"};
+	
+	//app签约团队删除_请求协议中的参数
+	public static final String[] APP_ADDGPP_TEAM_DEL_PARAM_ARRAY = {"ID"};
+	public static final String[] APP_ADDGPP_TEAM_DEL_VALUE_ARRAY = {"团队ID"};
+	
+	//app签约团队更新状态_请求协议中的参数
+	public static final String[] APP_ADDGPP_TEAM_STATUS_PARAM_ARRAY = {"ID","STATUS"};
+	public static final String[] APP_ADDGPP_TEAM_STATUS_VALUE_ARRAY = {"团队ID","状态"};
+	
+	//app过敏管理新增_请求协议中的参数
+	public static final String[] APP_ADDGPP_GM_ADD_PARAM_ARRAY = {"PATIENT_ID","PATIENT_NAME","ALLERGY"};
+	public static final String[] APP_ADDGPP_GM_ADD_VALUE_ARRAY = {"患者ID","患者姓名","过敏源"};
+	
+	//app过敏管理编辑_请求协议中的参数
+	public static final String[] APP_ADDGPP_GM_EDIT_PARAM_ARRAY = {"ID"};
+	public static final String[] APP_ADDGPP_GM_EDIT_VALUE_ARRAY = {"ID"};
+	
+	//app门诊测血压新增_请求协议中的参数
+	public static final String[] APP_BLOODPRESSURE_ADD_PARAM_ARRAY = {"PATIENT_ID","PATIENT_NAME","HIGH_PRESSURE","LOW_PRESSURE"};
+	public static final String[] APP_BLOODPRESSURE_ADD_VALUE_ARRAY = {"患者ID","患者姓名","高压","低压"};
+	
+	//app门诊测血压编辑_请求协议中的参数
+	public static final String[] APP_BLOODPRESSURE_EDIT_PARAM_ARRAY = {"ID"};
+	public static final String[] APP_BLOODPRESSURE_EDIT_VALUE_ARRAY = {"ID"};
+
+		//app签约管理--续约
+		public static final String[] APP_RENEW_GPP_AGREEMENT_SERVICE_PARAM_ARRAY = { "ID","AGREEMENT_NAME","GMT_START","GMT_END","GMT_SIGNED","MEMBER_PHONE","ADDRESS","FILE_URL","SERVICE_PACK" };
+		public static final String[] APP_RENEW_GPP_AGREEMENT_SERVICE_VALUE_ARRAY = { "主键","协议名称","协议开始时间","协议结束时间","签订时间","居民联系电话","家庭地址","协议文件地址","服务类型"};
+		//app签约管理--解约
+		public static final String[] APP_RESCISSION_GPP_AGREEMENT_SERVICE_PARAM_ARRAY = { "ID" ,"RESCIND_TYPE","GMT_RESCIND","RESCIND_REASON"};
+		public static final String[] APP_RESCISSION_GPP_AGREEMENT_SERVICE_VALUE_ARRAY = { "主键ID","解约类型","解约时间","解约理由"};
+
+		//app门诊测血糖-新增
+		public static final String[] APP_SAVE_GPP_BLOODSUGAR_PARAM_ARRAY = { "PERSONID","PERSONNAME","TIMECLASS","VALUE","MEASURINGTIME","INPUTNAME","ORGID","INPUTID"};
+		public static final String[] APP_SAVE_GPP_BLOODSUGAR_VALUE_ARRAY = { "患者ID","患者","时段","测量值","测量时间","录入人","机构ID","录入人ID" };
+		//app变更申请--审核通过
+		public static final String[] APP_AGREEAPPLY_GPP_AGREEMENTCHANGE_PARAM_ARRAY = { "ID","AUDITOR_ID","AUDITOR_NAME","SERVICE_PACK","AGREEMENT_ID","AUDITOR_COMMENT"};
+		public static final String[] APP_AGREEAPPLY_GPP_AGREEMENTCHANGE_VALUE_ARRAY = { "主键","审批人ID","审批人","服务包","协议ID","审批意见"};
+		//app变更申请--审核拒绝
+		public static final String[] APP_UNAGREEAPPLY_GPP_AGREEMENTCHANGE_PARAM_ARRAY = { "ID","AUDITOR_ID","AUDITOR_NAME","AUDITOR_COMMENT"};
+		public static final String[] APP_UNAGREEAPPLY_GPP_AGREEMENTCHANGE_VALUE_ARRAY = { "主键","审批人ID","审批人","审批意见"};
+		//app变更申请--作废
+		public static final String[] APP_EXPIRE_GPP_AGREEMENTCHANGE_PARAM_ARRAY = { "ID","AUDITOR_ID","AUDITOR_NAME","GMT_AUDIT"};
+		public static final String[] APP_EXPIRE_GPP_AGREEMENTCHANGE_VALUE_ARRAY = { "主键","审批人ID","审批人","审批时间"};
+
+	//app检查申请管理新增_请求协议中的参数
+	public static final String[] APP_ADDGPP_CHECK_ADD_PARAM_ARRAY = {"JZLSH","CFMXH"};
+	public static final String[] APP_ADDGPP_CHECK_ADD_VALUE_ARRAY = {"就诊流水号","处方明细号"};
+		
+	//app检查申请管理编辑_请求协议中的参数
+	public static final String[] APP_ADDGPP_CHECK_EDIT_PARAM_ARRAY = {"ID"};
+	public static final String[] APP_ADDGPP_CHECK_EDIT_VALUE_ARRAY = {"ID"};
+	
+	//app注射登记管理新增_请求协议中的参数
+	public static final String[] APP_ADDGPP_INJECTION_ADD_PARAM_ARRAY = {"MZJZLSH","HZID","HZXM","LRRID","LRR"};
+	public static final String[] APP_ADDGPP_INJECTION_ADD_VALUE_ARRAY = {"门诊就诊流水号","患者姓名","录入人ID","录入人姓名"};
+
+	//app注射登记管理编辑_请求协议中的参数
+	public static final String[] APP_ADDGPP_INJECTION_EDIT_PARAM_ARRAY = {"ID"};
+	public static final String[] APP_ADDGPP_INJECTION_EDIT_VALUE_ARRAY = {"ID"};
+	
+	//app全科医生新增任务中的参数
+		public static final String[] APP_ADDGPP_TASK_PARAM_ARRAY = {"JOB_NAME","JOB_TYPE","JOB_SOURCE","STATUS","DOCTOR_NAME","DOCTOR_ID","DOCTOR_CODE","ORG_CODE","OPERATOR_ID","OPERATOR_NAME"};
+		public static final String[] APP_ADDGPP_TASK_VALUE_ARRAY = { "任务名称", "任务类型","任务来源","任务状态","执行医生姓名","执行医生ID","执行医生CODE","机构编码","操作人ID","操作人姓名"};
+
+		//app全科医生修改任务中的参数
+		public static final String[] APP_EIDTGPP_TASK_PARAM_ARRAY = { "ID", "JOB_SOURCE","OPERATOR_ID","OPERATOR_NAME"};
+		public static final String[] APP_EIDTGPP_TASK_VALUE_ARRAY = { "主键", "任务来源","操作人ID","操作人姓名"};
+
+		//app全科医生处理任务中的参数
+		public static final String[] APP_DEALGPP_TASK_PARAM_ARRAY = { "ID","OPERATOR_ID" };
+		public static final String[] APP_DEALGPP_TASK_VALUE_ARRAY = { "主键","操作人ID"};
+				
+		//app新增患者中的参数
+		public static final String[] APP_ADDGPP_PATIENT_PARAM_ARRAY = {"KH","KLX","YLJGDM","FKDQ","XB","XM"};
+		public static final String[] APP_ADDGPP_PATIENT_VALUE_ARRAY = {"卡号","卡类型","医疗机构代码","发卡地区","性别","姓名"};
+
+		//app修改患者信息中的参数
+		//public static final String[] APP_EIDTGPP_PATIENT_PARAM_ARRAY = { "ID","KH","KLX","YLJGDM","XB","XM"};
+		//public static final String[] APP_EIDTGPP_PATIENT_VALUE_ARRAY = { "主键","卡号","卡类型","医疗机构代码","性别","姓名"};
+
+				
+		//app新增住院证中的参数
+		public static final String[] APP_ADDGPP_HOSPITALIZATION_PARAM_ARRAY = { "XB","NL","KSBM","KSMC","ZZYSGH","ZZYSXM","ORG_CODE"};
+		public static final String[] APP_ADDGPP_HOSPITALIZATION_VALUE_ARRAY = { "性别","年龄","科室编码","科室名称","医生编号","医生姓名","机构编码"};
+
+		//app修改住院证中的参数
+		//public static final String[] APP_EIDTGPP_HOSPITALIZATION_PARAM_ARRAY = { "ID", "XB","NL","KSBM","KSMC","ZZYSGH","ZZYSXM"};
+		//public static final String[] APP_EIDTGPP_HOSPITALIZATION_VALUE_ARRAY = { "主键","性别","年龄","科室编码","科室名称","医生编号","医生姓名"};
+
+		//app新增基层卫生服务提醒的参数
+		public static final String[] APP_TB_HYGIENE_REMIND_ADD_PARAM_ARRAY = { "TXLX","BT","NR","ZT",};
+		public static final String[] APP_TB_HYGIENE_REMIND_ADD_VALUE_ARRAY = { "提醒类型","标题","内容","状态"};
+		
+		//app新增基层卫生服务提醒的参数
+		public static final String[] APP_TB_HYGIENE_REMIND_EDIT_PARAM_ARRAY = { "ID"};
+		public static final String[] APP_TB_HYGIENE_REMIND_EDIT_VALUE_ARRAY = { "ID"};
+
+
+		//app新增输液登记
+		public static final String[] APP_ADD_GPP_INFUSION_REGISTRATION_PARAM_ARRAY = { "YPMC","DRUG_ID","DOSE","CHANNEL","DROP_SPEED","EXECUTION_TIME","END_TIME","ZXR_ID",
+																						"ZXR_NAME","ORG_CODE","MZJZLSH","PATIENT_ID","PATIENT_NAME","INPUT_ID","INPUT_NAME"};
+		public static final String[] APP_ADD_GPP_INFUSION_REGISTRATION_VALUE_ARRAY = { "药品名称","药品ID","剂量（单位ml）","途径（ivdrip）","滴速","执行时间","结束时间","执行人ID","执行人姓名","机构ID","门诊就诊流水号","患者ID","患者姓名","录入人ID","录入人"};
+		//app修改输液登记
+		public static final String[] APP_EDIT_GPP_INFUSION_REGISTRATION_PARAM_ARRAY = {"ID"};
+		public static final String[] APP_EDIT_GPP_INFUSION_REGISTRATION_VALUE_ARRAY = {"主键"};
+
+		//app新增不良反应药品管理的参数
+		public static final String[] APP_GPP_ADVERSE_DRUG_REACTION_ADD_PARAM_ARRAY = { "DRUG_NAME","DRUG_ID","ORG_CODE","MZJZLSH","PATIENT_ID","PATIENT_NAME","CATEGORY"};
+		public static final String[] APP_GPP_ADVERSE_DRUG_REACTION_ADD_VALUE_ARRAY = { "药品名称","药品ID","机构ID","门诊就诊流水号","患者ID","患者姓名","类别"};
+		
+		//app修改不良反应药品管理的参数
+		public static final String[] APP_GPP_ADVERSE_DRUG_REACTION_EDIT_PARAM_ARRAY = { "ID"};
+		public static final String[] APP_GPP_ADVERSE_DRUG_REACTION_EDIT_VALUE_ARRAY = { "ID"};
+		
+		//app新增皮试管理中的参数
+		public static final String[] APP_ADDGPP_SKINTEST_PARAM_ARRAY = {"HZXM","HZID","LRR","LRRID","ORG_CODE"};
+		public static final String[] APP_ADDGPP_SKINTEST_VALUE_ARRAY = {"患者姓名","患者id","录入人","录入人ID","机构编码"};
+
+		//app修改皮试管理中的参数
+		//public static final String[] APP_EDITGPP_SKINTEST_PARAM_ARRAY = { "ID","HZXM","HZID","LRR","LRRID"};
+		//public static final String[] APP_EDITGPP_SKINTEST_VALUE_ARRAY = { "主键","患者姓名","录入人","录入人ID"};
+
+		
+		//预签约申请查询详情
+		public static final String[] APP_FINDBYID_AGREEMENT_PARAM_ARRAY = {"ID"};
+		public static final String[] APP_FINDBYID_AGREEMENT_VALUE_ARRAY = {"主键"};
+		
+		//预签约申请查询详情
+		public static final String[] APP_QUERYPAGE_AGREEMENT_PARAM_ARRAY = {"PAGESIZE","PAGECOUNT","FKEY"};
+		public static final String[] APP_QUERYPAGE_AGREEMENT_VALUE_ARRAY = {"页码","页数","参数验证"};
+		
+		//注射登记查询参数
+		public static final String[] APP_INJECTIONQUERYPAGE_AGREEMENT_PARAM_ARRAY = {"PAGESIZE","PAGECOUNT","FKEY"};
+		public static final String[] APP_INJECTIONQUERYPAGE_AGREEMENT_VALUE_ARRAY = {"页码","页数","参数验证"};
+		
+		//过敏管理查询参数
+		public static final String[] APP_GMQUERYPAGE_AGREEMENT_PARAM_ARRAY = {"PAGESIZE","PAGECOUNT","FKEY"};
+		public static final String[] APP_GMQUERYPAGE_AGREEMENT_VALUE_ARRAY = {"页码","页数","参数验证"};
+		
+		//检查申请管理查询参数
+		public static final String[] APP_CHECKQUERYPAGE_AGREEMENT_PARAM_ARRAY = {"PAGESIZE","PAGECOUNT","FKEY"};
+		public static final String[] APP_CHECKQUERYPAGE_AGREEMENT_VALUE_ARRAY = {"页码","页数","参数验证"};
+		
+		//团队管理查询参数
+		public static final String[] APP_TEAMQUERYPAGE_AGREEMENT_PARAM_ARRAY = {"PAGESIZE","PAGECOUNT","FKEY"};
+		public static final String[] APP_TEAMQUERYPAGE_AGREEMENT_VALUE_ARRAY = {"页码","页数","参数验证"};
+		
+		//根据医生查询团队
+		public static final String[] APP_TEAMQUERYPAGEBYPROVIDER_AGREEMENT_PARAM_ARRAY = {"PROVIDER_ID","ORG_CODE","FKEY"};
+		public static final String[] APP_TEAMQUERYPAGEBYPROVIDER_AGREEMENT_VALUE_ARRAY = {"医生ID","机构编码","参数验证"};
+				
+
+		//app预签约申请审核
+		public static final String[] APP_EDITGPP_AGREEMENT_SH_PARAM_ARRAY = {"ID","SIGNED_TYPE","SHBJ","AUDITOR_ID"};
+		public static final String[] APP_EDITGPP_AGREEMENT_SH_VALUE_ARRAY = {"主键","预约方式","审核标记","审批人ID"};
+
+	
+		//修改appUser密码
+		public static final String[] EDITPW_SYS_APP_USER_PARAM_ARRAY = {"USER_ID","PASSWORD","PASSWORD_NEW"};
+		public static final String[] EDITPW_SYS_APP_USER_VALUE_ARRAY = {"账号","密码","新密码"};
+		//修改appUser密码
+		public static final String[] FIND_SYS_APP_USER_PARAM_ARRAY = {"PHONE","PASSWORD_NEW","MOBILECODE"};
+		public static final String[] FIND_SYS_APP_USER_VALUE_ARRAY = {"账号","新密码","验证码"};
+				
+		//app门诊测血糖-新增
+		public static final String[] APP_EDIT_GPP_BLOODSUGAR_PARAM_ARRAY = {"ID"};
+		public static final String[] APP_EDIT_GPP_BLOODSUGAR_VALUE_ARRAY = {"主键"};
+		
+		//app广告管理查询;
+		public static final String[] APP_GGGL_AGREEMENT_PARAM_ARRAY = {"FKEY","GG_TYPE"};
+		public static final String[] APP_GGGL_AGREEMENT_VALUE_ARRAY = {"参数验证","广告类型"};
+
+		//app居民注册
+		public static final String[] APP_JMXX_SAVE_PARAM_ARRAY = {"TELEPHONE","PASSWORD","YZM"};
+		public static final String[] APP_JMXX_SAVE_VALUE_ARRAY = {"手机号","密码","验证码"};
+		
+		//居民登陆
+		public static final String[] APP_JMXX_LOGIN_PARAM_ARRAY = {"TELEPHONE","PASSWORD"};
+		public static final String[] APP_JMXX_LOGIN_VALUE_ARRAY= {"手机号","密码"};
+		
+		
+		
+		//app居民密码修改
+		public static final String[] APP_JMXX_EDITPW_PARAM_ARRAY = {"USER_AGENT_ID","NEW_PW","OLD_PW"};
+		public static final String[] APP_JMXX_EDITPW_VALUE_ARRAY = {"用户ID","新密码","旧密码"};
+		//app居民密码修改
+		public static final String[] APP_JMXX_PHONEEDITPW_PARAM_ARRAY = {"TELEPHONE","PASSWORD","MOBILECODE"};
+		public static final String[] APP_JMXX_PHONEEDITPW_VALUE_ARRAY = {"用户手机","新密码","验证码"};
+		//app居民信息修改
+		public static final String[] APP_JMXX_EDIT_PARAM_ARRAY =  {"USER_AGENT_ID","USER_NAME","ID_NUMBER","SEX","BIRTHDAY_TIME","ADDRESS","NEW_TELEPHONE"};
+		public static final String[] APP_JMXX_EDIT_VALUE_ARRAY = {"用户ID","用户姓名","身份证号码","性别","生日","地址","新手机号码"};
+		//app意见反馈;
+		public static final String[] APP_FEEDBACK_PARAM_ARRAY = {"TJR","TJRID","REMARK"};
+		public static final String[] APP_FEEDBACK_VALUE_ARRAY = {"提交人","提交人ID","内容"};
+		
+		//app随访模版查询
+		public static final String[] APP_SFTEMP_AGREEMENT_PARAM_ARRAY = {"PROVIDER_ID"};
+		public static final String[] APP_SFTEMP_AGREEMENT_VALUE_ARRAY = {"医生id"};
+		
+		//app随访模版新增
+		public static final String[] APP_SFTEMP_SAVE_PARAM_ARRAY = {"NAME","PROVIDER_ID","PROVIDER_NAME","SFLX","CREATE_TIME"};
+		public static final String[] APP_SFTEMP_SAVE_VALUE_ARRAY = {"模板名称","医生id","医生名称","随访类型","创建时间"};
+		
+		//app随访模版修改
+		public static final String[] APP_SFTEMP_EDIT_PARAM_ARRAY = {"GUID","NAME","SFLX"};
+		public static final String[] APP_SFTEMP_EDIT_VALUE_ARRAY = {"模板ID","模板名称","随访类型"};
+		
+		//app随访管理查询
+		public static final String[] APP_SFGL_AGREEMENT_PARAM_ARRAY = {"PAGESIZE","PAGECOUNT","FSYS_ID","ORG_CODE"};
+		public static final String[] APP_SFGL_AGREEMENT_VALUE_ARRAY = {"页码","页数","访视医生ID","机构编码"};
+	
+		//app随访管理新增
+	    public static final String[] APP_SFGL_SAVE_AGREEMENT_PARAM_ARRAY = {"FSYS","FSYS_ID","ORG_CODE","JM_NAME","JM_SBKH","FSSJ","SFLX","SFCL","LRR","FSYS_CODE","ZT","LRR_ID","TEMP_ID"};
+		public static final String[] APP_SFGL_SAVE_AGREEMENT_VALUE_ARRAY = {"访视医生","访视医生id","机构编码","居民","居民社保卡号","访视时间","随访类型","是否处理","录入人","状态","访视医生工号","录入人id","模板ID"};
+		
+		//app随访管理新增
+		public static final String[] APP_SFGL_EDIT_AGREEMENT_PARAM_ARRAY = {"ID","FSYS","FSYS_ID","ORG_CODE","JM_NAME","JM_SBKH","FSSJ","SFLX","SFCL","LRR","FSYS_CODE","ZT","LRR_ID"};
+		public static final String[] APP_SFGL_EDIT_AGREEMENT_VALUE_ARRAY = {"ID","访视医生","访视医生id","机构编码","居民","居民社保卡号","访视时间","随访类型","是否处理","录入人","状态","访视医生工号","录入人id"};
+
+
+		//高血压随访管理新增  
+		public static final String[] APP_SFGL_HYPERTENSION_SAVE_AGREEMENT_PARAM_ARRAY = {"FSYS","FSYS_CODE","ORG_CODE","USER_NAME","ID_NUMBER","HDSB040201_003","HDSB04020101_004","SFCL","LRR","ZT","LRR_ID"};
+		public static final String[] APP_SFGL_HYPERTENSION_SAVE_AGREEMENT_VALUE_ARRAY = {"访视医生","访视医生id","机构编码","居民","居民身份证号","访视时间","随访方式","是否处理","录入人","状态","录入人id"};
+		//高血压随访管理修改
+		public static final String[] APP_SFGL_HYPERTENSION_EDIT_AGREEMENT_PARAM_ARRAY = {"GUID","FSYS","FSYS_CODE","ORG_CODE","USER_NAME","ID_NUMBER","HDSB040201_003","HDSB04020101_004","SFCL","ZT"};
+		public static final String[] APP_SFGL_HYPERTENSION_EDIT_AGREEMENT_VALUE_ARRAY = {"平台id","访视医生","访视医生id","机构编码","居民","居民身份证号","访视时间","随访方式","是否处理","状态"};
+		
+		//app糖尿病随访问添加 修改
+		public static final String[] APP_SFGL_DIABETES_SAVE_AGREEMENT_PARAM_ARRAY ={"FSYS","FSYS_CODE","ORG_CODE","USER_NAME","ID_NUMBER","HDSB040501_003","HDSB040501_004","SFCL","LRR","ZT","LRR_ID"};
+		public static final String[] APP_SFGL_DIABETES_SAVE_AGREEMENT_VALUE_ARRAY = {"访视医生","访视医生id","机构编码","居民","居民身份证号","访视时间","随访方式","是否处理","录入人","状态","录入人id"};
+		public static final String[] APP_SFGL_DIABETES_EDIT_AGREEMENT_PARAM_ARRAY = {"GUID","FSYS","FSYS_CODE","ORG_CODE","USER_NAME","ID_NUMBER","HDSB040501_003","HDSB040501_004","SFCL","ZT"};
+		public static final String[] APP_SFGL_DIABETES_EDIT_AGREEMENT_VALUE_ARRAY ={"平台id","访视医生","访视医生id","机构编码","居民","居民身份证号","访视时间","随访方式","是否处理","状态"};
+		
+		//app精神病随访问添加 修改  
+		public static final String[] APP_SFGL_MENTALILLNESS_SAVE_AGREEMENT_PARAM_ARRAY ={"FSYS","FSYS_CODE","ORG_CODE","USER_NAME","ID_NUMBER","HDSB040301_003","HDSB040301_004","HDSB040301_005","SFCL","LRR","ZT","LRR_ID"};
+		public static final String[] APP_SFGL_MENTALILLNESS_SAVE_AGREEMENT_VALUE_ARRAY = {"访视医生","访视医生id","机构编码","居民","居民身份证号","访视时间","随访方式", "下次随访时间","是否处理","录入人","状态","录入人id"};
+		public static final String[] APP_SFGL_MENTALILLNESS_EDIT_AGREEMENT_PARAM_ARRAY = {"GUID","FSYS","FSYS_CODE","ORG_CODE","USER_NAME","ID_NUMBER","HDSB040301_003","HDSB040301_004","HDSB040301_005","SFCL","ZT"};
+		public static final String[] APP_SFGL_MENTALILLNESS_EDIT_AGREEMENT_VALUE_ARRAY ={"平台id","访视医生","访视医生id","机构编码","居民","居民身份证号","访视时间","随访方式", "下次随访时间","是否处理","状态"};
+		
+		
+		
+		
+		
+		//app预约挂号申请
+		public static final String[] APP_REGAPP_PARAM_ARRAY = {"PERSON_ID","PERSON_NAME","ORG_CODE","DEPTCODE","DEPTNAME","DOCTORCODE","DOCTORNAME","APPLYTIME"};
+		public static final String[] APP_REGAPP_VALUE_ARRAY = {"患者ID","患者姓名","机构编码","科室ID","科室名称","医生ID","医生名称","预约时间"};
+		//app预约挂号查询
+		public static final String[] APP_QUERY_REGAPP_PARAM_ARRAY = {"PAGESIZE","PAGECOUNT"};
+		public static final String[] APP_QUERY_REGAPP_VALUE_ARRAY = {"页码","页数"};
+		
+		//新增健康咨询记录
+		public static final String[] APP_SAVE_JKZX_PARAM_ARRAY = {"PERSON_ID","PERSON_NAME","DOCTOR_ID","DOCTOR_NAME","ORG_CODE","SEND_CONTENT"};
+		public static final String[] APP_SAVE_JKZX_VALUE_ARRAY = {"咨询人ID","咨询人姓名","咨询医生ID","咨询医生姓名","机构ID","咨询内容"};
+		
+		//健康咨询信息
+		public static final String[] APP_SAVE_JKZX_CONTENT_PARAM_ARRAY = {"SEND_ROLE","CONSULTATION_ID","SEND_ID","SEND_NAME","SEND_CONTENT"};
+		public static final String[] APP_SAVE_JKZX_CONTENT_VALUE_ARRAY = {"发送者角色 ","记录表ID","发送者ID","发送者姓名","内容"};
+		//app预约挂号查询
+		public static final String[] APP_QUERY_JKZX_CONTENT_PARAM_ARRAY = {"CONSULTATION_ID"};
+		public static final String[] APP_QUERY_JKZX_CONTENT_VALUE_ARRAY = {"记录表ID"};
+		//预签约申请查询详情
+		public static final String[] APP_FINDBYID_JKZX_PARAM_ARRAY = {"ID"};
+		public static final String[] APP_FINDBYID_JKZX_VALUE_ARRAY = {"主键"};
+		
+		//预签约申请查询详情
+		public static final String[] APP_TSXX_PARAM_ARRAY = {"MC","NR"};
+		public static final String[] APP_TSXX_VALUE_ARRAY = {"名称","内容"};
+		
+		//预签约申请查询详情
+		public static final String[] APP_TSXX_DZ_PARAM_ARRAY = {"ID","DZL"};
+		public static final String[] APP_TSXX_DZ_VALUE_ARRAY = {"ID","点赞量"};
+		
+		//个人电子病历
+		public static final String[] APP_GRDZBL_PARAM_ARRAY = {"TYPE","TP","TJR","TJRID"};
+		public static final String[] APP_GRDZBL_VALUE_ARRAY = {"类型","图片","提交人","提交人ID"};
+		
+		//app同机构医护人员查询
+		public static final String[] APP_GETPROVIDER_PARAM_ARRAY = {"ORG_CODE"};
+		public static final String[] APP_GETPROVIDER_VALUE_ARRAY = {"机构编码"};
+		
+		//app根据医生机构查询医护人员
+		public static final String[] APP_GETPROVIDERBYCODE_PARAM_ARRAY = {"PROVIDER_ID","ORG_CODE"};
+		public static final String[] APP_GETPROVIDERBYCODE_VALUE_ARRAY = {"医生ID","机构编码"};
+		
+		//app居民查询健康资讯反馈
+		public static final String[] APP_MYFEEDBACK_PARAM_ARRAY = {"TJRID"};
+		public static final String[] APP_MYFEEDBACK_VALUE_ARRAY = {"提交人ID"};
+		
+		//app居民查询健康资讯反馈
+		public static final String[] APP_HEALTH_PARAM_ARRAY = {"TYPE"};
+		public static final String[] APP_HEALTH_VALUE_ARRAY = {"类型"};
+		
+		//app居民查看已提交个人病历
+		public static final String[] APP_MYGRDZBL_PARAM_ARRAY = {"TJRID","TYPE"};
+		public static final String[] APP_MYGRDZBL_VALUE_ARRAY = {"提交人ID","类型"};
+		
+		//app通知公告查询
+		public static final String[] APP_NOTICE_PARAM_ARRAY = {"STATE"};
+		public static final String[] APP_NOTICE_VALUE_ARRAY = {"状态"};
+		
+		//app变更申请
+		public static final String[] APP_AGERMENTCHANGE_PARAM_ARRAY={"APPLICANT_ID","AGREEMENT_ID","SERVICE_PACK"};
+		public static final String[] APP_AGERMENTCHANGE_VALUE_ARRAY={"申请人id","签约协议id","服务包id"};
+		
+		
+		//个人电子病历
+		public static final String[] APP_EDIT_JKZX_PARAM_ARRAY = {"CONSULTATION_ID","SCORE"};
+		public static final String[] APP_EDIT_JKZX_VALUE_ARRAY = {"记录表ID","评分"};
+		
+		//新增签约团队成员
+		public static final String[] APP_ADDTEAMMEMBER_PARAM_ARRAY={"TEAM_ID","TEAM_MEMBER_ID","ROLE_NAME"};
+		public static final String[] APP_ADDTEAMMEMBER_VALUE_ARRAY={"团队id","成员id","角色id"};
+		
+		//删除团队成员
+		public static final String[] APP_DELTEAMMEMBER_PARAM_ARRAY={"TEAM_ID","TEAM_MEMBER_ID"};
+		public static final String[] APP_DELTEAMMEMBER_VALUE_ARRAY={"团队id","成员id"};
+		
+		//修改团队成员
+		public static final String[] APP_UPDATETEAMMEMBER_PARAM_ARRAY = {"TEAM_ID","TEAM_MEMBER_ID","ROLE_NAME","TEAM_MEMBER_PHONE"};
+		public static final String[] APP_UPDATETEAMMEMBER_VALUE_ARRAY={"团队id","成员id","角色","电话"};
+		
+		//发送站内信
+		public static final String[] APP_ADDFHSMS_PARAM_ARRAY={"TO_USERID","FROM_USERID","CONTENT"};
+		public static final String[] APP_ADDFHSMS_VALUE_ARRAY={"接收人id","发送人id","发送内容"};
+		public static final int COMMIT_COUNT_EVERYTIME = 100;
+		
+		//医生预约信息注册接口
+		public static final String[] HM_REGAPP_SAVE_PARAM_ARRY = {"HOSPCODE", "HOSPNAME", "DEPTCODE", "DEPTNAME", "TITLENAME", "TITLECODE", "DOCTORNAME", "DOCTORCODE", "EDUCATION", "EDUCATIONCODE", "ATTENDING", "APPT", "SCHEDULING", "DOCTORPHONE", "DOCTORINTRO"};
+		public static final String[] HM_REGAPP_SAVE_VALUE_ARRY = {"医院代码", "医院名称", "科室代码", "科室名称", "职称名称","职称代码","医生姓名","医生代码","学历","学历代码","主治","预约量","可约排班","医生简介"};
+		
+		//医生预约信息显示
+		public static final String[] HM_REGAPP_FIND_PARAM_ARRY = {"HOSPCODE","DOCTORCODE"};
+		public static final String[] HM_REGAPP_FIND_VALUE_ARRY = {"医院代码", "医生代码"};
+		
+		//医生信息编辑接口
+		public static final String[] HM_REGAPP_EDIT_PARAM_ARRY = {"GUID", "HOSPCODE", "HOSPNAME", "DEPTCODE", "DEPTNAME", "TITLENAME", "TITLECODE", "DOCTORNAME", "DOCTORCODE", "EDUCATION", "EDUCATIONCODE", "ATTENDING", "APPT", "SCHEDULING", "DOCTORPHONE", "DOCTORINTRO"};
+		public static final String[] HM_REGAPP_EDIT_VALUE_ARRY = {"主键", "医院代码", "医院名称", "科室代码", "科室名称", "职称名称","职称代码","医生姓名","医生代码","学历","学历代码","主治","预约量","可约排班","医生简介"};
+		
+		//预约的排班表
+		public static final String[] HM_REGAPP_ARRANGEMENT_SAVE_PARAM_ARRY = {"DOCTORCODE", "RECEPTIONS", "RECEPTIONE", "RECEPTIOND", "HOSPCODE", "SCHEDULING"};
+		public static final String[] HM_REGAPP_ARRANGEMENT_SAVE_VALUE_ARRY = {"医生编号", "开始接诊时间", "接诊结束时间", "接诊时间", "医院编码", "可预约的排班"};
+		
+		//预约的排班表编辑
+		public static final String[] HM_REGAPP_ARRANGEMENT_EDIT_PARAM_ARRY = {"GUID", "DOCTORCODE", "RECEPTIONS", "RECEPTIONE", "RECEPTIOND", "HOSPCODE", "SCHEDULING"};
+		public static final String[] HM_REGAPP_ARRANGEMENT_EDIT_VALUE_ARRY = {"主键","医生编号", "开始接诊时间", "接诊结束时间", "接诊时间", "医院编码", "可预约的排班"};
+		
+		//app尿酸记录分页查询
+		public static final String[] APP_URIC_QUERY_PAPE_PARAM_ARRY = {"USER_AGENT_ID"};
+		public static final String[] APP_URIC_QUERY_PAPE_VALUE_ARRY = {"居民ID"};
+		
+		//app删除尿酸记录
+		public static final String[] APP_URIC_DEL_PARAM_ARRY = {"ID"};
+		public static final String[] APP_URIC_DEL_VALUE_ARRY = {"ID"};
+		
+		//app新增尿酸记录
+		public static final String[] APP_URIC_SAVE_PARAM_ARRY = {"USER_AGENT_ID", "URIC_ACID", "TEST_TIME", "CREAT_TIME"};
+		public static final String[] APP_URIC_SAVE_VALUE_ARRY = {"居民ID", "尿酸值", "测试时间", "生成时间"};
+		
+		//app修改尿酸记录
+		public static final String[] APP_URIC_EDIT_PARAM_ARRY = {"USER_AGENT_ID"};
+		public static final String[] APP_URIC_EDIT_VALUE_ARRY = {"居民ID"};
+		
+		//app获得一条尿酸记录
+		public static final String[] APP_URIC_FIND_PARAM_ARRY = {"ID"};
+		public static final String[] APP_URIC_FIND_VALUE_ARRY = {"ID"};
+		
+		//app血脂四项记录分页查询
+		public static final String[] APP_FAT_QUERY_PAPE_PARAM_ARRY = {"USER_AGENT_ID"};
+		public static final String[] APP_FAT_QUERY_PAPE_VALUE_ARRY = {"居民ID"};
+		
+		//app删除血脂四项记录
+		public static final String[] APP_FAT_DEL_PARAM_ARRY = {"ID"};
+		public static final String[] APP_FAT_DEL_VALUE_ARRY = {"ID"};
+
+		//app新增血脂四项记录
+		public static final String[] APP_FAT_SAVE_PARAM_ARRY = {"USER_AGENT_ID", "CHO", "GLY", "LOW_FAT", "HIG_FAT", "TEST_TIME", "CREAT_TIME"};
+		public static final String[] APP_FAT_SAVE_VALUE_ARRY = {"居民ID", "总胆固醇", "甘油三酯", "低密度脂蛋白", "高密度脂蛋白", "测试时间", "生成时间"};
+		
+		//app修改血脂四项记录
+		public static final String[] APP_FAT_EDIT_PARAM_ARRY = {"USER_AGENT_ID"};
+		public static final String[] APP_FAT_EDIT_VALUE_ARRY = {"居民ID"};
+		
+		//app获得一条血脂四项记录
+		public static final String[] APP_FAT_FIND_PARAM_ARRY = {"ID"};
+		public static final String[] APP_FAT_FIND_VALUE_ARRY = {"ID"};
+		
+		//app血糖记录分页查询
+		public static final String[] APP_SUGAR_QUERY_PAPE_PARAM_ARRY = {"USER_AGENT_ID"};
+		public static final String[] APP_SUGAR_QUERY_PAPE_VALUE_ARRY = {"居民ID"};
+		
+		//app删除血糖记录
+		public static final String[] APP_SUGAR_DEL_PARAM_ARRY = {"ID"};
+		public static final String[] APP_SUGAR_DEL_VALUE_ARRY = {"ID"};
+		
+		//app新增血糖记录
+		public static final String[] APP_SUGAR_SAVE_PARAM_ARRY = {"USER_AGENT_ID", "SUGAR_VALUE", "TEST_TIME", "TEST_TIME", "CREAT_TIME"};
+		public static final String[] APP_SUGAR_SAVE_VALUE_ARRY = {"居民ID", "血糖值", "测试的时段", "测试时间", "生成时间"};
+		
+		//app修改血糖记录
+		public static final String[] APP_SUGAR_EDIT_PARAM_ARRY = {"USER_AGENT_ID"};
+		public static final String[] APP_SUGAR_EDIT_VALUE_ARRY = {"居民ID"};
+		
+		//app获得一条血糖记录
+		public static final String[] APP_SUGAR_FIND_PARAM_ARRY = {"ID"};
+		public static final String[] APP_SUGAR_FIND_VALUE_ARRY = {"ID"};
+		
+		//app体型记录分页查询
+		public static final String[] APP_SHAPE_QUERY_PAPE_PARAM_ARRY = {"USER_AGENT_ID"};
+		public static final String[] APP_SHAPE_QUERY_PAPE_VALUE_ARRY = {"居民ID"};
+		
+		//app删除体型记录
+		public static final String[] APP_SHAPE_DEL_PARAM_ARRY = {"ID"};
+		public static final String[] APP_SHAPE_DEL_VALUE_ARRY = {"ID"};
+
+		//app新增体型记录
+		public static final String[] APP_SHAPE_SAVE_PARAM_ARRY = {"USER_AGENT_ID", "WEIGHT", "HEIGHT", "WAIST", "HIPLINE", "BMI", "WHR", "TEST_TIME", "CREAT_TIME"};
+		public static final String[] APP_SHAPE_SAVE_VALUE_ARRY = {"居民ID", "体重", "身高", "腰围", "臀围", "BMI", "WHR", "测试时间", "生成时间"};
+		
+		//app修改体型记录
+		public static final String[] APP_SHAPE_EDIT_PARAM_ARRY = {"USER_AGENT_ID"};
+		public static final String[] APP_SHAPE_EDIT_VALUE_ARRY = {"居民ID"};
+		
+		//app获得一条体型记录
+		public static final String[] APP_SHAPE_FIND_PARAM_ARRY = {"ID"};
+		public static final String[] APP_SHAPE_FIND_VALUE_ARRY = {"ID"};
+		
+		//app血压记录分页查询
+		public static final String[] APP_PRESSURE_QUERY_PAPE_PARAM_ARRY = {"USER_AGENT_ID"};
+		public static final String[] APP_PRESSURE_QUERY_PAPE_VALUE_ARRY = {"居民ID"};
+		
+		//app血压尿酸记录
+		public static final String[] APP_PRESSURE_DEL_PARAM_ARRY = {"ID"};
+		public static final String[] APP_PRESSURE_DEL_VALUE_ARRY = {"ID"};
+
+		//app新增血压记录
+		public static final String[] APP_PRESSURE_SAVE_PARAM_ARRY = {"USER_AGENT_ID", "SPRESSURE", "DIASTOLE", "BPM", "TEST_TIME", "CREAT_TIME"};
+		public static final String[] APP_PRESSURE_SAVE_VALUE_ARRY = {"居民ID", "收缩mmol值", "舒张压", "心率", "测试时间", "生成时间"};
+		
+		//app修改血压记录
+		public static final String[] APP_PRESSURE_EDIT_PARAM_ARRY = {"USER_AGENT_ID"};
+		public static final String[] APP_PRESSURE_EDIT_VALUE_ARRY = {"居民ID"};
+		
+		//app获得一条血压记录
+		public static final String[] APP_PRESSURE_FIND_PARAM_ARRY = {"ID"};
+		public static final String[] APP_PRESSURE_FIND_VALUE_ARRY = {"ID"};
+		
+		//app删除健康资讯类型
+		public static final String[] APP_HEALTHTYPE_DEL_PARAM_ARRY = {"GUID"};
+		public static final String[] APP_HEALTHTYPE_DEL_VALUE_ARRY = {"GUID"};
+		
+		//app修改健康资讯类型
+		public static final String[] APP_HEALTHTYPE_EDIT_PARAM_ARRY = {"GUID","NAME"};
+		public static final String[] APP_HEALTHTYPE_EDIT_VALUE_ARRY = {"GUID","健康资讯类型名称"};
+		
+		//app添加健康资讯类型
+		public static final String[] APP_HEALTHTYPE_SAVE_PARAM_ARRY = {"NAME"};
+		public static final String[] APP_HEALTHTYPE_SAVE_VALUE_ARRY = {"健康资讯类型名称"};
+		//app保存设备信息
+		public static final String[] APP_DEVICEPUSH_SAVEDEVICE_PARAM_ARRY={"DEVUSERID","DEVICETYPE"};
+		public static final String[] APP_DEVICEPUSH_SAVEDEVICE_VALUE_ARRY={"推送ID","设备类型"};
+		//更新用户信息
+		public static final String[] APP_DEVICEPUSH_SAVEUSER_PARAM_ARRY={"DEVUSERID","USERID","TYPE","DEVICETYPE"};
+		public static final String[] APP_DEVICEPUSH_SAVEUSER_VALUE_ARRY={"设备ID","用户Id","用户类型","设备类型"};
+		//更新站内信等信息
+		public static final String[] APP_DEVICEPUSH_SAVEFOURMSGTYPE_PARAM_ARRY = {"DEVUSERID","ISBROAD","ISPMSG","ISZXMSG","ISWORKMSG","DEVICETYPE","USERID","TYPE"};
+		public static final String[] APP_DEVICEPUSH_SAVEFOURMSGTYPE_VALUE_ARRY = {"设备ID","是否开启广播","是否开启站内信","是否开启咨询消息提醒","是否开启工作任务提醒","设备类型","用户Id","用户类型"};
+		
+		
+		
+		
+		
+}

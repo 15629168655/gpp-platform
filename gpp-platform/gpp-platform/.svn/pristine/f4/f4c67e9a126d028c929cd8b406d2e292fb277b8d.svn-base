@@ -1,0 +1,223 @@
+package com.tbyf.controller.gp.indexmanager;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.tbyf.controller.base.BaseController;
+import com.tbyf.entity.enums.EnumFitSex;
+import com.tbyf.entity.enums.EnumIndexState;
+import com.tbyf.entity.enums.EnumModelType;
+import com.tbyf.entity.enums.EnumResultType;
+import com.tbyf.plugin.Page;
+import com.tbyf.service.gp.index.manager.IndexManagerManager;
+import com.tbyf.service.system.dictionaries.DictionariesManager;
+import com.tbyf.util.AppUtil;
+import com.tbyf.util.Constants;
+import com.tbyf.util.FirstLetterUtil;
+import com.tbyf.util.Jurisdiction;
+import com.tbyf.util.PageData;
+import com.tbyf.util.Tools;
+@Controller
+@RequestMapping(value="/indexmanager")
+public class IndexManagerController extends BaseController{
+	String menuUrl = "indexmanager/list.do"; //菜单地址(权限用)
+	@Resource(name="indexManagerService")
+    private IndexManagerManager indexManagerService;
+	@Resource(name="dictionariesService")
+	private DictionariesManager dictionariesService;
+	/**显示指标信息指标
+	 * 
+	 * @param page
+	 * @return
+	 */
+	@RequestMapping(value="/list")
+	public ModelAndView list(Page page) throws Exception{
+		logBefore(logger, Jurisdiction.getUsername()+"显示指标管理列表");
+		ModelAndView mv = this.getModelAndView();
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		pd.put("INDEX_STATE", EnumIndexState.NORAML.getCode());
+		page.setPd(pd);
+		List<PageData>	list = indexManagerService.list(page);  //列表
+		mv.addObject("SCREENTYPE", dictionariesService.queryDictionary(Constants.DICT_SCREENING_TYPE));  //筛查的类型
+		mv.addObject("FITSEX", EnumFitSex.toMap());  //适合的类型
+		mv.setViewName("gp/indexmanager/indexmanager_list");
+		mv.addObject("varList", list);
+		mv.addObject("pd", pd);
+		mv.addObject("QX",Jurisdiction.getHC());	//按钮权限
+		return mv;
+	}
+	/**
+	 * 保存
+	 */
+	@RequestMapping(value="/save")
+	public ModelAndView save() throws Exception{
+		ModelAndView mv = this.getModelAndView();
+		logBefore(logger, Jurisdiction.getUsername()+"添加一条指标管理");
+		if(!Jurisdiction.buttonJurisdiction(menuUrl, "add")){return null;} //校验权限
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		pd.put("PY_CODE", FirstLetterUtil.getFirstLetter(pd.getString("INDEX_NAME")).toUpperCase());//自动生成拼音简码
+		String nowDate = Tools.date2Str(new Date());
+		pd.put("CREAT_TIME",nowDate);		//创建时间
+		pd.put("EDIT_TIME",nowDate);		//编辑时间
+		pd.put("INDEX_STATE", EnumIndexState.NORAML.getCode());//添加状态正常
+		indexManagerService.save(pd);
+		mv.addObject("msg","edit");
+		pd = indexManagerService.findById(pd);	//根据ID读取
+		mv.addObject("pd", pd);//添加map
+		mv.addObject("SCREENTYPE", dictionariesService.queryDictionary(Constants.DICT_SCREENING_TYPE));  	//筛查的类型
+		mv.addObject("FITSEX", EnumFitSex.toMap());  	//适合的类型
+		mv.addObject("RESULTTYPE", EnumResultType.toMap());	//结果类型
+		mv.addObject("MODELSELECT", EnumModelType.toMap());	//结果类型
+		mv.setViewName("gp/indexmanager/indexmanager_edit");
+		return mv; 
+	}
+	
+	/**
+	 * 新增页面(包括指标、模板和范围)
+	 */
+	@RequestMapping(value="/addIndex")
+	public ModelAndView addIndex() throws Exception{
+		logBefore(logger, Jurisdiction.getUsername()+"指标新增(包括指标、模板和范围)界面");
+		ModelAndView mv = this.getModelAndView();
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		pd.put("ID", this.get32UUID());					//主键
+		mv.addObject("pd", pd);
+		mv.setViewName("gp/indexmanager/indexInformation");
+		mv.addObject("msg", "add");
+		return mv;
+	}
+	/**
+	 * 新增指标界面(包括指标、模板和范围)
+	 */
+	@RequestMapping(value="/add")
+	public ModelAndView add() throws Exception{
+		logBefore(logger, Jurisdiction.getUsername()+"指标新增(包括指标、模板和范围)界面");
+		ModelAndView mv = this.getModelAndView();
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		mv.addObject("SCREENTYPE", dictionariesService.queryDictionary(Constants.DICT_SCREENING_TYPE));  	//筛查的类型
+		mv.addObject("FITSEX", EnumFitSex.toMap());  	//适合的类型
+		mv.addObject("RESULTTYPE", EnumResultType.toMap());	//结果类型
+		mv.addObject("MODELSELECT", EnumModelType.toMap());	//结果类型
+		mv.addObject("pd", pd);
+		mv.setViewName("gp/indexmanager/indexmanager_edit");
+		mv.addObject("msg", "save");
+		return mv;
+	}
+	/**
+	 * 修改指标
+	 */
+	@RequestMapping(value="/edit")
+	public ModelAndView edit() throws Exception{
+		ModelAndView mv = this.getModelAndView();
+		logBefore(logger, Jurisdiction.getUsername()+"指标编辑界面");
+		if(!Jurisdiction.buttonJurisdiction(menuUrl, "edit")){return null;} //校验权限
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		pd.put("EDIT_TIME",Tools.date2Str(new Date()));		//编辑时间
+		pd.put("PY_CODE", FirstLetterUtil.getFirstLetter(pd.getString("INDEX_NAME")).toUpperCase());//自动生成拼音简码
+		indexManagerService.update(pd);//编辑指标
+		pd = indexManagerService.findById(pd);	//根据ID读取
+		mv.addObject("msg","edit");
+		mv.addObject("pd", pd);
+		mv.addObject("SCREENTYPE", dictionariesService.queryDictionary(Constants.DICT_SCREENING_TYPE));  	//筛查的类型
+		mv.addObject("FITSEX", EnumFitSex.toMap());  	//适合的类型
+		mv.addObject("RESULTTYPE", EnumResultType.toMap());	//结果类型
+		mv.addObject("MODELSELECT", EnumModelType.toMap());	//结果类型
+		mv.setViewName("gp/indexmanager/indexmanager_edit");
+		return  mv;
+	}
+	
+	/**
+	 * 编辑指标界面
+	 */
+	@RequestMapping(value="/update")
+	public ModelAndView update() throws Exception{
+		ModelAndView mv = this.getModelAndView();
+		logBefore(logger, Jurisdiction.getUsername()+"指标修改界面");
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		mv.addObject("SCREENTYPE", dictionariesService.queryDictionary(Constants.DICT_SCREENING_TYPE));  	//筛查的类型
+		mv.addObject("FITSEX", EnumFitSex.toMap());  	//适合的类型
+		mv.addObject("RESULTTYPE", EnumResultType.toMap());	//结果类型
+		mv.addObject("MODELSELECT", EnumModelType.toMap());	//结果类型
+		pd = indexManagerService.findById(pd);	//根据ID读取
+		mv.setViewName("gp/indexmanager/indexmanager_edit");
+		mv.addObject("pd", pd);
+		mv.addObject("msg", "edit");//编辑和保存状态
+		return mv;
+	}
+	/**
+	 * 修改指标页面(包括指标、模板和范围)
+	 */
+	@RequestMapping(value="/updateInformation")
+	public ModelAndView updateInformation() throws Exception{
+		ModelAndView mv = this.getModelAndView();
+		logBefore(logger, Jurisdiction.getUsername()+"指标修改信息界面");
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		mv.setViewName("gp/indexmanager/indexInformation");
+		mv.addObject("pd", pd);
+		mv.addObject("msg", "update");
+		return mv;
+	}
+	
+	/**删除
+	 * @param out
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/delete")
+	@ResponseBody
+	public Object delete()throws Exception{
+		logBefore(logger, Jurisdiction.getUsername()+"删除");
+		Map<String,Object> map = new HashMap<String,Object>();
+	    PageData pd = new PageData();
+		pd = this.getPageData();
+		pd.put("INDEX_STATE", EnumIndexState.DEL.getCode());
+		indexManagerService.delete(pd);
+		map.put("msg", "SUCCESS");
+		return AppUtil.returnObject(new PageData(), map);
+		
+	}
+	/**批量删除
+	 * @param out
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/deleteAll")
+	@ResponseBody
+	public Object deleteAll()throws Exception{
+		logBefore(logger, Jurisdiction.getUsername()+"批量删检查指标指示");
+		Map<String,Object> map = new HashMap<String,Object>();
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		String IDS=String.valueOf(pd.get("IDS"));
+		if(null!=IDS && !IDS.equals("")){
+        	String[] str = IDS.split(",");
+        	StringBuffer sb = new StringBuffer("(");
+        	for(String s:str){
+        		sb.append("'"+s+"',");
+        	}
+        	
+        	pd.put("IDS", sb.substring(0, sb.length()-1)+")");
+        }
+		String nowDate = Tools.date2Str(new Date());//删除的时间
+		pd.put("EDIT_TIME", nowDate);		//修改时间
+		pd.put("INDEX_STATE", EnumIndexState.DEL.getCode());
+		indexManagerService.delAll(pd);
+		map.put("msg", "SUCCESS");
+		return AppUtil.returnObject(new PageData(), map);
+		
+	}
+}

@@ -1,0 +1,619 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="UserGenerMapper">
+	<!-- 列表 -->
+<select id="findById" parameterType="pd" resultType="pd">
+     SELECT * FROM HDSA0001  where 
+      HDSA0001_003 = #{idcode}
+	</select>
+
+<select id="findCountById" parameterType="pd" resultType="pd">
+     SELECT count(1)  as SUM FROM HDSA0001  where 
+      HDSA0001_003 = #{idcode}
+	</select>
+	
+	
+<!-- 个人档案 -->
+<insert id="savejd" parameterType="pd" >
+      		insert into
+			HDSA0001
+		(    "GUID","HDSA0001_001","HDSA0001_003","HDSA0001_004","HDSA0001_005",
+			 "HDSA0001_006","HDSA0001_007","HDSA0001_008","HDSA0001_009","HDSA0001_010",
+			 "HDSA0001_011","HDSA0001_012","HDSA0001_013","HDSA0001_014","HDSA0001_015",
+			 "HDSA0001_016","HDSA0001_017","HDSA0001_018","HDSA0001_019","HDSA0001_020",
+			 "HDSA0001_021","HDSA0001_022","HDSA0001_024","HDSA0001_025","HDSA0001_027",
+			 "HDSA0001_028","HDSA0001_031","HDSA0001_033"
+		) values (
+			#{guid,jdbcType=VARCHAR},
+			#{hdsa0001_001,jdbcType=VARCHAR},
+			#{idcode,jdbcType=VARCHAR},
+			#{hdsa0001_004,jdbcType=VARCHAR},
+			#{hdsa0001_005,jdbcType=VARCHAR},
+			
+			#{hdsa0001_006,jdbcType=VARCHAR},
+			#{hdsa0001_007,jdbcType=VARCHAR},
+			#{hdsa0001_008,jdbcType=VARCHAR},
+			#{hdsa0001_009,jdbcType=VARCHAR},
+		    to_date(#{hdsa0001_010},'yyyy-mm-dd'),
+		    
+			#{hdsa0001_011,jdbcType=VARCHAR},
+			#{hdsa0001_012,jdbcType=VARCHAR},
+			#{hdsa0001_013,jdbcType=VARCHAR},
+			#{hdsa0001_014,jdbcType=VARCHAR},
+			#{hdsa0001_015,jdbcType=VARCHAR},
+			
+			#{hdsa0001_016,jdbcType=VARCHAR},
+			#{hdsa0001_017,jdbcType=VARCHAR},
+			#{hdsa0001_018,jdbcType=VARCHAR},
+			 to_date(#{hdsa0001_019},'yyyy-mm-dd'),
+			 to_date(#{hdsa0001_020},'yyyy-mm-dd'),
+			 
+			 to_date(#{hdsa0001_021},'yyyy-mm-dd'),
+			#{hdsa0001_022,jdbcType=VARCHAR},
+			#{hdsa0001_024,jdbcType=VARCHAR},
+			sysdate,
+			#{hdsa0001_027,jdbcType=VARCHAR},
+			
+			#{hdsa0001_028,jdbcType=VARCHAR},
+			#{hdsa0001_031,jdbcType=VARCHAR},
+			#{hdsa0001_033,jdbcType=VARCHAR}
+		)
+	</insert>
+	
+	
+ 
+	
+	<!-- 判断用户是否建专档 -->
+	
+	<!-- 判断高血压是否建专档 -->
+	<select id="findCountHypertensionById" parameterType="pd" resultType="pd">
+     SELECT count(1)  as SUM FROM HDSB0402  where 
+      HDSA0001_003 = #{idcode}
+	</select>
+	<!-- 判断糖尿病否建专档 -->
+	<select id="findCountDiabetesById" parameterType="pd" resultType="pd">
+     SELECT count(1)  as SUM FROM  HDSB0405 where 
+      HDSA0001_003 = #{idcode}
+	</select>
+	
+	
+	<!-- 判断精神病否建专档 -->
+	<select id="findCountMentalillnessById" parameterType="pd" resultType="pd">
+     SELECT count(1)  as SUM FROM HDSB0403  where 
+      HDSA0001_003 = #{idcode}
+	</select>
+	
+	
+	<!--建专档  -->
+	
+	<!-- 建高血压专档 -->
+<insert id="zdSfjlHypertensionsave" parameterType="pd" >
+      		insert into
+			HDSB0402
+		(    "GUID","HDSB0402_001","HDSB0402_004","HDSB0402_005","HDSB0402_006",
+			 "HDSB0402_007","HDSB0402_008","HDSB0402_009","HDSB0402_010","HDSB0402_011",
+			 "FLAG","HDSB0402_015","HDSA0001_001","HDSA0001_003"
+		) values (
+			#{guid,jdbcType=VARCHAR},
+			#{hdsb0402_001,jdbcType=VARCHAR},
+			#{hdsb0402_004,jdbcType=VARCHAR},
+			#{hdsb0402_005,jdbcType=VARCHAR},
+			#{hdsb0402_006,jdbcType=VARCHAR},
+			#{hdsb0402_007,jdbcType=VARCHAR},
+			#{hdsb0402_008,jdbcType=VARCHAR},
+			#{hdsb0402_009,jdbcType=VARCHAR},
+			to_date(#{hdsb0402_010},'yyyy-MM-dd HH24:mi:ss'),
+		    to_date(#{hdsb0402_011},' yyyy-MM-dd HH24:mi:ss'),
+			#{flag,jdbcType=VARCHAR},
+			#{hdsb0402_015,jdbcType=VARCHAR},
+			#{hdsa0001_001,jdbcType=VARCHAR},
+			#{hdsa0001_003,jdbcType=VARCHAR}
+		)
+	</insert>
+		<!-- 建糖尿病专档 -->
+<insert id="zdSfjlDiabetessave" parameterType="pd" >
+      		insert into
+			HDSB0405
+		(    "GUID","HDSB0405_001","HDSB0405_002","HDSB0405_003","HDSB0405_004",
+			 "HDSB0405_005","HDSB0405_006","HDSB0405_007","HDSB0405_008","HDSB0405_009",
+			 "HDSB0405_010","HDSB0405_011","HDSB0405_012","FLAG","HDSB0405_016","HDSA0001_001","HDSA0001_003"
+		) values (
+			#{guid,jdbcType=VARCHAR},
+			#{hdsb0405_001,jdbcType=VARCHAR},
+			#{hdsb0405_002,jdbcType=VARCHAR},
+			#{hdsb0405_003,jdbcType=VARCHAR},
+			#{hdsb0405_004,jdbcType=VARCHAR},
+			#{hdsb0405_005,jdbcType=VARCHAR},
+			#{hdsb0405_006,jdbcType=VARCHAR},
+			#{hdsb0405_007,jdbcType=VARCHAR},
+			#{hdsb0405_008,jdbcType=VARCHAR},
+			#{hdsb0405_009,jdbcType=VARCHAR},
+			#{hdsb0405_010,jdbcType=VARCHAR},
+		    to_date(#{hdsb0405_011},'yyyy-MM-dd HH24:mi:ss'),
+		    to_date(#{hdsb0405_012},' yyyy-MM-dd HH24:mi:ss'),
+			#{flag,jdbcType=VARCHAR},
+			#{hdsb0405_016,jdbcType=VARCHAR},
+			#{hdsa0001_001,jdbcType=VARCHAR},
+			#{hdsa0001_003,jdbcType=VARCHAR}
+		)
+	</insert>
+	
+			<!-- 建精神病专档案 -->
+   <insert id="zdSfjlMentalillnesssave" parameterType="pd" >
+      		insert into
+			HDSB0403
+		(    "GUID","HDSB0403_001","HDSB0403_002","HDSB0403_003","HDSB0403_004",
+			 "HDSB0403_005","HDSB0403_006","HDSB0403_007","HDSB0403_008","HDSB0403_009",
+			 "HDSB0403_010","HDSB0403_011","FLAG","HDSB0403_015","HDSA0001_001","HDSA0001_003"
+		) values (
+			#{guid,jdbcType=VARCHAR},
+			#{hdsb0403_001,jdbcType=VARCHAR},
+			#{hdsb0403_002,jdbcType=VARCHAR},
+			#{hdsb0403_003,jdbcType=VARCHAR},
+			#{hdsb0403_004,jdbcType=VARCHAR},
+			#{hdsb0403_005,jdbcType=VARCHAR},
+			#{hdsb0403_006,jdbcType=VARCHAR},
+			#{hdsb0403_007,jdbcType=VARCHAR},
+			#{hdsb0403_008,jdbcType=VARCHAR},
+			#{hdsb0403_009,jdbcType=VARCHAR},
+		    to_date(#{hdsb0403_010},'yyyy-MM-dd HH24:mi:ss'),
+		    to_date(#{hdsb0403_011},' yyyy-MM-dd HH24:mi:ss'),
+			#{flag,jdbcType=VARCHAR},
+			#{hdsb0403_015,jdbcType=VARCHAR},
+			#{hdsa0001_001,jdbcType=VARCHAR},
+			#{hdsa0001_003,jdbcType=VARCHAR}
+		)
+	</insert>
+	
+	<!-- 通过身份证查找专档id -->
+	<select id="findZdIdByIdCode" parameterType="pd" resultType="pd">
+     SELECT guid as zdid   FROM  ${zdtablename}  where 
+      hdsa0001_003 = #{idcode}
+	</select>
+	
+	
+	
+	<!-- >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>随访记录添加>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> -->
+	
+  <!-- 1.高血压随访主表信息添加 --> <!-- 这个地方建档日期就是随访日期 -->
+   <insert id="saveSfjlHypertensionZb" parameterType="pd" >
+      		insert into
+			HDSB040201
+		(    "GUID","HDSB040201_001","HDSB040201_002","HDSB040201_003","HDSB040201_004",
+			 "HDSB040201_005","HDSB040201_006","HDSB040201_007","HDSB040201_008","HDSB040201_009",
+			 "HDSB040201_010","HDSB040201_011","HDSB040201_012","HDSB040201_013","HDSB040201_014","HDSB040201_017","HDSB040201_018"
+		) values (
+			#{guid,jdbcType=VARCHAR},
+			#{hdsb040201_001,jdbcType=VARCHAR}, 
+			#{hdsb040201_002,jdbcType=VARCHAR},
+			to_date(#{hdsb040201_003},'yyyy-mm-dd'),
+		    to_date(#{hdsb040201_004},'yyyy-mm-dd'),
+			#{hdsb040201_005,jdbcType=VARCHAR},
+			#{hdsb040201_006,jdbcType=VARCHAR},
+			#{hdsb040201_007,jdbcType=VARCHAR},
+			#{hdsb040201_008,jdbcType=VARCHAR},
+			#{hdsb040201_009,jdbcType=VARCHAR},
+			#{hdsb040201_010,jdbcType=VARCHAR},
+			#{hdsb040201_011,jdbcType=VARCHAR},
+			#{hdsb040201_012,jdbcType=VARCHAR},
+			to_date(#{hdsb040201_013},'YYYY-MM-DD HH24:MI:SS'),
+		    to_date(#{hdsb040201_014},'YYYY-MM-DD HH24:MI:SS'),
+	     	to_date(#{hdsb040201_003},'yyyy-mm-dd'),
+			#{hdsb040201_018,jdbcType=VARCHAR}
+		)
+	</insert>
+	  <!-- 高血压随访从表信息添加-->
+	 <insert id="saveSfjlHypertensionCb" parameterType="pd" >
+      		insert into
+			HDSB04020101
+		(    "GUID","HDSB04020101_001","HDSB04020101_002","HDSB04020101_003","HDSB04020101_004",
+			 "HDSB04020101_005","HDSB04020101_006","HDSB04020101_007","HDSB04020101_008","HDSB04020101_009",
+			 "HDSB04020101_010","HDSB04020101_011","HDSB04020101_012","HDSB04020101_013","HDSB04020101_014","HDSB04020101_015",
+			 "HDSB04020101_016","HDSB04020101_017","HDSB04020101_018","HDSB04020101_019","HDSB04020101_020","HDSB04020101_021",
+			 "HDSB04020101_022","HDSB04020101_023","HDSB04020101_024","HDSB04020101_025","HDSB04020101_026","HDSB04020101_027",
+			 "HDSB04020101_028","HDSB04020101_029","HDSB04020101_030","HDSB04020101_031","HDSB04020101_032","HDSB04020101_033"
+		) values (
+			#{guid,jdbcType=VARCHAR},
+			#{hdsb04020101_001,jdbcType=VARCHAR},
+			#{hdsb04020101_002,jdbcType=VARCHAR},
+		    to_date(#{hdsb04020101_003},'yyyy-mm-dd'),
+			#{hdsb04020101_004,jdbcType=VARCHAR},
+			#{hdsb04020101_005,jdbcType=VARCHAR},
+			#{hdsb04020101_006,jdbcType=VARCHAR},
+			#{hdsb04020101_007,jdbcType=VARCHAR},
+			#{hdsb04020101_008,jdbcType=VARCHAR},
+			#{hdsb04020101_009,jdbcType=VARCHAR},
+			#{hdsb04020101_010,jdbcType=VARCHAR},
+			#{hdsb04020101_011,jdbcType=VARCHAR},
+			#{hdsb04020101_012,jdbcType=VARCHAR},
+			#{hdsb04020101_013,jdbcType=VARCHAR},
+			#{hdsb04020101_014,jdbcType=VARCHAR},
+			#{hdsb04020101_015,jdbcType=VARCHAR},
+			#{hdsb04020101_016,jdbcType=VARCHAR},
+			#{hdsb04020101_017,jdbcType=VARCHAR},
+			#{hdsb04020101_018,jdbcType=VARCHAR},
+			#{hdsb04020101_019,jdbcType=VARCHAR},
+			#{hdsb04020101_020,jdbcType=VARCHAR},
+			#{hdsb04020101_021,jdbcType=VARCHAR},
+			#{hdsb04020101_022,jdbcType=VARCHAR},
+			#{hdsb04020101_023,jdbcType=VARCHAR},
+			#{hdsb04020101_024,jdbcType=VARCHAR},
+			#{hdsb04020101_025,jdbcType=VARCHAR},
+			#{hdsb04020101_026,jdbcType=VARCHAR},
+			#{hdsb04020101_027,jdbcType=VARCHAR},
+			#{hdsb04020101_028,jdbcType=VARCHAR},
+			#{hdsb04020101_029,jdbcType=VARCHAR},
+			#{hdsb04020101_030,jdbcType=VARCHAR},
+			#{hdsb04020101_031,jdbcType=VARCHAR},
+			#{hdsb04020101_032,jdbcType=VARCHAR},
+			#{hdsb04020101_033,jdbcType=VARCHAR}
+		)
+	</insert>
+	
+	
+	
+	 <!-- 2.糖尿病主表信息添加>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>-->
+   <insert id="saveSfjlDiabetesZb" parameterType="pd" >
+      		insert into
+			HDSB040501
+		(    "GUID","HDSB040501_001","HDSB040501_002","HDSB040501_003","HDSB040501_004",
+			 "HDSB040501_005","HDSB040501_006","HDSB040501_007","HDSB040501_008","HDSB040501_009",
+			 "HDSB040501_010","HDSB040501_011","HDSB040501_012","HDSB040501_013","HDSB040501_014","HDSB040501_017","HDSB040501_018"
+		) values (
+			#{guid,jdbcType=VARCHAR},
+			#{hdsb040501_001,jdbcType=VARCHAR},
+			#{hdsb040501_002,jdbcType=VARCHAR},
+			to_date(#{hdsb040501_003},'yyyy-mm-dd'),
+		    to_date(#{hdsb040501_004},'yyyy-mm-dd'),
+			#{hdsb040501_005,jdbcType=VARCHAR},
+			#{hdsb040501_006,jdbcType=VARCHAR},
+			#{hdsb040501_007,jdbcType=VARCHAR},
+			#{hdsb040501_008,jdbcType=VARCHAR},
+			#{hdsb040501_009,jdbcType=VARCHAR},
+			#{hdsb040501_010,jdbcType=VARCHAR},
+			#{hdsb040501_011,jdbcType=VARCHAR},
+			#{hdsb040501_012,jdbcType=VARCHAR},
+			to_date(#{hdsb040501_013},'YYYY-MM-DD HH24:MI:SS'),
+		    to_date(#{hdsb040501_014},'YYYY-MM-DD HH24:MI:SS'),
+		    to_date(#{hdsb040501_003},'yyyy-mm-dd'),
+			#{hdsb040501_018,jdbcType=VARCHAR}
+		)
+	</insert>
+	  <!-- 糖尿病随访从表信息添加-->
+	 <insert id="saveSfjlDiabetesCb" parameterType="pd" >
+      		insert into
+			HDSB04050101
+		(    "GUID","HDSB04050101_001","HDSB04050101_002","HDSB04050101_003","HDSB04050101_004",
+			 "HDSB04050101_005","HDSB04050101_006","HDSB04050101_007","HDSB04050101_008","HDSB04050101_009",
+			 "HDSB04050101_010","HDSB04050101_011","HDSB04050101_012","HDSB04050101_013","HDSB04050101_014","HDSB04050101_015",
+			 "HDSB04050101_016","HDSB04050101_017","HDSB04050101_018","HDSB04050101_019","HDSB04050101_020","HDSB04050101_021",
+			 "HDSB04050101_022","HDSB04050101_023","HDSB04050101_024","HDSB04050101_025","HDSB04050101_026","HDSB04050101_027",
+			 "HDSB04050101_028","HDSB04050101_029","HDSB04050101_030","HDSB04050101_031","HDSB04050101_032","HDSB04050101_033",
+			 "HDSB04050101_034","HDSB04050101_035","HDSB04050101_036","HDSB04050101_037","HDSB04050101_038","HDSB04050101_039",
+			  "HDSB04050101_040","HDSB04050101_041","HDSB04050101_042","HDSB04050101_043","HDSB04050101_044","HDSB04050101_045",
+			 "HDSB04050101_046","HDSB04050101_047","HDSB04050101_048","HDSB04050101_049","HDSB04050101_050","HDSB04050101_051",
+			 "HDSB04050101_052"
+		) values (
+			#{guid,jdbcType=VARCHAR},
+			#{hdsb04050101_001,jdbcType=VARCHAR},
+			#{hdsb04050101_002,jdbcType=VARCHAR},
+			#{hdsb04050101_003,jdbcType=VARCHAR},
+			#{hdsb04050101_004,jdbcType=VARCHAR},
+			to_date(#{hdsb04050101_005},'yyyy-mm-dd'),
+			#{hdsb04050101_006,jdbcType=VARCHAR},
+			#{hdsb04050101_007,jdbcType=VARCHAR},
+			#{hdsb04050101_008,jdbcType=VARCHAR},
+			#{hdsb04050101_009,jdbcType=VARCHAR},
+			#{hdsb04050101_010,jdbcType=VARCHAR},
+			#{hdsb04050101_011,jdbcType=VARCHAR},
+			#{hdsb04050101_012,jdbcType=VARCHAR},
+			#{hdsb04050101_013,jdbcType=VARCHAR},
+			#{hdsb04050101_014,jdbcType=VARCHAR},
+			#{hdsb04050101_015,jdbcType=VARCHAR},
+			#{hdsb04050101_016,jdbcType=VARCHAR},
+			#{hdsb04050101_017,jdbcType=VARCHAR},
+			#{hdsb04050101_018,jdbcType=VARCHAR},
+			#{hdsb04050101_019,jdbcType=VARCHAR},
+			#{hdsb04050101_020,jdbcType=VARCHAR},
+			#{hdsb04050101_021,jdbcType=VARCHAR},
+			#{hdsb04050101_022,jdbcType=VARCHAR},
+			#{hdsb04050101_023,jdbcType=VARCHAR},
+			#{hdsb04050101_024,jdbcType=VARCHAR},
+			#{hdsb04050101_025,jdbcType=VARCHAR},
+			#{hdsb04050101_026,jdbcType=VARCHAR},
+			#{hdsb04050101_027,jdbcType=VARCHAR},
+			#{hdsb04050101_028,jdbcType=VARCHAR},
+			#{hdsb04050101_029,jdbcType=VARCHAR},
+			#{hdsb04050101_030,jdbcType=VARCHAR},
+			#{hdsb04050101_031,jdbcType=VARCHAR},
+			#{hdsb04050101_032,jdbcType=VARCHAR},
+			#{hdsb04050101_033,jdbcType=VARCHAR},
+			#{hdsb04050101_034,jdbcType=VARCHAR},
+			#{hdsb04050101_035,jdbcType=VARCHAR},
+			#{hdsb04050101_036,jdbcType=VARCHAR},
+			#{hdsb04050101_037,jdbcType=VARCHAR},
+			#{hdsb04050101_038,jdbcType=VARCHAR},
+			#{hdsb04050101_039,jdbcType=VARCHAR},
+			#{hdsb04050101_040,jdbcType=VARCHAR},
+			#{hdsb04050101_041,jdbcType=VARCHAR},
+			#{hdsb04050101_042,jdbcType=VARCHAR},
+			#{hdsb04050101_043,jdbcType=VARCHAR},
+			#{hdsb04050101_044,jdbcType=VARCHAR},
+			#{hdsb04050101_045,jdbcType=VARCHAR},
+			#{hdsb04050101_046,jdbcType=VARCHAR},
+			#{hdsb04050101_047,jdbcType=VARCHAR},
+			#{hdsb04050101_048,jdbcType=VARCHAR},
+			#{hdsb04050101_049,jdbcType=VARCHAR},
+			#{hdsb04050101_050,jdbcType=VARCHAR},
+		    to_date(#{hdsb04050101_051},'yyyy-mm-dd'),
+			#{hdsb04050101_052,jdbcType=VARCHAR}
+			
+		
+		)
+	</insert>
+	
+	 <!-- 3.精神病随访记录添加>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> -->
+   <insert id="saveSfjlMentalillnessZb" parameterType="pd" >
+      		insert into
+			HDSB040301
+		(    "GUID","HDSB040301_001","HDSB040301_002","HDSB040301_003","HDSB040301_004",
+			 "HDSB040301_005","HDSB040301_006","HDSB040301_007","HDSB040301_008","HDSB040301_009",
+			 "HDSB040301_010","HDSB040301_011","HDSB040301_012","HDSB040301_013","HDSB040301_014","HDSB040301_015","HDSB040301_018"
+		) values (
+			#{guid,jdbcType=VARCHAR},
+			#{hdsb040301_001,jdbcType=VARCHAR},
+			#{hdsb040301_002,jdbcType=VARCHAR},
+		    to_date(#{hdsb040301_003},'yyyy-mm-dd'),
+			#{hdsb040301_004,jdbcType=VARCHAR},
+		    to_date(#{hdsb040301_005},'yyyy-mm-dd'),
+			#{hdsb040301_006,jdbcType=VARCHAR},
+			#{hdsb040301_007,jdbcType=VARCHAR},
+			#{hdsb040301_008,jdbcType=VARCHAR},
+			#{hdsb040301_009,jdbcType=VARCHAR},
+			#{hdsb040301_010,jdbcType=VARCHAR},
+			#{hdsb040301_011,jdbcType=VARCHAR},
+			#{hdsb040301_012,jdbcType=VARCHAR},
+			#{hdsb040301_013,jdbcType=VARCHAR},
+			sysdate,
+			sysdate,
+			<!--  to_date(#{hdsb040301_014},'YYYY-MM-DD HH24:MI:SS'),-->
+		   <!-- to_date(#{hdsb040301_015},'YYYY-MM-DD HH24:MI:SS'),-->
+			#{hdsb040301_018,jdbcType=VARCHAR}
+			
+		)
+	</insert>
+	  <!-- 精神病随访从表信息添加-->
+	 <insert id="saveSfjlMentalillnessCb" parameterType="pd" >
+      		insert into
+			HDSB04030101
+		(    "GUID","HDSB04030101_001","HDSB04030101_002","HDSB04030101_003","HDSB04030101_004",
+			 "HDSB04030101_005","HDSB04030101_006","HDSB04030101_007","HDSB04030101_008","HDSB04030101_009",
+			 "HDSB04030101_010","HDSB04030101_011","HDSB04030101_012","HDSB04030101_013","HDSB04030101_014","HDSB04030101_015",
+			 "HDSB04030101_016","HDSB04030101_017","HDSB04030101_018","HDSB04030101_019","HDSB04030101_020","HDSB04030101_021",
+			 "HDSB04030101_022","HDSB04030101_023","HDSB04030101_024","HDSB04030101_025","HDSB04030101_026","HDSB04030101_027",
+			 "HDSB04030101_028","HDSB04030101_029","HDSB04030101_030","HDSB04030101_031","HDSB04030101_032","HDSB04030101_033"
+		) values (
+			#{guid,jdbcType=VARCHAR},
+			#{hdsb04030101_001,jdbcType=VARCHAR},
+			#{hdsb04030101_002,jdbcType=VARCHAR},
+			#{hdsb04030101_003,jdbcType=VARCHAR},
+			#{hdsb04030101_004,jdbcType=VARCHAR},
+			#{hdsb04030101_005,jdbcType=VARCHAR},
+			#{hdsb04030101_006,jdbcType=VARCHAR},
+			#{hdsb04030101_007,jdbcType=VARCHAR},
+			#{hdsb04030101_008,jdbcType=VARCHAR},
+			#{hdsb04030101_009,jdbcType=VARCHAR},
+			#{hdsb04030101_010,jdbcType=VARCHAR},
+			#{hdsb04030101_011,jdbcType=VARCHAR},
+			#{hdsb04030101_012,jdbcType=VARCHAR},
+		    to_date(#{hdsb04030101_013},'yyyy-mm-dd'),
+			#{hdsb04030101_014,jdbcType=VARCHAR},
+			#{hdsb04030101_015,jdbcType=VARCHAR},
+		    to_date(#{hdsb04030101_016},'yyyy-mm-dd'),
+			#{hdsb04030101_017,jdbcType=VARCHAR},
+			#{hdsb04030101_018,jdbcType=VARCHAR},
+			#{hdsb04030101_019,jdbcType=VARCHAR},
+			#{hdsb04030101_020,jdbcType=VARCHAR},
+			#{hdsb04030101_021,jdbcType=VARCHAR},
+			#{hdsb04030101_022,jdbcType=VARCHAR},
+			#{hdsb04030101_023,jdbcType=VARCHAR},
+			#{hdsb04030101_024,jdbcType=VARCHAR},
+			#{hdsb04030101_025,jdbcType=VARCHAR},
+			#{hdsb04030101_026,jdbcType=VARCHAR},
+			#{hdsb04030101_027,jdbcType=VARCHAR},
+			#{hdsb04030101_028,jdbcType=VARCHAR},
+			#{hdsb04030101_029,jdbcType=VARCHAR},
+			#{hdsb04030101_030,jdbcType=VARCHAR},
+			#{hdsb04030101_031,jdbcType=VARCHAR},
+			#{hdsb04030101_032,jdbcType=VARCHAR},
+			#{hdsb04030101_033,jdbcType=VARCHAR}
+		)
+	</insert>
+	
+
+<!-- 获取糖尿病随访记录 -->
+	<select id="queryDiabetesPage" parameterType="pd" resultType="pd">
+	SELECT *
+    FROM (SELECT ROWNUM AS rowno,
+   a.guid ,
+    b.HDSB040501_003,  
+    b.HDSB040501_004 ,
+    b.HDSB040501_005,
+    b.HDSB040501_006,     
+    d.HDSA0001_001,
+    d.HDSA0001_003, 
+    a.HDSB04050101_003 , 
+    a.HDSB04050101_005 ,
+    a.HDSB04050101_006 , 
+    a.HDSB04050101_007, 
+    a.HDSB04050101_008, 
+    a.HDSB04050101_010, 
+    a.HDSB04050101_032, 
+    a.HDSB04050101_033 ,
+    a.HDSB04050101_034, 
+    a.HDSB04050101_046 ,
+    a.HDSB04050101_047  
+    FROM HDSB04050101 a
+    LEFT JOIN HDSB040501 b ON a.guid = b.guid
+    LEFT JOIN HDSB0405 c ON c.guid = b.hdsb040501_001
+    LEFT JOIN hdsa0001 d ON d.guid = c.hdsb0405_001
+    LEFT JOIN Hdsb0405010101 e ON e.hdsb0405010101_001= c.guid
+    LEFT JOIN Hdsb0405010102 f ON f.hdsb0405010102_001 = c.guid
+    LEFT JOIN Hdsb0405010103 g ON g.hdsb0405010103_001 = c.guid
+	 <where>
+             <if test="ORGCODE != null and ORGCODE != ''"> <!-- ORG_CODE  -->
+					and b.HDSB040501_009 = #{ORGCODE}
+				</if>
+				<if test="FSYSID != null and FSYSID != ''"> <!-- 访试医生ID  -->
+					and b.HDSB040501_005 = #{FSYSID}
+				</if>
+				
+				<if test="IDCODE != null and IDCODE != ''"> <!--居民身份证  -->
+					and d.HDSA0001_003 = #{IDCODE}
+				</if>
+				<if test="GMTSTART!=null and GMTSTART!=''">
+				and b.HDSB040501_003 &gt;= to_date(#{GMTSTART},'yyyy-mm-dd')
+			</if>
+			<if test="GMTEND!=null and GMTEND!=''"><!-- 随访时间结束时间检索 -->
+				and b.HDSB040501_003 &lt;= to_date(#{GMTEND},'yyyy-mm-dd')
+			</if>
+			<if test="XYCFSSJSTART!=null and XYCFSSJ_START!=''"><!-- 下一次随访时间开始时间检索 -->
+				and  b.HDSB040501_004 &gt;= to_date(#{XYCFSSJSTART},'yyyy-mm-dd')
+			</if>
+			<if test="XYCFSSJEND!=null and XYCFSSJEND!=''"><!-- 下一次随访时间结束时间检索 -->
+				and  b.HDSB040501_004 &lt;= to_date(#{XYCFSSJEND},'yyyy-mm-dd')
+			</if>
+			<if test="SFFS!=NULL and SFFS!=''"><!-- 随访方式-->
+			     and  a.HDSB04050101_003 = #{SFFS}
+			</if>
+			</where>
+		    order  by  b.HDSB040501_003   desc  ) table_alias
+			 WHERE table_alias.rowno BETWEEN #{pageStart} and #{pageEnd}
+	</select>
+
+<!-- 获取高血压随访记录列表 -->
+	<select id="queryHypertensionPage" parameterType="pd" resultType="pd">
+	SELECT *
+   FROM (SELECT ROWNUM AS rowno,
+                a.guid as SFID,
+                b.HDSB040201_005,
+                b.HDSB040201_006,
+                d.HDSA0001_001,
+                d.HDSA0001_003,
+                b.HDSB040201_003,
+                b.HDSB040201_004,
+                a.HDSB04020101_004,
+                a.HDSB04020101_005,
+                a.HDSB04020101_033,
+                a.HDSB04020101_008,
+                a.HDSB04020101_006,
+                a.HDSB04020101_011,
+                a.HDSB04020101_032,
+                e.guid as  HDSB0402010101_ID,
+                e.hdsb0402010101_001,
+                e.hdsb0402010101_002,
+                e.hdsb0402010101_003,
+                e.hdsb0402010101_004,
+                e.hdsb0402010101_005,
+                g.guid as hdsb0402010103_ID ,
+                g.hdsb0402010103_001,
+                g.hdsb0402010103_002,
+                g.hdsb0402010103_003,
+                f.*
+    FROM HDSB04020101 a
+    LEFT JOIN HDSB040201 b ON a.GUID = b.guid
+    LEFT JOIN HDSB0402 c ON c.GUID = b.hdsb040201_001
+    LEFT JOIN HDSA0001 d ON d.GUID = c.hdsb0402_001
+    LEFT JOIN HDSB0402010101 e ON e.HDSB0402010101_001 = c.guid
+    LEFT JOIN HDSB0402010102 f ON f.HDSB0402010102_001 = c.guid
+    LEFT JOIN HDSB0402010103 g ON g.HDSB0402010103_001 = c.guid
+		 <where>
+          <if test="ORGCODE!=null and ORGCODE!=''">  
+				and b.HDSB040201_009 = #{ORG_CODE}
+			</if>
+			 <if test="FSYSID!=null and FSYSID!=''">  
+				and b.HDSB040201_005 = #{FSYSID}
+			</if>
+              	<if test="IDCODE != null and IDCODE != ''"> <!--居民身份证  -->
+					and d.HDSA0001_003 = #{IDCODE}
+				</if>
+				<if test="GMTSTART!=null and GMTSTART!=''">
+				and b.HDSB040201_003 &gt;= to_date(#{GMTSTART},'yyyy-mm-dd')
+			</if>
+			<if test="GMTEND!=null and GMTEND!=''"><!-- 随访时间结束时间检索 -->
+				and b.HDSB040201_003 &lt;= to_date(#{GMTEND},'yyyy-mm-dd')
+			</if>
+			<if test="XYCFSSJSTART!=null and XYCFSSJSTART!=''"><!-- 下一次随访时间结束时间检索 -->
+				and  b.HDSB040201_004 &gt;= to_date(#{XYCFSSJSTART},'yyyy-mm-dd')
+			</if>
+			<if test="XYCFSSJEND!=null and XYCFSSJEND!=''"><!-- 下一次随访时间结束时间检索 -->
+				and  b.HDSB040201_004 &lt;= to_date(#{XYCFSSJEND},'yyyy-mm-dd')
+			</if>
+			<if test="SFFS!=NULL and SFFS!=''"><!-- 随访方式-->
+			     and  a.HDSB04020101_004 = #{SFFS}
+			</if>
+			 </where>
+			order  by  b.HDSB040201_003   desc  ) table_alias
+			 WHERE table_alias.rowno BETWEEN #{pageStart} and #{pageEnd}
+	</select>
+	
+	
+		
+	<!-- 精神病随访记录-->
+	<select id="queryMentalillnessPage" parameterType="pd" resultType="pd">
+SELECT *
+     FROM (
+     SELECT ROWNUM             AS rowno,
+                  a.guid             as SFID,
+                  b.HDSB040301_003,
+                  b.HDSB040301_004,
+                  b.HDSB040301_005,  
+                  b.HDSB040301_006,
+                  d.HDSA0001_001,
+                  d.HDSA0001_003,
+                  b.HDSB040301_007,
+                  a.hdsb04030101_004,
+                  a.hdsb04030101_030
+             FROM hdsb04030101 a
+             LEFT JOIN hdsb040301 b ON a.guid = b.guid
+             LEFT JOIN hdsb0403 c       ON c.GUID =b.hdsb040301_001
+             LEFT JOIN HDSA0001 d  ON d.GUID = c.hdsb0403_001
+              <!-- 
+             LEFT JOIN hdsb0403010101 e ON e.hdsb0403010101_001 = b.guid
+             LEFT JOIN hdsb0403010102 f   ON f.hdsb0403010102_001 =b.guid
+             LEFT JOIN hdsb0403010103 g  ON g.hdsb0403010103_001 = b.guid
+             LEFT JOIN hdsb0403010104 e ON e.hdsb0403010101_001 = b.guid
+             LEFT JOIN hdsb0403010105 f ON f.hdsb0403010102_001 =b.guid
+             LEFT JOIN hdsb0403010106 g  ON g.hdsb0403010103_001 = b.guid-->
+			<where>
+				<if test="ORGCODE != null and ORGCODE != ''"> <!-- ORG_CODE  -->
+					and HDSB040301_010 = #{ORGCODE}
+				</if>
+				<if test="FSYSID != null and FSYSID != ''"> <!-- 方式医生ID  -->
+					and HDSB040301_006 = #{FSYSID}
+				</if>
+			  <if test="IDCODE != null and IDCODE != ''"> <!--居民身份证  -->
+					and d.HDSA0001_003 = #{IDCODE}
+				</if>
+				<if test="GMTSTART!=null and GMTSTART!=''">
+				and b.HDSB040301_003 &gt;= to_date(#{GMTSTART},'yyyy-mm-dd')
+			</if>
+			<if test="GMTEND!=null and GMTEND!=''"><!-- 随访时间结束时间检索 -->
+				and b.HDSB040301_003 &lt;= to_date(#{GMTEND},'yyyy-mm-dd')
+			</if>
+			<if test="XYCFSSJSTART!=null and XYCFSSJSTART!=''"><!-- 下一次随访时间结束时间检索 -->
+				and  b.HDSB040301_005 &gt;= to_date(#{XYCFSSJSTART},'yyyy-mm-dd')
+			</if>
+			<if test="XYCFSSJEND!=null and XYCFSSJEND!=''"><!-- 下一次随访时间结束时间检索 -->
+				and  b.HDSB040301_005 &lt;= to_date(#{XYCFSSJEND},'yyyy-mm-dd')
+			</if>
+				<if test="SFCL!=NULL and SFCL!=''"><!-- 是否处理 -->
+				and b.SFCL = #{SFCL}
+			</if>
+			
+			 </where>
+			order  by  b.hdsb040301_003   desc  ) table_alias
+			 WHERE table_alias.rowno BETWEEN #{pageStart} and #{pageEnd}
+	</select>
+	
+</mapper>

@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MzcfmxMapper">
+	<!--表名 -->
+	<!-- 门诊处方明细表 -->
+	<sql id="tableName">
+		TB_CIS_PRESCRIPTION_DETAIL
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+	   	  cyh,
+		  cfmxhm,
+		  yljgdm,
+		  jzlsh,
+		  cflx,
+		  kh,
+		  klx,
+		  jzksdm,
+		  jzksmc,
+		  kfys,
+		  kfysxm,
+		  kfrq,
+		  xmbm,
+		  xmbmyb,
+		  xmmc,
+		  fyje,
+		  xmdj,
+		  sfyp,
+		  cdmc,
+		  kjywbz,
+		  jsywbz,
+		  jbywbz,
+		  mzywbz,
+		  syywbz,
+		  zybs,
+		  jxdm,
+		  ypjxmc,
+		  ypgg,
+		  ypbzggxs,
+		  ypsl,
+		  ypdw,
+		  cfts,
+		  yzzh,
+		  sypc,
+		  jl,
+		  dw,
+		  mcsl,
+		  mcdw,
+		  yf,
+		  yytjmc,
+		  yyts,
+		  dpysgh,
+		  dpysxm,
+		  hdysgh,
+		  hdysxm,
+		  fyysgh,
+		  fyysxm,
+		  jydm,
+		  sfps,
+		  jcbw,
+		  cfzt,
+		  bz,
+		  xgbz,
+		  personid,
+		  mj,
+		  ylyl1,
+		  ylyl2,
+		  id
+	</sql>
+	
+	<!-- 列表 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select 
+			<include refid="Field"></include> 
+		from 
+			<include refid="tableName"></include> 
+		<where>
+			<if test="pd.keywords != null and pd.keywords!= ''"><!-- 关键词检索 -->
+			(
+				CFMXHM LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+			or
+				CYH = #{pd.keywords}
+			)
+				
+		</if>
+		</where>
+	</select>
+	<!-- 新增-->
+	<insert id="save" parameterType="pd">
+		insert into <include refid="tableName"></include>
+		(
+			ID,CYH,CFMXHM,YLJGDM,JZLSH,CFLX,KH,KLX,JZKSDM,JZKSMC,
+			KFYS,KFYSXM,KFRQ,XMBM,XMBMYB,XMMC,FYJE,XMDJ,SFYP,CDMC,
+			KJYWBZ,JSYWBZ,JBYWBZ,MZYWBZ,SYYWBZ,ZYBS,JXDM,YPJXMC,YPGG,YPBZGGXS,
+			YPSL,YPDW,CFTS,YZZH,SYPC,JL,DW,MCSL,MCDW,YF,
+			YYTJMC,YYTS,DPYSGH,DPYSXM,HDYSGH,HDYSXM,FYYSGH,FYYSXM,JYDM,SFPS,
+			JCBW,CFZT,BZ,XGBZ,PERSONID,MJ,YLYL1,YLYL2
+		) values (
+			#{ID,jdbcType=VARCHAR},
+			#{CYH,jdbcType=VARCHAR},
+			#{CFMXHM,jdbcType=VARCHAR},
+			#{YLJGDM,jdbcType=VARCHAR},
+			#{JZLSH,jdbcType=VARCHAR},
+			#{CFLX,jdbcType=VARCHAR},
+			#{KH,jdbcType=VARCHAR},
+			#{KLX,jdbcType=VARCHAR},
+			#{JZKSDM,jdbcType=VARCHAR},
+			#{JZKSMC,jdbcType=VARCHAR},
+			
+			#{KFYS,jdbcType=VARCHAR},
+			#{KFYSXM,jdbcType=VARCHAR},
+			#{KFRQ,jdbcType=DATE},
+			#{XMBM,jdbcType=VARCHAR},
+			#{XMBMYB,jdbcType=VARCHAR},
+			#{XMMC,jdbcType=VARCHAR},
+			#{FYJE,jdbcType=NUMERIC},
+			#{XMDJ,jdbcType=NUMERIC},
+			#{SFYP,jdbcType=VARCHAR},
+			#{CDMC,jdbcType=VARCHAR},
+			
+			#{KJYWBZ,jdbcType=VARCHAR},
+			#{JSYWBZ,jdbcType=VARCHAR},
+			#{JBYWBZ,jdbcType=VARCHAR},
+			#{MZYWBZ,jdbcType=VARCHAR},
+			#{SYYWBZ,jdbcType=VARCHAR},
+			#{ZYBS,jdbcType=VARCHAR},
+			#{JXDM,jdbcType=VARCHAR},
+			#{YPJXMC,jdbcType=VARCHAR},
+			#{YPGG,jdbcType=VARCHAR},
+			#{YPBZGGXS,jdbcType=VARCHAR},
+			
+			#{YPSL},
+			#{YPDW,jdbcType=VARCHAR},
+			#{CFTS,jdbcType=NUMERIC},
+			#{YZZH,jdbcType=VARCHAR},
+			#{SYPC,jdbcType=VARCHAR},
+			#{JL,jdbcType=NUMERIC},
+			#{DW,jdbcType=VARCHAR},
+			#{MCSL,jdbcType=NUMERIC},
+			#{MCDW,jdbcType=VARCHAR},
+			#{YF,jdbcType=VARCHAR},
+			
+			#{YYTJMC,jdbcType=VARCHAR},
+			#{YYTS,jdbcType=NUMERIC},
+			#{DPYSGH,jdbcType=VARCHAR},
+			#{DPYSXM,jdbcType=VARCHAR},
+			#{HDYSGH,jdbcType=VARCHAR},
+			#{HDYSXM,jdbcType=VARCHAR},
+			#{FYYSGH,jdbcType=VARCHAR},
+			#{FYYSXM,jdbcType=VARCHAR},
+			#{JYDM,jdbcType=VARCHAR},
+			#{SFPS,jdbcType=VARCHAR},
+			
+			#{JCBW,jdbcType=VARCHAR},
+			#{CFZT,jdbcType=VARCHAR},
+			#{BZ,jdbcType=VARCHAR},
+			#{XGBZ,jdbcType=VARCHAR},
+			#{PERSONID,jdbcType=VARCHAR},
+			#{MJ,jdbcType=VARCHAR},
+			#{YLYL1,jdbcType=VARCHAR},
+			#{YLYL2,jdbcType=VARCHAR}
+		)
+	</insert>
+</mapper>

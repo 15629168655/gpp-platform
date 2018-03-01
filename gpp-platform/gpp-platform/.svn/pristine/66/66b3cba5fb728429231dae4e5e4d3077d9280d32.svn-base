@@ -1,0 +1,499 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="TaskMapper">
+	
+	<!--表名 -->
+	<sql id="tableName">
+		GPP_CRON_JOB
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		<if test="ID != null and ID != ''">
+			ID,	
+		</if>
+		JOB_NAME,	
+		JOB_CONTENT,	
+		JOB_TYPE,	
+		JOB_SOURCE,	
+		GMT_JOB,	
+		GMT_REMIND,
+		GMT_CREATED,
+		GMT_MODIFIED,
+		MEMBER_ID,
+		MEMBER_NAME,
+		DOCTOR_NAME,
+		DOCTOR_ID,	
+		DOCTOR_CODE,
+		ORG_CODE,
+		REGION_CODE,
+		OPERATOR_ID,
+		OPERATOR_NAME,
+		STATUS
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{ID,jdbcType=VARCHAR},	
+		#{JOB_NAME,jdbcType=VARCHAR},	
+		#{JOB_CONTENT,jdbcType=VARCHAR},	
+		#{JOB_TYPE,jdbcType=VARCHAR},	
+		#{JOB_SOURCE,jdbcType=VARCHAR},
+		to_date(#{GMT_JOB,jdbcType=DATE},'YYYY-MM-DD HH24:MI:SS'),
+		to_date(#{GMT_REMIND,jdbcType=DATE},'YYYY-MM-DD HH24:MI:SS'),
+        sysdate,
+        sysdate,
+        #{MEMBER_ID,jdbcType=VARCHAR},
+        #{MEMBER_NAME,jdbcType=VARCHAR},	
+        #{DOCTOR_NAME,jdbcType=VARCHAR},
+        #{DOCTOR_ID,jdbcType=VARCHAR},	
+        #{DOCTOR_CODE,jdbcType=VARCHAR},
+        #{ORG_CODE,jdbcType=VARCHAR},	
+        #{REGION_CODE,jdbcType=VARCHAR},
+        #{OPERATOR_ID,jdbcType=VARCHAR},
+        #{OPERATOR_NAME,jdbcType=VARCHAR},
+		#{STATUS,jdbcType=VARCHAR}
+	</sql>
+	
+	<!-- 列表 -->
+	<select id="tasklistPage" parameterType="page" resultType="pd">
+		select
+			a.JOB_NAME,	
+			a.JOB_CONTENT,	
+			a.JOB_TYPE,	
+			a.JOB_SOURCE,	
+			a.GMT_JOB,	
+			a.GMT_REMIND,	
+			a.GMT_CREATED,
+			a.GMT_MODIFIED,
+			a.MEMBER_ID,
+			a.MEMBER_NAME,
+			a.STATUS,
+			a.ORG_CODE,
+			a.REGION_CODE,
+		    a.OPERATOR_ID,
+		    a.OPERATOR_NAME,
+			a.ID
+		from 
+			<include refid="tableName"></include> a
+		where 1 = 1 
+		and a.STATUS != 9 
+		<if test="pd.ORG_CODE!= null and pd.ORG_CODE != ''">
+              and a.ORG_CODE = #{pd.ORG_CODE}
+        </if>
+        <if test="pd.DOCTOR_ID!= null and pd.DOCTOR_ID != ''">
+              and a.DOCTOR_ID = #{pd.DOCTOR_ID}
+        </if>
+		<if test="pd.JOB_NAME != null and pd.JOB_NAME != ''"><!-- 任务名称检索 -->
+			and a.JOB_NAME LIKE CONCAT(CONCAT('%', #{pd.JOB_NAME}),'%')
+		</if>
+		<if test="pd.taskTimeStart!=null and pd.taskTimeStart!=''"><!-- 任务时间起检索 -->
+			and to_char(a.GMT_JOB,'yyyymmdd') &gt;=to_char(to_date(#{pd.taskTimeStart},'YYYY-MM-DD'),'yyyymmdd')
+		</if>
+		<if test="pd.taskTimeEnd!=null and pd.taskTimeEnd!=''"><!-- 任务时间止检索 -->
+			and to_char(a.GMT_JOB,'yyyymmdd') &lt;=to_char(to_date(#{pd.taskTimeEnd},'YYYY-MM-DD'),'yyyymmdd')
+		</if>
+		<if test="pd.JOB_TYPE != null and pd.JOB_TYPE != ''"><!-- 任务类型检索 -->
+			and a.JOB_TYPE=#{pd.JOB_TYPE} 
+		</if>
+		<if test="pd.JOB_SOURCE != null and pd.JOB_SOURCE != ''"><!-- 任务来源检索 -->
+			and a.JOB_SOURCE=#{pd.JOB_SOURCE} 
+		</if>
+		<if test="pd.STATUS != null and pd.STATUS != ''"><!-- 状态检索 -->
+			and a.STATUS=#{pd.STATUS} 
+		</if>
+		order by a.GMT_JOB
+	</select>
+	
+	<!-- 新增任务 -->
+	<!--  <insert id="save" parameterType="pd">
+		insert into <include refid="tableName"></include> (
+			<include refid="Field"></include>
+		) values (
+			<include refid="FieldValue"></include>
+		)
+	</insert>  -->
+	
+ 	<insert id="save" parameterType="pd">
+		insert into <include refid="tableName"></include>
+	<trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="ID != null" >
+        ID,
+      </if>
+      <if test="JOB_NAME != null" >
+        JOB_NAME,
+      </if>
+      <if test="JOB_CONTENT != null" >
+        JOB_CONTENT,
+      </if>
+      <if test="JOB_TYPE != null" >
+        JOB_TYPE,
+      </if>
+      <if test="JOB_SOURCE != null" >
+        JOB_SOURCE,
+      </if>
+      <if test="GMT_JOB != null" >
+        GMT_JOB,
+      </if>
+     <if test="GMT_REMIND != null" >
+         GMT_REMIND,
+      </if>
+      <if test="MEMBER_ID != null" >
+        MEMBER_ID,
+      </if>
+      <if test="MEMBER_NAME != null" >
+        MEMBER_NAME,
+      </if>
+      <if test="DOCTOR_NAME != null" >
+        DOCTOR_NAME,
+      </if>
+      <if test="DOCTOR_ID != null" >
+        DOCTOR_ID,
+      </if>
+      <if test="DOCTOR_CODE != null" >
+        DOCTOR_CODE,
+      </if>
+      <if test="ORG_CODE != null" >
+        ORG_CODE,
+      </if>
+      <if test="REGION_CODE != null" >
+        REGION_CODE,
+      </if>
+      <if test="OPERATOR_ID != null" >
+        OPERATOR_ID,
+      </if>
+      <if test="OPERATOR_NAME != null" >
+        OPERATOR_NAME,
+      </if>
+      <if test="STATUS != null" >
+        STATUS,
+      </if>
+       GMT_CREATED,
+       GMT_MODIFIED
+      </trim>
+            VALUES
+     <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="ID != null" >
+        #{ID,jdbcType=VARCHAR},
+      </if>
+      <if test="JOB_NAME != null" >
+        #{JOB_NAME,jdbcType=VARCHAR},
+      </if>
+      <if test="JOB_CONTENT != null" >
+       #{JOB_CONTENT,jdbcType=VARCHAR},
+      </if>
+      <if test="JOB_TYPE != null" >
+         #{JOB_TYPE,jdbcType=VARCHAR},		
+      </if>
+      <if test="JOB_SOURCE != null" >
+        #{JOB_SOURCE,jdbcType=VARCHAR},
+      </if>
+      <if test="GMT_JOB != null" >
+       to_date(#{GMT_JOB,jdbcType=DATE},'YYYY-MM-DD HH24:MI:SS'),
+      </if>
+      <if test="GMT_REMIND != null" >
+		to_date(#{GMT_REMIND,jdbcType=DATE},'YYYY-MM-DD HH24:MI:SS'),
+      </if>
+      <if test="MEMBER_ID != null" >
+        #{MEMBER_ID,jdbcType=VARCHAR},
+      </if>
+      <if test="MEMBER_NAME != null" >
+        #{MEMBER_NAME,jdbcType=VARCHAR},	
+      </if>
+      <if test="DOCTOR_NAME != null" >
+         #{DOCTOR_NAME,jdbcType=VARCHAR},
+      </if>
+      <if test="DOCTOR_ID != null" >
+        #{DOCTOR_ID,jdbcType=VARCHAR},	
+      </if>
+      <if test="DOCTOR_CODE != null" >
+        #{DOCTOR_CODE,jdbcType=VARCHAR},
+      </if>
+      <if test="ORG_CODE != null" >
+        #{ORG_CODE,jdbcType=VARCHAR},
+      </if>
+      <if test="REGION_CODE != null" >
+        #{REGION_CODE,jdbcType=VARCHAR},
+      </if>
+      <if test="OPERATOR_ID != null" >
+        #{OPERATOR_ID,jdbcType=VARCHAR},
+      </if>
+      <if test="OPERATOR_NAME != null" >
+       #{OPERATOR_NAME,jdbcType=VARCHAR},
+      </if>
+      <if test="STATUS != null" >
+      #{STATUS,jdbcType=VARCHAR},
+      </if>
+      sysdate,
+      sysdate
+     </trim>
+      </insert> 
+      
+      
+	<!-- 通过id获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd" >
+		select 
+			<include refid="Field"></include>
+		from 
+			<include refid="tableName"></include>
+		where 
+			ID = #{ID}
+	</select>
+	
+	<!-- 修改 -->
+	<!-- <update id="edit" parameterType="pd" >
+		update  <include refid="tableName"></include>
+			set JOB_NAME				= #{JOB_NAME},
+				JOB_CONTENT 			= #{JOB_CONTENT},
+				JOB_TYPE 				= #{JOB_TYPE},
+				GMT_JOB					= to_date(substr(#{GMT_JOB},1,10),'YYYY-MM-DD'),
+				GMT_REMIND				= to_date(substr(#{GMT_REMIND},1,10),'YYYY-MM-DD'),
+				MEMBER_ID				= #{MEMBER_ID,jdbcType=VARCHAR},
+				MEMBER_NAME				= #{MEMBER_NAME,jdbcType=VARCHAR},
+				ID                      = ID
+			where 
+				ID = #{ID}
+	</update> -->
+	
+	<update id="edit" parameterType="pd" >
+		update  <include refid="tableName"></include>
+			set 
+			<if test="JOB_NAME != null" >
+			     JOB_NAME				= #{JOB_NAME,jdbcType=VARCHAR},
+			</if>
+			<if test="JOB_CONTENT != null " >
+				JOB_CONTENT 			= #{JOB_CONTENT,jdbcType=VARCHAR},
+			</if>
+			<if test="JOB_TYPE != null " >
+				JOB_TYPE 				= #{JOB_TYPE,jdbcType=VARCHAR},
+			</if>
+			<if test="GMT_JOB != null " >
+				GMT_JOB					= to_date(#{GMT_JOB,jdbcType=DATE},'YYYY-MM-DD HH24:MI:SS'),
+			</if>
+			<if test="GMT_REMIND != null " >
+				GMT_REMIND				= to_date(#{GMT_REMIND,jdbcType=DATE},'YYYY-MM-DD HH24:MI:SS'),
+			</if>
+			<if test="MEMBER_ID != null " >
+				MEMBER_ID				= #{MEMBER_ID,jdbcType=VARCHAR},
+			</if>
+			<if test="MEMBER_NAME != null  " >
+				MEMBER_NAME				= #{MEMBER_NAME,jdbcType=VARCHAR},
+			</if>
+			<if test="OPERATOR_ID != null" >
+                OPERATOR_ID             = #{OPERATOR_ID,jdbcType=VARCHAR},
+           </if>
+           <if test="OPERATOR_NAME != null" >
+                OPERATOR_NAME           = #{OPERATOR_NAME,jdbcType=VARCHAR},
+           </if>
+                GMT_MODIFIED            = sysdate,
+				ID                      = ID
+			where 
+				ID = #{ID}
+	</update>
+	
+	<!-- 删除 -->
+	<update id="delete" parameterType="pd">
+		update  <include refid="tableName"></include>
+			set STATUS = #{STATUS,jdbcType=VARCHAR},
+			    OPERATOR_NAME           = #{OPERATOR_NAME,jdbcType=VARCHAR},
+			    OPERATOR_ID             = #{OPERATOR_ID,jdbcType=VARCHAR},
+			    GMT_MODIFIED            = sysdate
+		where 
+			ID = #{ID}
+	</update>
+	
+	<!-- 任务处理，改变状态 -->
+	<update id="process" parameterType="pd">
+		update  <include refid="tableName"></include>
+			set  OPERATOR_NAME           = #{OPERATOR_NAME,jdbcType=VARCHAR},
+			     OPERATOR_ID             = #{OPERATOR_ID,jdbcType=VARCHAR},
+			     GMT_MODIFIED            = sysdate,
+			     STATUS = STATUS*-1+1
+		where 
+			ID = #{ID} 
+	</update>
+	
+	<!-- 批量删除任务 -->
+	<update id="deleteAll" parameterType="java.util.Map">
+		update <include refid="tableName"></include>
+		   set STATUS = #{STATUS,jdbcType=VARCHAR},
+			   OPERATOR_NAME           = #{OPERATOR_NAME,jdbcType=VARCHAR},
+			   OPERATOR_ID             = #{OPERATOR_ID,jdbcType=VARCHAR},
+			   GMT_MODIFIED            = sysdate
+		where 
+			ID in
+  			 <foreach item="item" index="index" collection="IDS" open="(" separator="," close=")">
+                  #{item}
+             </foreach>
+	</update>
+	
+	<!-- app分页查询-->
+	<select id="queryPage" parameterType="pd" resultType="pd">
+				SELECT *
+				  FROM ( 
+				       SELECT ROWNUM AS rowno, a.* 
+				           FROM 
+				          <include refid="tableName"></include>  a
+			where 1 = 1
+			 and a.STATUS != 9 
+		<if test="ORG_CODE!= null and ORG_CODE != ''">
+              and a.ORG_CODE = #{ORG_CODE}
+        </if>
+        <if test="DOCTOR_ID!= null and DOCTOR_ID != ''">
+              and a.DOCTOR_ID = #{DOCTOR_ID}
+        </if>
+		<if test="JOB_NAME != null and JOB_NAME != ''"><!-- 任务名称检索 -->
+			and a.JOB_NAME LIKE CONCAT(CONCAT('%', #{JOB_NAME}),'%')
+		</if>
+		<if test="TIMESTART!=null and TIMESTART!=''"><!-- 任务时间起检索 -->
+			and a.GMT_JOB &gt;=to_date(#{TIMESTART},'yyyy-mm-dd') 
+		</if>
+		<if test="TIMEEND!=null and TIMEEND!=''"><!-- 任务时间止检索 -->
+			and a.GMT_JOB &lt;=to_date(#{TIMEEND},'yyyy-mm-dd')
+		</if>
+		<if test="JOB_TYPE != null and JOB_TYPE != ''"><!-- 任务类型检索 -->
+			and a.JOB_TYPE=#{JOB_TYPE} 
+		</if>
+		<if test="JOB_SOURCE != null and JOB_SOURCE != ''"><!-- 任务来源检索 -->
+			and a.JOB_SOURCE=#{JOB_SOURCE} 
+		</if>
+		<if test="STATUS != null and STATUS != ''"><!-- 状态检索 -->
+			and a.STATUS=#{STATUS} 
+		</if>
+				          order by GMT_JOB desc   ) table_alias
+				           
+				 WHERE table_alias.rowno BETWEEN #{pageStart} and #{pageEnd}
+	</select>
+	
+	
+	<!-- app新增-->
+<!-- 	<insert id="addTask" parameterType="pd">
+		insert into
+			<include refid="tableName"></include>
+		(
+             <include refid="Field"></include>
+
+		) values (
+		#{ID,jdbcType=VARCHAR},	
+		#{JOB_NAME,jdbcType=VARCHAR},	
+		#{JOB_CONTENT,jdbcType=VARCHAR},	
+		#{JOB_TYPE,jdbcType=VARCHAR},	
+		#{JOB_SOURCE,jdbcType=VARCHAR},
+		to_date(#{GMT_JOB},'yyyy-mm-dd'),
+		to_date(#{GMT_REMIND},'yyyy-mm-dd'),
+        sysdate,
+        #{MEMBER_ID,jdbcType=VARCHAR},
+        #{MEMBER_NAME,jdbcType=VARCHAR},	
+		#{STATUS,jdbcType=VARCHAR}
+		)
+	</insert>	 -->
+	
+	
+	<insert id="saveQy" parameterType="pd">
+		insert into <include refid="tableName"></include>
+	<trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="ID != null" >
+        ID,
+      </if>
+      <if test="JOB_NAME != null" >
+        JOB_NAME,
+      </if>
+      <if test="JOB_CONTENT != null" >
+        JOB_CONTENT,
+      </if>
+      <if test="JOB_TYPE != null" >
+        JOB_TYPE,
+      </if>
+      <if test="JOB_SOURCE != null" >
+        JOB_SOURCE,
+      </if>
+      <if test="MEMBER_ID != null" >
+        MEMBER_ID,
+      </if>
+      <if test="MEMBER_NAME != null" >
+        MEMBER_NAME,
+      </if>
+      <if test="DOCTOR_NAME != null" >
+        DOCTOR_NAME,
+      </if>
+      <if test="DOCTOR_ID != null" >
+        DOCTOR_ID,
+      </if>
+      <if test="DOCTOR_CODE != null" >
+        DOCTOR_CODE,
+      </if>
+      <if test="ORG_CODE != null" >
+        ORG_CODE,
+      </if>
+      <if test="REGION_CODE != null" >
+        REGION_CODE,
+      </if>
+      <if test="OPERATOR_ID != null" >
+        OPERATOR_ID,
+      </if>
+      <if test="OPERATOR_NAME != null" >
+        OPERATOR_NAME,
+      </if>
+      <if test="STATUS != null" >
+        STATUS,
+      </if>
+       GMT_JOB,
+       GMT_REMIND,
+       GMT_CREATED,
+       GMT_MODIFIED
+      </trim>
+            VALUES
+     <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="ID != null" >
+        #{ID,jdbcType=VARCHAR},
+      </if>
+      <if test="JOB_NAME != null" >
+        #{JOB_NAME,jdbcType=VARCHAR},
+      </if>
+      <if test="JOB_CONTENT != null" >
+       #{JOB_CONTENT,jdbcType=VARCHAR},
+      </if>
+      <if test="JOB_TYPE != null" >
+         #{JOB_TYPE,jdbcType=VARCHAR},		
+      </if>
+      <if test="JOB_SOURCE != null" >
+        #{JOB_SOURCE,jdbcType=VARCHAR},
+      </if>
+      <if test="MEMBER_ID != null" >
+        #{MEMBER_ID,jdbcType=VARCHAR},
+      </if>
+      <if test="MEMBER_NAME != null" >
+        #{MEMBER_NAME,jdbcType=VARCHAR},	
+      </if>
+      <if test="DOCTOR_NAME != null" >
+         #{DOCTOR_NAME,jdbcType=VARCHAR},
+      </if>
+      <if test="DOCTOR_ID != null" >
+        #{DOCTOR_ID,jdbcType=VARCHAR},	
+      </if>
+      <if test="DOCTOR_CODE != null" >
+        #{DOCTOR_CODE,jdbcType=VARCHAR},
+      </if>
+      <if test="ORG_CODE != null" >
+        #{ORG_CODE,jdbcType=VARCHAR},
+      </if>
+      <if test="REGION_CODE != null" >
+        #{REGION_CODE,jdbcType=VARCHAR},
+      </if>
+      <if test="OPERATOR_ID != null" >
+        #{OPERATOR_ID,jdbcType=VARCHAR},
+      </if>
+      <if test="OPERATOR_NAME != null" >
+       #{OPERATOR_NAME,jdbcType=VARCHAR},
+      </if>
+      <if test="STATUS != null" >
+        #{STATUS,jdbcType=VARCHAR},
+      </if>
+      sysdate,
+      sysdate,
+      sysdate,
+      sysdate
+     </trim>
+      </insert> 
+	
+	</mapper>

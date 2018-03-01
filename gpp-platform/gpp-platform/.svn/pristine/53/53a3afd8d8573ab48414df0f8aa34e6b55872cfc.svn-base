@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="IndexCombinationMapper">
+	<!--表名指标组合表  -->
+	<sql id="tableName">
+		GPP_INDEX_COMBINATION
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		ID,
+		INDEX_COMBINATION_CODE,
+		INDEX_COMBINATION_NAME,
+		PY_CODE,
+		DEPARTMENT,
+		INDEX_COMBINATION_ORDER,
+		REMARKS,
+		FIT_SEX,
+		INDEX_COMBINATION_STATE,
+		CREAT_TIME,
+		EDIT_TIME
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{ID, jdbcType=VARCHAR},
+		#{INDEX_COMBINATION_CODE, jdbcType=VARCHAR},
+		#{INDEX_COMBINATION_NAME, jdbcType=VARCHAR},
+		#{PY_CODE, jdbcType=VARCHAR},
+		#{DEPARTMENT, jdbcType=VARCHAR},
+		#{INDEX_COMBINATION_ORDER, jdbcType=NUMERIC},
+		#{REMARKS, jdbcType=VARCHAR},
+		#{FIT_SEX, jdbcType=VARCHAR},
+		#{INDEX_COMBINATION_STATE, jdbcType=VARCHAR},
+		to_date(#{CREAT_TIME},'yyyy-mm-dd HH24:mi:ss'),
+		to_date(#{EDIT_TIME},'yyyy-mm-dd HH24:mi:ss')
+	</sql>
+	<!-- 查询全部 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select <include refid="Field"></include> from
+		<include refid="tableName"></include>
+		where 1=1 and INDEX_COMBINATION_STATE= #{pd.INDEX_COMBINATION_STATE, jdbcType=VARCHAR}
+        <if test="pd.keywords != null and pd.keywords !=''">
+        	and(
+        		 INDEX_COMBINATION_ORDER LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				 or
+				 INDEX_COMBINATION_CODE LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				 or 
+				 INDEX_COMBINATION_STATE LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%') 
+        	)
+        </if>
+        order by INDEX_COMBINATION_ORDER desc
+	</select>
+	<!-- 查看详情 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+			<include refid="Field"></include>
+		from 
+			<include refid="tableName"></include>
+		where 
+			ID = #{ID,jdbcType=VARCHAR}
+	</select>
+	<!-- 编辑 -->
+	<update id="edit" parameterType="pd">
+		update
+			<include refid="tableName"></include>
+		set 
+			ID=#{ID, jdbcType=VARCHAR},
+			INDEX_COMBINATION_CODE=#{INDEX_COMBINATION_CODE, jdbcType=VARCHAR},
+			INDEX_COMBINATION_NAME=#{INDEX_COMBINATION_NAME, jdbcType=VARCHAR},
+			PY_CODE=#{PY_CODE, jdbcType=VARCHAR},
+			DEPARTMENT=#{DEPARTMENT, jdbcType=VARCHAR},
+			INDEX_COMBINATION_ORDER=#{INDEX_COMBINATION_ORDER, jdbcType=NUMERIC},
+			REMARKS=#{REMARKS, jdbcType=VARCHAR},
+			FIT_SEX=#{FIT_SEX, jdbcType=VARCHAR},
+			INDEX_COMBINATION_STATE=#{INDEX_COMBINATION_STATE, jdbcType=VARCHAR},
+			CREAT_TIME=to_date(#{CREAT_TIME},'yyyy-mm-dd HH24:mi:ss'),
+			EDIT_TIME=to_date(#{EDIT_TIME},'yyyy-mm-dd HH24:mi:ss')
+		where
+			ID=#{ID, jdbcType=VARCHAR}
+	</update>
+	<!-- 删除 -->
+	<update id="delete" parameterType="pd">
+		update
+			<include refid="tableName"></include>
+		set
+		  INDEX_COMBINATION_STATE= #{INDEX_COMBINATION_STATE, jdbcType=VARCHAR}
+		where
+			ID=#{ID, jdbcType=VARCHAR}
+	</update>
+	<!-- 批量删除 -->
+	<delete id="deleteAll" parameterType="String">
+		delete from
+		<include refid="tableName"></include>
+		where 
+			ID in
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                 #{item}
+		</foreach>
+	</delete>
+	<!-- 批量查找 -->
+	<!-- 增加-->
+	<select id="findByMostId" parameterType="String" resultType="pd">
+	select <include refid="Field"></include> from
+		<include refid="tableName"></include>
+		where 
+			ID in
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                 #{item}
+		</foreach>
+	</select>
+	<!-- 插入 -->
+	<insert id="save" parameterType="pd">
+		insert into 
+	<include refid="tableName"></include>
+		(
+	<include refid="Field"></include>
+		) values (
+	<include refid="FieldValue"></include>
+		)
+	</insert>
+	<update id="renew" parameterType="pd">
+		update
+			<include refid="tableName"></include>
+		set 
+			<if test="INDEX_COMBINATION_CODE != null and INDEX_COMBINATION_CODE != ''">
+				INDEX_COMBINATION_CODE=#{INDEX_COMBINATION_CODE, jdbcType=VARCHAR},
+			</if>
+			<if test="INDEX_COMBINATION_NAME != null and INDEX_COMBINATION_NAME != ''">
+				INDEX_COMBINATION_NAME=#{INDEX_COMBINATION_NAME, jdbcType=VARCHAR},
+			</if>
+			<if test="PY_CODE != null and PY_CODE != ''">
+				PY_CODE=#{PY_CODE, jdbcType=VARCHAR},
+			</if>	
+			<if test="DEPARTMENT != null and DEPARTMENT != ''">
+				DEPARTMENT=#{DEPARTMENT, jdbcType=VARCHAR},
+			</if>
+			<if test="INDEX_COMBINATION_ORDER != null and INDEX_COMBINATION_ORDER != ''">
+				INDEX_COMBINATION_ORDER=#{INDEX_COMBINATION_ORDER, jdbcType=NUMERIC},
+			</if>
+			<if test="REMARKS != null and REMARKS != ''">
+				REMARKS=#{REMARKS, jdbcType=VARCHAR},
+			</if>
+			<if test="FIT_SEX != null and FIT_SEX != ''">
+				FIT_SEX=#{FIT_SEX, jdbcType=VARCHAR},
+			</if>
+			<if test="INDEX_COMBINATION_STATE != null and INDEX_COMBINATION_STATE != ''">
+		    	INDEX_COMBINATION_STATE=#{INDEX_COMBINATION_STATE, jdbcType=VARCHAR},
+		    </if>
+		    <if test="CERAT_TIME != null and CERAT_TIME != ''">
+		    	CREAT_TIME=to_date(#{CREAT_TIME},'yyyy-mm-dd HH24:mi:ss'),
+		    </if>
+		    <if test="EDIT_TIME != null and EDIT_TIME != ''">
+		    	EDIT_TIME=to_date(#{EDIT_TIME},'yyyy-mm-dd HH24:mi:ss'),
+		    </if>
+		    ID=#{ID, jdbcType=VARCHAR}
+		where
+			ID=#{ID, jdbcType=VARCHAR}
+	</update>	
+	
+
+</mapper>

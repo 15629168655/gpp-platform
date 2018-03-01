@@ -1,0 +1,463 @@
+package com.tbyf.controller.gp.team;
+
+import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.tbyf.entity.enums.EnumBlfyypglState;
+import com.tbyf.entity.enums.EnumRoleName;
+import com.tbyf.entity.enums.EnumStatusTeam;
+import com.tbyf.controller.base.BaseController;
+import com.tbyf.plugin.Page;
+import com.tbyf.service.gp.team.TeamManager;
+import com.tbyf.service.hm.yhry.YhryManager;
+import com.tbyf.util.AppUtil;
+import com.tbyf.util.Jurisdiction;
+import com.tbyf.util.PageData;
+
+/**
+ * 签约管理-签约团队管理
+ * @author lh
+ *
+ */
+@Controller
+@RequestMapping(value="/team")
+public class TeamController extends BaseController{
+	
+	String menuUrl = "team/list.do"; //菜单地址(权限用)
+	
+	@Resource(name="teamService")
+	private TeamManager teamService;
+	@Resource(name="yhryService")
+	private YhryManager yhryService;
+	
+	@RequestMapping(value="/list")
+	public ModelAndView list(Page page) throws Exception{
+		
+		logBefore(logger, Jurisdiction.getUsername()+"列表");
+		ModelAndView mv = this.getModelAndView();
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		String keywords = pd.getString("keywords");				//关键词检索条件
+		if(null != keywords && !"".equals(keywords)){
+			pd.put("keywords", keywords.trim());
+		}
+		pd.put("EnumStatus",EnumStatusTeam.toMap());
+		page.setPd(pd);
+		List<PageData> varList = teamService.list(page);
+		mv.setViewName("gp/team/team_list");
+		mv.addObject("varList", varList);
+		mv.addObject("pd", pd);
+		mv.addObject("QX",Jurisdiction.getHC());	//按钮权限
+		return mv;	
+	}
+	
+	/**
+	 * 保存
+	 */
+	@RequestMapping(value="/save")
+	public ModelAndView save() throws Exception{
+		logBefore(logger, Jurisdiction.getUsername()+"新增");
+		if(!Jurisdiction.buttonJurisdiction(menuUrl, "add")){return null;} //校验权限
+		ModelAndView mv = this.getModelAndView();
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		pd.put("ID", this.get32UUID());					//主键
+		pd.put("ORG_CODE", getCurUser().getOrgCode());		//机构编码
+		pd.put("REGION_CODE", getCurUser().getRegionCode());//区划编码
+		pd.put("STATUS", "0");							//状态
+		pd.put("LEADER_CODE", this.getCurUser().getProviderCode());//负责人工号
+		pd.put("OPERATOR_ID", this.getCurUser().getProviderId()); //操作人
+		pd.put("OPERATOR_NAME", this.getCurUser().getProviderName());
+		teamService.saveTeamApp(pd);
+		mv.addObject("msg","success");
+		mv.setViewName("save_result");
+		return mv;
+	}
+	@RequestMapping(value="/validateName")
+	@ResponseBody
+	public Object validateName() throws Exception{
+		logBefore(logger,Jurisdiction.getUsername()+"团队名称验证新增");
+		Map<String,String> map = new HashMap<String,String>();
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		List<PageData> list = teamService.getListByKEY(pd);
+		if(pd.containsKey("ID")){
+			//修改数据
+			if(list!=null&& list.size()>0){
+				if(list.size()==1){
+					PageData page = list.get(0);
+					if(page.get("ID").equals(pd.get("ID"))){
+						map.put("status","1");
+					}else{
+						//如果id值不同，表示已存在
+						map.put("status","0");
+						map.put("msg","存在相同的团队名称");
+					}
+				}else{
+					map.put("status","0");
+					map.put("msg","存在相同的团队名称");
+				}
+			}else{
+				
+			}
+		}else{
+			//新增数据
+			if(list!=null&& list.size()>0){
+				if(pd.get("ID")!=null){
+					//修改数据
+					if(list.size()==1){
+						PageData page = list.get(0);
+						//修改当前id数据
+						if(page.get("ID").equals(pd.get("ID"))){
+							map.put("status","1");
+						} else{
+							//如果id值不同，表示已存在
+							map.put("status","0");
+							map.put("msg","存在相同的团队名称");
+						}
+					}else{
+						map.put("status","0");
+						map.put("msg","存在相同的团队名称");
+					}
+				}else{
+					//代表有相同的名称的团队
+					map.put("status","0");
+					map.put("msg","存在相同的团队名称");
+				}
+			}else{
+				map.put("status","1");
+			}
+		}
+		return AppUtil.returnObject(new PageData(), map);
+	}
+ 
+
+	/**
+ 	 * 新增页面
+	 */
+	@RequestMapping(value="/add")
+	public ModelAndView add() throws Exception{
+		ModelAndView mv = this.getModelAndView();
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		pd.put("LEADER_ID", getCurUser().getUserId());
+		pd.put("LEADER_CODE", this.getCurUser().getProviderCode());//负责人工号
+		pd.put("LEADER_NAME", getCurUser().getName());
+		pd.put("LEADER_PHONE", getCurUser().getPhone());
+		mv.addObject("pd", pd);
+		mv.setViewName("gp/team/team_edit");
+		mv.addObject("msg", "save");
+		return mv;
+	}
+	
+	/**
+	 * 修改
+	 */
+	@RequestMapping(value="/edit")
+	public ModelAndView edit() throws Exception{
+		logBefore(logger, Jurisdiction.getUsername()+"编辑");
+		if(!Jurisdiction.buttonJurisdiction(menuUrl, "edit")){return null;} //校验权限
+		ModelAndView mv = this.getModelAndView();
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		teamService.edit(pd);
+		mv.addObject("msg","success");
+		mv.setViewName("save_result");
+		return mv;
+	}
+	
+	/**
+	 * 修改页面
+	 */
+	@RequestMapping(value="/update")
+	public ModelAndView update() throws Exception{
+		ModelAndView mv = this.getModelAndView();
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		pd = teamService.fingById(pd);	//根据ID读取
+		mv.addObject("pd", pd);
+		mv.setViewName("gp/team/team_edit");
+		mv.addObject("msg", "edit");
+		return mv;
+	}
+	
+	/**
+	  	更新状态 (启用、取消、删除)
+	 * @throws Exception 
+	 */
+	@RequestMapping(value="/status")
+	@ResponseBody
+	public Object status() throws Exception{
+		Map<String,String> map = new HashMap<String,String>();
+		String errInfo = "success";
+		PageData pd = new PageData();
+			pd = this.getPageData();
+			PageData teampd = teamService.fingById(pd);
+			teampd.put("STATUS","0");
+			teamService.edit(teampd);
+			if(teampd != null){ 
+				errInfo = "error";
+			}
+			map.put("STATUS",teampd.getString("STATUS"));
+			map.put("result", errInfo);				//返回结果
+			
+			return AppUtil.returnObject(new PageData(), map);
+	}
+	
+	@RequestMapping(value="/statusDis")
+	@ResponseBody
+	public Object statusDis() throws Exception{
+		Map<String,String> map = new HashMap<String,String>();
+		String errInfo = "success";
+		PageData pd = new PageData();
+			pd = this.getPageData();
+			PageData teampd = teamService.fingById(pd);
+			teampd.put("STATUS","1");
+			teamService.edit(teampd);
+			if(teampd != null){ 
+				errInfo = "error";
+			}
+			map.put("STATUS",teampd.getString("STATUS"));
+			map.put("result", errInfo);				//返回结果
+			
+			return AppUtil.returnObject(new PageData(), map);
+	}
+	
+	/**
+	 * 删除(状态编辑为作废)
+	 * @param out
+	 * @throws Exception 
+	 */
+	@RequestMapping(value="/delete")
+	public void delete(PrintWriter out) throws Exception{
+		logBefore(logger, Jurisdiction.getUsername()+"申请审核作废");
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		teamService.delete(pd);
+		out.write("success");
+		out.close();
+	}
+	
+	/**批量删除
+	 * @param out
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/deleteAll")
+	@ResponseBody
+	public Object deleteAll(){
+		logBefore(logger, Jurisdiction.getUsername()+"批量删除症状信息");
+		Map<String,Object> map = new HashMap<String,Object>();
+		 PageData pd = new PageData();
+		pd = this.getPageData();
+		String str=String.valueOf(pd.get("ids"));
+		String[] ids = str.split(",");
+		try {
+			for(String id:ids){
+				pd.put("ID", id);
+				teamService.delete(pd);
+			}
+			map.put("msg", "SUCCESS");
+		} catch (Exception e) {
+			e.printStackTrace();
+			map.put("msg", "FAIL");
+		}
+		return AppUtil.returnObject(new PageData(), map);
+		
+	}
+	
+	/**
+	 * 团队成员
+	 * GPP_TEAM_MEMBER
+	 */
+	@RequestMapping(value="/teamList")
+	public ModelAndView teamList(Page page) throws Exception{
+		logBefore(logger, Jurisdiction.getUsername()+"列表");
+		ModelAndView mv = this.getModelAndView();
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		String ID = pd.getString("ID");
+		pd.put("TEAM_ID", ID);
+		String keywords = pd.getString("keywords");				//关键词检索条件
+		if(null != keywords && !"".equals(keywords)){
+			pd.put("keywords", keywords.trim());
+		}
+		pd.put("memberStatus", EnumBlfyypglState.toMap());
+		pd.put("EnumRoleName", EnumRoleName.toMap());
+		page.setPd(pd);
+		List<PageData> varList = teamService.memberList(page);
+		mv.setViewName("gp/team/teamMember_list");
+		mv.addObject("varList", varList);
+		mv.addObject("pd", pd);
+		mv.addObject("QX",Jurisdiction.getHC());	//按钮权限
+		return mv;
+	}
+	
+	/**
+	 * 新增成员
+	 */
+	@RequestMapping(value="/saveMember")
+	@ResponseBody
+	public Object saveMember() throws Exception{
+		logBefore(logger, Jurisdiction.getUsername()+"新增成员");
+		if(!Jurisdiction.buttonJurisdiction(menuUrl, "add")){return null;} //校验权限
+
+		Map<String,String> map = new HashMap<String,String>();
+		ModelAndView mv = this.getModelAndView();
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		String ysid = pd.getString("GEN_PRACTITIONER_ID");
+		String ysname = pd.getString("GEN_PRACTITIONER_NAME");
+		String ysphone = pd.getString("GEN_PRACTITIONER_PHONE");
+		pd.put("ID", this.get32UUID());	
+		pd.put("TEAM_MEMBER_ID", ysid);
+		pd.put("TEAM_MEMBER_NAME", ysname);
+		pd.put("TEAM_MEMBER_PHONE", ysphone);
+		pd.put("TEAM_MEMBER_CODE", "");//团队成员工号
+		pd.put("ORG_CODE", getCurUser().getOrgCode());		//机构ID
+		pd.put("OPERATOR_ID", this.getCurUser().getProviderId()); //操作人
+		pd.put("OPERATOR_NAME", this.getCurUser().getProviderName());
+		pd.put("REGION_CODE", this.getCurUser().getRegionCode());
+		pd.put("STATUS", 0);
+		List<PageData> pageList = teamService.getlistByMemberId(pd);
+		if(pageList.size()>0){
+			map.put("status","0");
+		}else{
+			teamService.saveMember(pd);
+			map.put("status","1");
+			mv.addObject("msg","success");
+			mv.setViewName("save_result");
+		}
+
+		return AppUtil.returnObject(new PageData(), map);
+	}
+	
+	/**
+	 * 新增成员页面
+	 */
+	@RequestMapping(value="/addMember")
+	public ModelAndView addMember() throws Exception{
+		ModelAndView mv = this.getModelAndView();
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		pd.put("EnumRoleName", EnumRoleName.toMap());
+		pd.put("STATUS", "0");
+		mv.addObject("pd", pd);
+		mv.setViewName("gp/team/teamMember_edit");
+		mv.addObject("msg", "saveMember");
+		return mv;
+	}
+	
+	/**
+	 *  编辑成员信息
+	 */
+	@RequestMapping(value="/editMember")
+	@ResponseBody
+	public Object editMember() throws Exception{
+		logBefore(logger, Jurisdiction.getUsername()+"编辑");
+		if(!Jurisdiction.buttonJurisdiction(menuUrl, "edit")){return null;} //校验权限
+		Map<String,String> map = new HashMap<String,String>();
+		ModelAndView mv = this.getModelAndView();
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		String ysid = pd.getString("GEN_PRACTITIONER_ID");
+		String ysname = pd.getString("GEN_PRACTITIONER_NAME");
+		String ysphone = pd.getString("GEN_PRACTITIONER_PHONE");
+		pd.put("TEAM_MEMBER_ID", ysid);
+		pd.put("TEAM_MEMBER_NAME", ysname);
+		pd.put("TEAM_MEMBER_PHONE", ysphone);
+		pd.put("STATUS", "0");
+		List<PageData> pageList = teamService.getlistByMemberId(pd);
+		if(pageList.size()>0){
+			if(pageList.size()==1){
+				PageData page = pageList.get(0);
+				if(page.get("ID").equals(pd.get("ID"))){
+					map.put("status","1");
+				}else{
+					map.put("status","0");
+				}
+			}else{
+				map.put("status","0");
+			}
+		}else{
+			teamService.saveMember(pd);
+			map.put("status","1");
+			mv.addObject("msg","success");
+			mv.setViewName("save_result");
+		}
+		teamService.editMember(pd);
+//		mv.addObject("msg","success");
+//		mv.setViewName("save_result");
+//		return mv;
+		return AppUtil.returnObject(new PageData(), map);
+	}
+	
+	/**
+	 * 编辑成员信息页面
+	 */
+	@RequestMapping(value="/updateMember")
+	public ModelAndView updateMember() throws Exception{
+		ModelAndView mv = this.getModelAndView();
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		pd = teamService.fingByIdMember(pd);	//根据ID读取
+		pd.put("EnumRoleName", EnumRoleName.toMap());
+		mv.addObject("pd", pd);
+		mv.setViewName("gp/team/teamMember_edit");
+		mv.addObject("msg", "editMember");
+		return mv;
+	}
+	
+	/**
+	 * 批量删除
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/memberDel")
+	@ResponseBody
+	public Object memberDel() throws Exception{
+		Map<String,String> map = new HashMap<String,String>();
+		String errInfo = "success";
+		PageData pd = new PageData();
+			pd = this.getPageData();
+			PageData teampd = teamService.fingByIdMember(pd);
+			teampd.put("STATUS","9");
+			teamService.editMember(teampd);
+			if(teampd != null){ 
+				errInfo = "error";
+			}
+			map.put("STATUS",teampd.getString("STATUS"));
+			map.put("result", errInfo);				//返回结果
+			
+			return AppUtil.returnObject(new PageData(), map);
+	}
+	/**
+	 * 团队信息
+	 * 启用/停用
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/editTeamStatus")
+	public ModelAndView editTeamStatus() throws Exception{
+		logBefore(logger, Jurisdiction.getUsername()+"修改团队信息状态");
+		if(!Jurisdiction.buttonJurisdiction(menuUrl, "edit")){return null;} //校验权限
+		ModelAndView mv = this.getModelAndView();
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		teamService.statusTeamApp(pd);
+		mv.addObject("msg","success");
+		mv.setViewName("save_result");
+		return mv;
+	}
+	
+}

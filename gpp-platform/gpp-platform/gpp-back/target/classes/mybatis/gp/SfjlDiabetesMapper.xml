@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="SfjlDiabetesMapper">
+	<!--表名 -->
+	<!-- 随访记录表 -->
+
+	<!-- 列表 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+   SELECT a.guid ,
+    b.HDSB040501_003,  
+    b.HDSB040501_004 ,
+    b.HDSB040501_005,
+    b.HDSB040501_006, 
+    b.SFCL, 
+    b.ZT,    
+    c.USER_NAME ,
+    c.ID_NUMBER, 
+    a.HDSB04050101_003 , 
+    a.HDSB04050101_005 ,
+    a.HDSB04050101_006 , 
+    a.HDSB04050101_007, 
+    a.HDSB04050101_008, 
+    a.HDSB04050101_010, 
+    a.HDSB04050101_032, 
+    a.HDSB04050101_033 ,
+    a.HDSB04050101_034, 
+    a.HDSB04050101_046 ,
+    a.HDSB04050101_047  
+    FROM HDSB04050101 a
+    LEFT JOIN HDSB040501 b ON a.guid = b.guid
+    LEFT JOIN tb_user_agent c ON c.ID_NUMBER = b.IDCODE
+		 <where>
+          b.ZT &lt;&gt; #{pd.ZT}			<!-- 状态不等于删除状态（删除状态为9）  -->
+          
+             <if test="pd.ORG_CODE != null and pd.ORG_CODE != ''">  
+				and b.HDSB040501_009 = #{pd.ORG_CODE}
+			</if>
+				<if test="pd.keywords != null and pd.keywords!= ''"><!-- 关键词检索 -->
+			and
+			(
+				 c.USER_NAME LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+			or
+				 c.ID_NUMBER LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+			)
+				
+			</if>
+				<if test="pd.GMT_START!=null and pd.GMT_START!=''">
+				and b.HDSB040501_003 &gt;= to_date(#{pd.GMT_START},'yyyy-mm-dd')
+			</if>
+			<if test="pd.GMT_END!=null and pd.GMT_END!=''"><!-- 随访时间结束时间检索 -->
+				and b.HDSB040501_003 &lt;= to_date(#{pd.GMT_END},'yyyy-mm-dd')
+			</if>
+			<if test="pd.XYCFSSJ_START!=null and pd.XYCFSSJ_START!=''"><!-- 下一次随访时间结束时间检索 -->
+				and  b.HDSB040501_004 &gt;= to_date(#{pd.XYCFSSJ_START},'yyyy-mm-dd')
+			</if>
+			<if test="pd.XYCFSSJ_END!=null and pd.XYCFSSJ_END!=''"><!-- 下一次随访时间结束时间检索 -->
+				and  b.HDSB040501_004 &lt;= to_date(#{pd.XYCFSSJ_END},'yyyy-mm-dd')
+			</if>
+			
+				<if test="pd.sfcl!=null and pd.sfcl!=''"><!-- 是否处理 -->
+				and b.SFCL = #{pd.sfcl}
+			</if>
+			<if test="pd.sffs!=null and pd.sffs!=''"><!-- 随访方式-->
+			     and  a.HDSB04050101_003 = #{pd.sffs}
+			</if>
+			order  by  b.HDSB040501_003   desc  
+          </where>
+	</select>
+	
+	<!-- APP查询接口 -->
+	<select id="queryPage" parameterType="pd" resultType="pd">
+	SELECT *
+    FROM (SELECT ROWNUM AS rowno,
+    a.guid ,
+    b.HDSB040501_003,  
+    b.HDSB040501_004 ,
+    b.HDSB040501_005,
+    b.HDSB040501_006, 
+    b.SFCL, 
+    b.ZT,    
+    c.USER_NAME ,
+    c.ID_NUMBER, 
+    a.HDSB04050101_003 , 
+    a.HDSB04050101_005 ,
+    a.HDSB04050101_006 , 
+    a.HDSB04050101_007, 
+    a.HDSB04050101_008, 
+    a.HDSB04050101_010, 
+    a.HDSB04050101_032, 
+    a.HDSB04050101_033 ,
+    a.HDSB04050101_034, 
+    a.HDSB04050101_046 ,
+    a.HDSB04050101_047  
+    FROM HDSB04050101 a
+    LEFT JOIN HDSB040501 b ON a.guid = b.guid
+    LEFT JOIN tb_user_agent c ON c.ID_NUMBER = b.IDCODE
+			<where>
+					 b.ZT != 9 		<!-- 状态不等于删除状态（删除状态为9）  -->
+				<if test="ORG_CODE != null and ORG_CODE != ''"> <!-- ORG_CODE  -->
+					and b.HDSB040501_009 = #{ORG_CODE}
+				</if>
+				<if test="FSYS_ID != null and FSYS_ID != ''"> <!-- 访试医生ID  -->
+					and b.HDSB040501_005 = #{FSYS_ID}
+				</if>
+				<if test="KEYWORDS != null and KEYWORDS != ''"><!-- 关键词检索 -->
+					and
+					(
+						JM_NAME = #{KEYWORDS,jdbcType=VARCHAR}
+					or
+						JM_SBKH = #{KEYWORDS,jdbcType=VARCHAR}
+					)
+				</if>
+				
+				<if test="GMT_START!=null and GMT_START!=''">
+				and b.HDSB040501_003 &gt;= to_date(#{GMT_START},'yyyy-mm-dd')
+			</if>
+			<if test="GMT_END!=null and GMT_END!=''"><!-- 随访时间结束时间检索 -->
+				and b.HDSB040501_003 &lt;= to_date(#{GMT_END},'yyyy-mm-dd')
+			</if>
+			<if test="XYCFSSJ_START!=null and XYCFSSJ_START!=''"><!-- 下一次随访时间结束时间检索 -->
+				and  b.HDSB040501_004 &gt;= to_date(#{XYCFSSJ_START},'yyyy-mm-dd')
+			</if>
+			<if test="XYCFSSJ_END!=null and XYCFSSJ_END!=''"><!-- 下一次随访时间结束时间检索 -->
+				and  b.HDSB040501_004 &lt;= to_date(#{XYCFSSJ_END},'yyyy-mm-dd')
+			</if>
+				<if test="SFCL!=NULL and SFCL!=''"><!-- 是否处理 -->
+				and b.SFCL = #{SFCL}
+			</if>
+			<if test="SFFS!=NULL and SFFS!=''"><!-- 随访方式-->
+			     and  a.HDSB04050101_004 = #{SFFS}
+			</if>
+			</where>
+		    order  by  b.HDSB040501_003   desc  ) table_alias
+			 WHERE table_alias.rowno BETWEEN #{pageStart} and #{pageEnd}
+	</select>
+
+
+
+	<!-- 通过ID获取数据 -->
+<select id="findById" parameterType="pd" resultType="pd">
+ SELECT a.guid ,
+    b.HDSB040501_003,  
+    b.HDSB040501_004 ,
+    b.HDSB040501_005,
+    b.HDSB040501_006, 
+    b.SFCL, 
+    b.ZT,    
+    c.USER_NAME ,
+    c.ID_NUMBER, 
+    a.HDSB04050101_003 , 
+    a.HDSB04050101_005 ,
+    a.HDSB04050101_006 , 
+    a.HDSB04050101_007, 
+    a.HDSB04050101_008, 
+    a.HDSB04050101_010, 
+    a.HDSB04050101_032, 
+    a.HDSB04050101_033 ,
+    a.HDSB04050101_034, 
+    a.HDSB04050101_046,
+    a.HDSB04050101_047  
+    FROM HDSB04050101 a
+    LEFT JOIN HDSB040501 b ON a.guid = b.guid
+    LEFT JOIN tb_user_agent c ON c.ID_NUMBER = b.IDCODE
+		<where>
+		   b.ZT != 9
+		   and
+		   a.guid = #{ID,jdbcType=VARCHAR}
+		</where>
+	</select>
+
+	
+	<!-- 修改随访信息主表 -->
+	<update id="editsfzb" parameterType="pd">
+	     update HDSB040501 
+	      	<set>
+	    <if test="HDSB040501_003 != null and HDSB040501_003 !=''" >
+        HDSB040501_003 = to_date(#{HDSB040501_003},'yyyy-mm-dd'),
+        </if>
+		<if test="HDSB040501_004 != null and HDSB040501_004 !=''" >
+        HDSB040501_004 = to_date(#{HDSB040501_004},'yyyy-mm-dd'),
+        </if>
+		<if test="FSYS_CODE != null" >
+			 HDSB040501_005	= #{FSYS_CODE,jdbcType=VARCHAR},
+		</if>
+			<if test="FSYS != null" >
+			 HDSB040501_006= #{FSYS,jdbcType=VARCHAR},
+		</if>
+		<if test="SFCL != null" >
+			 SFCL	= #{SFCL,jdbcType=VARCHAR},
+		</if>
+		<if test="ZT != null" >
+			 ZT	= #{ZT,jdbcType=VARCHAR},
+		</if>
+		<if test="ID_NUMBER != null" >
+			 IDCODE	= #{ID_NUMBER,jdbcType=VARCHAR}
+		</if>
+		 
+		 </set>
+		 where 
+			GUID = #{GUID,jdbcType=VARCHAR}
+	</update>
+	
+	<!-- 修改随访记录参数信息表 -->
+	
+	  <update id="editsfinf" parameterType="pd">
+          update HDSB04050101 
+	      set
+	      	<if test="HDSB04050101_003 != null" >
+			 HDSB04050101_003 = #{HDSB04050101_003,jdbcType=VARCHAR},
+		</if>
+		     	<if test="HDSB04050101_005 != null" >
+			 HDSB04050101_005 = #{HDSB04050101_005,jdbcType=VARCHAR},
+		</if>
+		     	<if test="HDSB04050101_006 != null" >
+			 HDSB04050101_006 = #{HDSB04050101_006,jdbcType=VARCHAR},
+		</if>
+		  	<if test="HDSB04050101_007 != null" >
+			 HDSB04050101_007 = #{HDSB04050101_007,jdbcType=VARCHAR},
+		</if>
+		  	<if test="HDSB04050101_008 != null" >
+			 HDSB04050101_008 = #{HDSB04050101_008,jdbcType=VARCHAR},
+		</if>
+		  	<if test="HDSB04050101_010 != null" >
+			 HDSB04050101_010 = #{HDSB04050101_010,jdbcType=VARCHAR},
+		</if>
+		 	<if test="HDSB04050101_032 != null" >
+			 HDSB04050101_032 = #{HDSB04050101_032,jdbcType=VARCHAR},
+		</if>
+		 	<if test="HDSB04050101_033 != null" >
+			 HDSB04050101_033 = #{HDSB04050101_033,jdbcType=VARCHAR},
+		</if>
+		 	<if test="HDSB04050101_034 != null" >
+			 HDSB04050101_034 = #{HDSB04050101_034,jdbcType=VARCHAR},
+		</if>
+		 	<if test="HDSB04050101_046 != null" >
+			 HDSB04050101_046 = #{HDSB04050101_046,jdbcType=VARCHAR},
+		</if>
+		 	<if test="HDSB04050101_047 != null" >
+			 HDSB04050101_047 = #{HDSB04050101_047,jdbcType=VARCHAR}
+		</if>
+		
+		
+		where 
+			GUID = #{GUID,jdbcType=VARCHAR}
+	</update>
+
+	
+<!-- 新增主表信息-->
+	<insert id="savesfzb" parameterType="pd">
+		insert into HDSB040501
+		(GUID,HDSB040501_003,HDSB040501_004,
+		HDSB040501_005,HDSB040501_006 ,HDSB040501_009,
+		HDSB040501_013,SFCL,ZT,IDCODE
+		) 
+		values ( 	 
+		#{ID,jdbcType=VARCHAR},to_date(#{HDSB040501_003},'yyyy-mm-dd'),to_date(#{HDSB040501_004},'yyyy-mm-dd'),
+		#{FSYS_CODE,jdbcType=VARCHAR},#{FSYS,jdbcType=VARCHAR},#{ORG_CODE,jdbcType=VARCHAR},
+		sysdate,#{SFCL,jdbcType=VARCHAR},#{ZT,jdbcType=VARCHAR},#{ID_NUMBER,jdbcType=VARCHAR}
+		)
+	</insert>
+	
+	<!-- 新增参数表信息-->
+	<insert id="savesfinf" parameterType="pd">  
+	   insert into HDSB04050101
+		(GUID,HDSB04050101_003,
+		HDSB04050101_005,HDSB04050101_006,HDSB04050101_007,
+		HDSB04050101_008,HDSB04050101_010,HDSB04050101_032,
+		HDSB04050101_033,HDSB04050101_034,HDSB04050101_046,
+		HDSB04050101_047
+		) 
+		values (
+		#{ID,jdbcType=VARCHAR},#{HDSB04050101_003,jdbcType=VARCHAR},
+		#{HDSB04050101_005,jdbcType=VARCHAR},#{HDSB04050101_006,jdbcType=VARCHAR},#{HDSB04050101_007,jdbcType=VARCHAR},
+		#{HDSB04050101_008,jdbcType=VARCHAR},#{HDSB04050101_010,jdbcType=VARCHAR},#{HDSB04050101_032,jdbcType=VARCHAR},
+		#{HDSB04050101_033,jdbcType=VARCHAR},#{HDSB04050101_034,jdbcType=VARCHAR},#{HDSB04050101_046,jdbcType=VARCHAR},
+		#{HDSB04050101_047,jdbcType=VARCHAR}
+		)
+	</insert>
+	
+    
+  <update id="delete" parameterType="pd">
+  　　　　　	update HDSB040501
+		 set
+		   	<if test="ZT != null" >
+			 ZT = #{ZT,jdbcType=VARCHAR}
+		</if>
+		 where 
+			GUID = #{ID,jdbcType=VARCHAR}
+	</update>
+    
+    
+    <!-- app多条记录删除 -->
+
+  <update id="appdelete" parameterType="pd">
+  　　　　　	update HDSB040501
+		 set
+		   	<if test="ZT != null" >
+			 ZT = #{ZT,jdbcType=VARCHAR}
+		</if>
+		 where 
+			GUID in ${IDS}
+	</update>
+
+    
+</mapper>

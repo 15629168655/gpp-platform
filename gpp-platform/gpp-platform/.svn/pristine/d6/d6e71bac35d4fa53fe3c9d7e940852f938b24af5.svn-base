@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="NoticeMapper">
+	
+	<!--表名 -->
+	<sql id="tableName">
+		GPP_NOTICE
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		ID,
+  		TYPE,
+  		BT,
+  		REMARK,
+  		STATE,
+  		CREATETIME,
+  		UPDATETIME,
+  		CZR,        
+  		CZRID
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{ID,jdbcType=VARCHAR},
+  		#{TYPE,jdbcType=VARCHAR},
+  		#{BT,jdbcType=VARCHAR},      
+  		#{REMARK,jdbcType=VARCHAR},
+  		#{STATE,jdbcType=VARCHAR},
+  		to_date(#{CREATETIME,jdbcType=DATE},'YYYY-MM-DD HH24:MI:SS'),
+  		to_date(#{UPDATETIME,jdbcType=DATE},'YYYY-MM-DD HH24:MI:SS'),
+  		#{CZR,jdbcType=NUMERIC},
+  		#{CZRID,jdbcType=VARCHAR}
+	</sql>
+	
+	<!-- APP查询   状态 1启用-->
+	<select id="queryPage" parameterType="pd" resultType="pd">
+				SELECT *
+				  FROM ( SELECT ROWNUM AS rowno, t.* from (select t.*
+				          FROM GPP_NOTICE t
+				where 
+				STATE = #{STATE}
+				<if test="TYPE!=null and TYPE!=''">
+				    and TYPE =#{TYPE}
+				</if>
+				order by UPDATETIME desc
+				           )t ) table_alias
+				 WHERE table_alias.rowno BETWEEN #{pageStart} and #{pageEnd}
+	</select>
+	
+	<!-- APP查询  状态  0:保存,2:停用,9:删除-->
+	<select id="queryPageAll" parameterType="pd" resultType="pd">
+				SELECT *
+				  FROM ( SELECT ROWNUM AS rowno, t.*
+				          FROM GPP_NOTICE t
+				where 
+				STATE = #{STATE}
+				           ) table_alias
+				 WHERE table_alias.rowno BETWEEN #{pageStart} and #{pageEnd}
+	</select>
+	
+	<!-- 列表 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include>
+		<where>
+		1=1 and STATE !=9
+			<if test="pd.STATE != null and pd.STATE != ''"><!-- 状态检索 -->
+				and STATE=#{pd.STATE} 
+			</if>
+			<if test="pd.TYPE != null and pd.TYPE != ''"><!-- 类型检索 -->
+				and TYPE=#{pd.TYPE} 
+			</if>
+			<if test="pd.start_time!=null and pd.start_time!=''"><!-- 开始时间检索 -->
+				and to_char(CREATETIME,'yyyymmdd') &gt;= to_char(to_date(#{pd.start_time},'YYYY-MM-DD HH24:MI:SS'),'yyyymmdd')
+			</if>
+			<if test="pd.end_time!=null and pd.end_time!=''"><!-- 结束时间检索   -->
+				and to_char(CREATETIME,'yyyymmdd') &lt;= to_char(to_date(#{pd.end_time},'YYYY-MM-DD HH24:MI:SS'),'yyyymmdd')
+			</if>
+        </where>
+        order by UPDATETIME desc
+	</select>
+	
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include> 
+		where
+			ID = #{ID}
+	</select>
+	
+	<!-- 增加-->
+	<insert id="save" parameterType="pd">
+		insert into 
+	<include refid="tableName"></include>
+		(
+	<include refid="Field"></include>
+		) values (
+	<include refid="FieldValue"></include>
+		)
+	</insert>
+	
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+		update
+		<include refid="tableName"></include>
+		set 
+		TYPE = #{TYPE,jdbcType=VARCHAR},
+  		BT = #{BT,jdbcType=VARCHAR},   
+  		REMARK = #{REMARK,jdbcType=VARCHAR},
+  		STATE = #{STATE,jdbcType=VARCHAR},
+  		UPDATETIME =sysdate
+		where
+		ID = #{ID}
+	</update>
+	
+	<!-- 删除-->
+	<delete id="delete" parameterType="pd">
+		delete from
+		<include refid="tableName"></include>
+		where 
+			ID = #{ID}
+	</delete>
+	
+</mapper>

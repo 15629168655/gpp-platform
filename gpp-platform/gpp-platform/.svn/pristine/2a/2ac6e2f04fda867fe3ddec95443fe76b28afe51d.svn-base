@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="payservicetMapper">
+
+<!--表名 -->
+	<sql id="tableName">
+		GPP_PAY_SERVICE
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		  BM, 
+		  CBBM, 
+		  CBMC,
+		  CBJ,  
+		  CWLB,  
+		  CZY,
+		  FLBM,  
+		  GG,  
+		  HSXS,  
+		  HYHH, 
+		  HYJ,  
+		  ID,  
+		  JM, 
+		  JX,  
+		  LSJ, 
+		  MZDYLB,  
+		  MC, 
+		  NBJ,
+		  NHBM,
+		  NHMC,
+		  PFJ,
+		  SYQ,
+		  TBJ,
+		  TYM,
+		  TYPE,
+		  WBM,
+		  XSJ,
+		  YBBM,
+		  YBLB,
+		  YBMC,
+		  YFDW,
+		  YKDW,
+		  YLDW,
+		  YLHSXS,
+		  ZXLB,
+		  ZXYL,
+		  ZYDYLB,
+		  ZYJ,
+		  XGSJ
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{BM,jdbcType=VARCHAR},
+  		#{CBBM,jdbcType=VARCHAR},      
+  		#{CBMC,jdbcType=VARCHAR},    
+  			#{CBJ,jdbcType=NUMERIC},
+		#{CWLB,jdbcType=VARCHAR},
+		#{CZY,jdbcType=VARCHAR},
+  		#{FLBM,jdbcType=VARCHAR},
+  		#{GG,jdbcType=VARCHAR},
+  			#{HSXS,jdbcType=NUMERIC},
+  		#{HYHH,jdbcType=VARCHAR},
+			#{HYJ,jdbcType=NUMERIC},
+  		#{ID,jdbcType=VARCHAR},
+  		#{JM,jdbcType=VARCHAR},
+  		#{JX,jdbcType=VARCHAR},
+			#{LSJ,jdbcType=NUMERIC},
+  		#{MZDYLB,jdbcType=VARCHAR},
+  		#{MC,jdbcType=VARCHAR},
+			#{NBJ,jdbcType=NUMERIC},
+  		#{NHBM,jdbcType=VARCHAR},
+  		#{NHMC,jdbcType=VARCHAR},
+  			#{PFJ,jdbcType=NUMERIC},
+		#{SYQ,jdbcType=VARCHAR},
+			#{TBJ,jdbcType=NUMERIC},
+		#{TYM,jdbcType=VARCHAR},
+			#{TYPE,jdbcType=NUMERIC},
+		#{WBM,jdbcType=VARCHAR},
+			#{XSJ,jdbcType=NUMERIC},
+		#{YBBM,jdbcType=VARCHAR},
+		#{YBLB,jdbcType=VARCHAR},
+		#{YBMC,jdbcType=VARCHAR},
+		#{YFDW,jdbcType=VARCHAR},
+		#{YKDW,jdbcType=VARCHAR},
+		#{YLDW,jdbcType=VARCHAR},
+			#{YLHSXS,jdbcType=NUMERIC},
+		#{ZXLB,jdbcType=VARCHAR},
+			#{ZXYL,jdbcType=NUMERIC},
+		#{ZYDYLB,jdbcType=VARCHAR},
+			#{ZYJ,jdbcType=NUMERIC},
+		to_date(#{XGSJ,jdbcType=DATE},'YYYY-MM-DD HH24:MI:SS')
+	</sql>
+	
+	<!-- 列表 -->
+	<select id="paylistPage" parameterType="page" resultType="pd">
+		select
+		*		
+		from 
+			<include refid="tableName"></include>  a
+		where a.BM = #{pd.BM} 
+		<if test="pd.keywords != null and pd.keywords!= ''"><!-- 关键词检索 -->
+			and (
+				a.MC LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				)
+		</if>
+
+	</select>
+	
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+		*
+		from 
+		<include refid="tableName"></include> 
+		where
+			ID = #{ID}
+	</select>
+	
+	<!-- 新增-->
+	<insert id="save" parameterType="pd">
+		insert into 
+	<include refid="tableName"></include>
+		(
+	<include refid="Field"></include>
+		) values (
+	<include refid="FieldValue"></include>
+		)
+	</insert>
+	
+	<!-- 修改-->
+	<update id="edit" parameterType="pd">
+		update
+		<include refid="tableName"></include>
+		set 
+		"TYPE" =#{TYPE,jdbcType=NUMERIC},
+		"HSXS" =#{HSXS,jdbcType=NUMERIC},
+		GG =#{GG,jdbcType=VARCHAR},
+		JX =#{JX,jdbcType=VARCHAR},
+		YFDW =#{YFDW,jdbcType=VARCHAR},
+		YKDW =#{YKDW,jdbcType=VARCHAR},
+		TYM =#{TYM,jdbcType=VARCHAR},
+		JM =#{JM,jdbcType=VARCHAR},
+		WBM =#{WBM,jdbcType=VARCHAR},
+		"HYJ" =#{HYJ,jdbcType=NUMERIC},
+		"LSJ" =#{LSJ,jdbcType=NUMERIC},
+		"NBJ" =#{NBJ,jdbcType=NUMERIC},
+		"CBJ" =#{CBJ,jdbcType=NUMERIC},
+		"PFJ" =#{PFJ,jdbcType=NUMERIC},
+		"TBJ" =#{TBJ,jdbcType=NUMERIC},
+		"XSJ" =#{TBJ,jdbcType=NUMERIC},
+		"ZYJ" =#{ZYJ,jdbcType=NUMERIC},
+  		XGSJ =sysdate
+		where
+		ID = #{ID}
+	</update>
+	 
+	<!-- 删除-->
+	<delete id="delete" parameterType="pd">
+		delete from
+		<include refid="tableName"></include>
+		where 
+			ID = #{ID}
+	</delete>
+	
+	<!-- 批量删除 -->
+	<delete id="deleteAll" parameterType="String">
+		delete from
+		<include refid="tableName"></include>
+		where 
+			ID in
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                 #{item}
+		</foreach>
+	</delete>
+	
+	</mapper>

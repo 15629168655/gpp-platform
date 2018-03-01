@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="GmpatientMapper">
+	
+	<!--表名 -->
+	<sql id="tableName">
+		GPP_GM_INFORMATION
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		ID,
+  		PATIENT_ID,
+  		PATIENT_NAME,
+  		ALLERGY,
+  		BZ,
+  		OPERATOR_ID,
+  		OPERATOR_NAME,
+  		ORG_CODE,        
+  		CREATED_TIME,
+  		MODIFY_TIME,
+  		REGION_CODE
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{ID},
+  		#{PATIENT_ID},
+  		#{PATIENT_NAME},      
+  		#{ALLERGY,jdbcType=VARCHAR},
+  		#{BZ,jdbcType=VARCHAR},
+  		#{OPERATOR_ID,jdbcType=VARCHAR},
+  		#{OPERATOR_NAME,jdbcType=VARCHAR},
+  		#{ORG_CODE,jdbcType=VARCHAR},
+  		sysdate,
+	    sysdate,
+	    #{REGION_CODE,jdbcType=VARCHAR}
+	</sql>
+	
+	<select id="queryPage" parameterType="pd" resultType="pd">
+				SELECT *
+				  FROM ( SELECT ROWNUM AS rowno, t.*
+				          FROM TB_GM_PATIENT_INFORMATION t
+				where 1=1
+            <if test="KEYWORDS != null and KEYWORDS!= ''"><!-- 关键词检索 -->
+				and (
+				PATIENT_NAME LIKE CONCAT(CONCAT('%', #{KEYWORDS}),'%')
+				or
+				OPERATOR_NAME LIKE CONCAT(CONCAT('%', #{KEYWORDS}),'%')
+				)
+			</if>
+			<if test="ALLERGY != null and ALLERGY != ''"><!-- 过敏源检索 -->
+				and ALLERGY = #{ALLERGY}
+			</if>
+				           ) table_alias
+				 WHERE table_alias.rowno BETWEEN #{pageStart} and #{pageEnd}
+	</select>
+	
+	<!-- 新增-->
+	<insert id="saveApp" parameterType="pd">
+		insert into
+			TB_GM_PATIENT_INFORMATION
+		(
+			 "ID","PATIENT_ID", "PATIENT_NAME", "ALLERGY",
+			 "BZ","OPERATOR_ID","OPERATOR_NAME",
+			 "ORG_CODE","CREATED_TIME","MODIFY_TIME",REGION_CODE
+		) values (
+			#{ID,jdbcType=VARCHAR},#{PATIENT_ID,jdbcType=VARCHAR},#{PATIENT_NAME,jdbcType=VARCHAR},#{ALLERGY,jdbcType=VARCHAR},
+			#{BZ,jdbcType=VARCHAR},#{OPERATOR_ID,jdbcType=VARCHAR},#{OPERATOR_NAME,jdbcType=VARCHAR},#{ORG_CODE,jdbcType=VARCHAR},sysdate,sysdate,REGION_CODE
+		)
+	</insert>
+	
+	<!-- 删除-->
+	<delete id="delApp" parameterType="pd">
+		delete from
+		<include refid="tableName"></include>
+		where 
+			ID = #{ID}
+	</delete>
+	
+	<!-- 修改 -->
+	<update id="editApp" parameterType="pd">
+		update
+		<include refid="tableName"></include>
+		set 
+		"PATIENT_ID" = #{PATIENT_ID,jdbcType=VARCHAR},
+  		"PATIENT_NAME" = #{PATIENT_NAME,jdbcType=VARCHAR},   
+  		"ALLERGY" = #{ALLERGY,jdbcType=VARCHAR},
+  		"BZ" = #{BZ,jdbcType=VARCHAR},
+  		"OPERATOR_ID" = #{OPERATOR_ID,jdbcType=VARCHAR},
+  		"OPERATOR_NAME" = #{OPERATOR_NAME,jdbcType=VARCHAR},
+  		"ORG_CODE" = #{ORG_CODE,jdbcType=VARCHAR},
+  		"MODIFY_TIME" = sysdate
+		where
+		"ID" = #{ID}
+	</update>
+	
+	<!-- 列表 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include>
+		<where>
+			1=1
+            <if test="pd.keywords != null and pd.keywords!= ''"><!-- 关键词检索 -->
+			and (
+				PATIENT_NAME LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				or
+				OPERATOR_NAME LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				)
+			</if>
+			<if test="pd.ALLERGY != null and pd.ALLERGY != ''"><!-- 过敏源检索 -->
+				and ALLERGY=#{pd.ALLERGY} 
+			</if>
+			order by MODIFY_TIME DESC
+        </where>
+	</select>
+	
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include> 
+		where
+			ID = #{ID}
+	</select>
+	
+	<!-- 增加患者过敏信息-->
+	<insert id="save" parameterType="pd">
+		insert into 
+	<include refid="tableName"></include>
+		(
+	<include refid="Field"></include>
+		) values (
+	<include refid="FieldValue"></include>
+		)
+	</insert>
+	
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+		update
+		<include refid="tableName"></include>
+		set 
+		PATIENT_ID = #{PATIENT_ID,jdbcType=VARCHAR},
+  		PATIENT_NAME = #{PATIENT_NAME,jdbcType=VARCHAR},   
+  		ALLERGY = #{ALLERGY,jdbcType=VARCHAR},
+  		BZ = #{BZ,jdbcType=VARCHAR},
+  		OPERATOR_ID = #{OPERATOR_ID,jdbcType=VARCHAR},
+  		OPERATOR_NAME = #{OPERATOR_NAME,jdbcType=VARCHAR},
+  		MODIFY_TIME =sysdate
+		where
+		ID = #{ID}
+	</update>
+	
+	<!-- 删除-->
+	<delete id="delete" parameterType="pd">
+		delete from
+		<include refid="tableName"></include>
+		where 
+			ID = #{ID}
+	</delete>
+	
+	<!-- 批量删除 -->
+	<delete id="deleteAll" parameterType="String">
+		delete from
+		<include refid="tableName"></include>
+		where 
+			ID in
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                 #{item}
+		</foreach>
+	</delete>
+</mapper>

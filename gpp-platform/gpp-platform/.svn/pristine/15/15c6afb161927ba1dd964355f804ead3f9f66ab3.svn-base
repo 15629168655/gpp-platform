@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: gpp-platform
+Bundle-SymbolicName: gpp-platform
+Bundle-Version: 1.0.0.qualifier

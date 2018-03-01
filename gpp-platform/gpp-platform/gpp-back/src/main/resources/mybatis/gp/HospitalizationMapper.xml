@@ -1,0 +1,438 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="HospitalizationMapper">
+<!--表名 -->
+	<sql id="tableName">
+		GPP_HOSPITALIZATION_DOC
+	</sql>
+
+<!-- 字段 -->
+	<sql id="Field">
+		<if test="ID != null and ID != ''">
+			ID,
+		</if>
+
+			JZLSH,
+			ZJHM,
+			ZYH,
+			XM,
+			XB,
+			NL,
+			ZY,
+			KSBM,
+			KSMC,
+			ZYZYRQ,
+			YJZYF,
+			JZZDBM,
+			MZZDMC,
+			BQ,
+			TW,
+			YSFS,
+			GL,
+			WSCL,
+			ZYRQ,
+			TSCLSY,
+			LDCLYJ,
+			ZZYSGH,
+			ZZYSXM,
+			JBR,
+			DZ,
+			ORG_CODE,
+			SCSJ,
+			XGSJ,
+			ZT,
+			FYLB
+
+	</sql>
+	
+<!-- 字段值 -->
+	<sql id="FieldValue">
+			#{ID,jdbcType=VARCHAR},
+			#{JZLSH,jdbcType=VARCHAR},
+			#{ZJHM,jdbcType=VARCHAR},
+			#{ZYH,jdbcType=VARCHAR},
+			#{XM,jdbcType=VARCHAR},
+			#{XB,jdbcType=VARCHAR},
+			#{NL,jdbcType=VARCHAR},
+			#{ZY,jdbcType=VARCHAR},
+			#{KSBM,jdbcType=VARCHAR},
+			#{KSMC,jdbcType=VARCHAR},
+			to_date(#{ZYZYRQ},'YYYY-MM-DD'),
+			#{YJZYF,jdbcType=DOUBLE},
+			#{JZZDBM,jdbcType=VARCHAR},
+			#{MZZDMC,jdbcType=VARCHAR},
+			#{BQ,jdbcType=VARCHAR},
+			#{TW,jdbcType=VARCHAR},
+			#{YSFS,jdbcType=VARCHAR},
+			#{GL,jdbcType=VARCHAR},
+			#{WSCL,jdbcType=VARCHAR},
+			to_date(#{ZYRQ},'YYYY-MM-DD'),
+			#{TSCLSY,jdbcType=VARCHAR},
+			#{LDCLYJ,jdbcType=VARCHAR},
+			#{ZZYSGH,jdbcType=VARCHAR},
+			#{ZZYSXM,jdbcType=VARCHAR},
+			#{JBR,jdbcType=VARCHAR},
+			#{DZ,jdbcType=VARCHAR},
+			#{ORG_CODE,jdbcType=VARCHAR},
+			sysdate,
+			sysdate,
+			#{ZT,jdbcType=VARCHAR},
+			#{FYLB,jdbcType=VARCHAR}
+
+	</sql>
+	
+	<!-- 列表 -->
+	<select id="hospitalizationlistPage" parameterType="page" resultType="pd">
+		select
+		    a.ID,
+			a.JZLSH,
+			a.ZJHM,
+			a.ZYH,
+			a.XM,
+			a.XB,
+			a.NL,
+			a.ZY,
+			a.KSBM,
+			a.KSMC,
+			a.ZYZYRQ,
+			a.YJZYF,
+			a.JZZDBM,
+			a.MZZDMC,
+			a.BQ,
+			a.TW,
+			a.YSFS,
+			a.GL,
+			a.WSCL,
+			a.ZYRQ,
+			a.TSCLSY,
+			a.LDCLYJ,
+			a.ZZYSGH,
+			a.ZZYSXM,
+			a.JBR,
+			a.DZ,
+			a.ORG_CODE,
+			a.SCSJ,
+			a.XGSJ,
+			a.ZT,
+			a.FYLB
+
+		from 
+			<include refid="tableName"></include> a
+		where 1 = 1 
+		and a.ZT != 9
+		and a.ORG_CODE = #{pd.ORG_CODE}
+		<if test="pd.XM != null and pd.XM != ''"><!-- 姓名检索 -->
+			and a.XM LIKE CONCAT(CONCAT('%', #{pd.XM}),'%')
+		</if>
+		<if test="pd.zyrqStart!=null and pd.zyrqStart!=''"><!-- 住院日期起检索 -->
+			and a.ZYRQ &gt;=to_date(#{pd.zyrqStart},'yyyy-mm-dd')
+		</if>
+		<if test="pd.zyrqEnd!=null and pd.zyrqEnd!=''"><!-- 住院日期止检索 -->
+			and a.ZYRQ &lt;=to_date(#{pd.zyrqEnd},'yyyy-mm-dd')
+		</if>
+		order by a.XM
+
+	</select>
+	
+	<!-- 新增住院证 -->
+	
+	<insert id="save" parameterType="pd">
+		insert into <include refid="tableName"></include>
+	<trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="ID != null" >
+        ID,
+      </if>
+    <if test="JZLSH	!= null" >	JZLSH,	</if>
+	<if test="ZJHM	!= null" >	ZJHM,	</if>
+	<if test="ZYH	!= null" >	ZYH,	</if>
+	<if test="XM	!= null" >	XM,	</if>
+	<if test="XB	!= null" >	XB,	</if>
+	<if test="NL	!= null" >	NL,	</if>
+	<if test="ZY	!= null" >	ZY,	</if>
+	<if test="KSBM	!= null" >	KSBM,	</if>
+	<if test="KSMC	!= null" >	KSMC,	</if>
+	<if test="ZYZYRQ	!= null" >	ZYZYRQ,	</if>
+	<if test="YJZYF	!= null" >	YJZYF,	</if>
+	<if test="JZZDBM	!= null" >	JZZDBM,	</if>
+	<if test="MZZDMC	!= null" >	MZZDMC,	</if>
+	<if test="BQ	!= null" >	BQ,	</if>
+	<if test="TW	!= null" >	TW,	</if>
+	<if test="YSFS	!= null" >	YSFS,	</if>
+	<if test="GL	!= null" >	GL,	</if>
+	<if test="WSCL	!= null" >	WSCL,	</if>
+	<if test="ZYRQ	!= null" >	ZYRQ,	</if>
+	<if test="TSCLSY	!= null" >	TSCLSY,	</if>
+	<if test="LDCLYJ	!= null" >	LDCLYJ,	</if>
+	<if test="ZZYSGH	!= null" >	ZZYSGH,	</if>
+	<if test="ZZYSXM	!= null" >	ZZYSXM,	</if>
+	<if test="JBR	!= null" >	JBR,	</if>
+	<if test="DZ	!= null" >	DZ,	</if>
+	<if test="ORG_CODE	!= null" >	ORG_CODE,	</if>
+	<if test="ZT	!= null" >	ZT,	</if>
+	<if test="FYLB	!= null" >	FYLB,	</if>
+     SCSJ, 
+     XGSJ
+       </trim>
+            VALUES
+     <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="ID != null" >
+        #{ID,jdbcType=VARCHAR},
+      </if>
+    <if test="JZLSH	!= null" >	#{JZLSH,jdbcType=VARCHAR},	</if>
+	<if test="ZJHM	!= null" >	#{ZJHM,jdbcType=VARCHAR},	</if>
+	<if test="ZYH	!= null" >	#{ZYH,jdbcType=VARCHAR},	</if>
+	<if test="XM	!= null" >	#{XM,jdbcType=VARCHAR},	</if>
+	<if test="XB	!= null" >	#{XB,jdbcType=VARCHAR},	</if>
+	<if test="NL	!= null" >	#{NL,jdbcType=VARCHAR},	</if>
+	<if test="ZY	!= null" >	#{ZY,jdbcType=VARCHAR},	</if>
+	<if test="KSBM	!= null" >	#{KSBM,jdbcType=VARCHAR},	</if>
+	<if test="KSMC	!= null" >	#{KSMC,jdbcType=VARCHAR},	</if>
+	<if test="ZYZYRQ	!= null" >	to_date(#{ZYZYRQ},'YYYY-MM-DD'),	</if>
+	<if test="YJZYF	!= null" >	#{YJZYF,jdbcType=DOUBLE},	</if>
+	<if test="JZZDBM	!= null" >	#{JZZDBM,jdbcType=VARCHAR},	</if>
+	<if test="MZZDMC	!= null" >	#{MZZDMC,jdbcType=VARCHAR},	</if>
+	<if test="BQ	!= null" >	#{BQ,jdbcType=VARCHAR},	</if>
+	<if test="TW	!= null" >	#{TW,jdbcType=VARCHAR},	</if>
+	<if test="YSFS	!= null" >	#{YSFS,jdbcType=VARCHAR},	</if>
+	<if test="GL	!= null" >	#{GL,jdbcType=VARCHAR},	</if>
+	<if test="WSCL	!= null" >	#{WSCL,jdbcType=VARCHAR},	</if>
+	<if test="ZYRQ	!= null" >	to_date(#{ZYRQ},'YYYY-MM-DD'),	</if>
+	<if test="TSCLSY	!= null" >	#{TSCLSY,jdbcType=VARCHAR},	</if>
+	<if test="LDCLYJ	!= null" >	#{LDCLYJ,jdbcType=VARCHAR},	</if>
+	<if test="ZZYSGH	!= null" >	#{ZZYSGH,jdbcType=VARCHAR},	</if>
+	<if test="ZZYSXM	!= null" >	#{ZZYSXM,jdbcType=VARCHAR},	</if>
+	<if test="JBR	!= null" >	#{JBR,jdbcType=VARCHAR},	</if>
+	<if test="DZ	!= null" >	#{DZ,jdbcType=VARCHAR},	</if>
+	<if test="ORG_CODE	!= null" >	#{ORG_CODE,jdbcType=VARCHAR},	</if>
+	<if test="ZT	!= null" >	#{ZT,jdbcType=VARCHAR},	</if>
+	<if test="FYLB	!= null" >	#{FYLB,jdbcType=VARCHAR},	</if>
+     sysdate,
+     sysdate
+      </trim>
+      </insert> 
+	
+	<!-- 通过id获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd" >
+		select 
+			<include refid="Field"></include>
+		from 
+			<include refid="tableName"></include>
+		where 
+			ID = #{ID}
+	</select>
+	
+	<!-- 修改 -->
+	<!-- <update id="edit" parameterType="pd" >
+		update  <include refid="tableName"></include>
+	  set   
+	       JZLSH			= #{JZLSH,jdbcType=VARCHAR},
+			ZJHM			= #{ZJHM,jdbcType=VARCHAR},
+			ZYH			    = #{ZYH,jdbcType=VARCHAR},
+			XM			    = #{XM,jdbcType=VARCHAR},
+			XB			    = #{XB,jdbcType=VARCHAR},
+			NL			    = #{NL,jdbcType=VARCHAR},
+			ZY			    = #{ZY,jdbcType=VARCHAR},
+			KSBM			= #{KSBM,jdbcType=VARCHAR},
+			KSMC			= #{KSMC,jdbcType=VARCHAR},
+			ZYZYRQ			= to_date(substr(#{ZYZYRQ},1,10),'YYYY-MM-DD'),
+			YJZYF			= #{YJZYF,jdbcType=DOUBLE},
+			JZZDBM			= #{JZZDBM,jdbcType=VARCHAR},
+			MZZDMC			= #{MZZDMC,jdbcType=VARCHAR},
+			BQ			    = #{BQ,jdbcType=VARCHAR},
+			TW			    = #{TW,jdbcType=VARCHAR},
+			YSFS			= #{YSFS,jdbcType=VARCHAR},
+			GL			    = #{GL,jdbcType=VARCHAR},
+			WSCL			= #{WSCL,jdbcType=VARCHAR},
+			ZYRQ			= to_date(substr(#{ZYRQ},1,10),'YYYY-MM-DD'),
+			TSCLSY			= #{TSCLSY,jdbcType=VARCHAR},
+			LDCLYJ			= #{LDCLYJ,jdbcType=VARCHAR},
+			ZZYSGH			= #{ZZYSGH,jdbcType=VARCHAR},
+			ZZYSXM			= #{ZZYSXM,jdbcType=VARCHAR},
+			JBR			    = #{JBR,jdbcType=VARCHAR},
+			DZ			    = #{DZ,jdbcType=VARCHAR},
+			JGBM			= #{JGBM,jdbcType=VARCHAR},
+			XGSJ			= sysdate,
+			ZT			    = #{ZT,jdbcType=VARCHAR},
+			ID              = ID
+
+			where 
+				ID = #{ID}
+	</update> -->
+	
+	<update id="edit" parameterType="pd" >
+		update  <include refid="tableName"></include>
+			set
+		<if test="JZLSH != null " >	
+	JZLSH		=#{JZLSH,jdbcType=VARCHAR},
+	</if>
+	<if test="ZJHM != null " >	
+	ZJHM		=#{ZJHM,jdbcType=VARCHAR},
+	</if>
+	<if test="ZYH != null " >	
+	ZYH		=#{ZYH,jdbcType=VARCHAR},
+	</if>
+	<if test="XM != null " >	
+	XM		=#{XM,jdbcType=VARCHAR},
+	</if>
+	<if test="XB != null " >	
+	XB		=#{XB,jdbcType=VARCHAR},
+	</if>
+	<if test="NL != null " >	
+	NL		=#{NL,jdbcType=VARCHAR},
+	</if>
+	<if test="ZY != null " >	
+	ZY		=#{ZY,jdbcType=VARCHAR},
+	</if>
+	<if test="KSBM != null " >
+	KSBM		=#{KSBM,jdbcType=VARCHAR},
+	</if>
+	<if test="KSMC != null " >	
+	KSMC		=#{KSMC,jdbcType=VARCHAR},
+	</if>
+	<if test="ZYZYRQ != null " >	
+	ZYZYRQ		=to_date(#{ZYZYRQ},'YYYY-MM-DD'),
+	</if>
+	<if test="YJZYF != null " >	
+	YJZYF		=#{YJZYF,jdbcType=DOUBLE},
+	</if>
+	<if test="JZZDBM != null " >	
+	JZZDBM		=#{JZZDBM,jdbcType=VARCHAR},
+	</if>
+	<if test="MZZDMC != null " >	
+	MZZDMC		=#{MZZDMC,jdbcType=VARCHAR},
+	</if>
+	<if test="BQ != null " >	
+	BQ		=#{BQ,jdbcType=VARCHAR},
+	</if>
+	<if test="TW != null " >	
+	TW		=#{TW,jdbcType=VARCHAR},
+	</if>
+	<if test="YSFS != null " >	
+	YSFS		=#{YSFS,jdbcType=VARCHAR},
+	</if>
+	<if test="GL != null " >	
+	GL		=#{GL,jdbcType=VARCHAR},
+	</if>
+	<if test="WSCL != null " >	
+	WSCL		=#{WSCL,jdbcType=VARCHAR},
+	</if>
+	<if test="ZYRQ != null " >	
+	ZYRQ		=to_date(#{ZYRQ},'YYYY-MM-DD'),
+	</if>
+	<if test="TSCLSY != null " >	
+	TSCLSY		=#{TSCLSY,jdbcType=VARCHAR},
+	</if>
+	<if test="LDCLYJ != null " >	
+	LDCLYJ		=#{LDCLYJ,jdbcType=VARCHAR},
+	</if>
+	<if test="ZZYSGH != null " >	
+	ZZYSGH		=#{ZZYSGH,jdbcType=VARCHAR},
+	</if>
+	<if test="ZZYSXM != null " >	
+	ZZYSXM		=#{ZZYSXM,jdbcType=VARCHAR},
+	</if>
+	<if test="JBR != null " >		
+        JBR		=#{JBR,jdbcType=VARCHAR},
+	</if>
+	<if test="DZ != null " >	
+	DZ		=#{DZ,jdbcType=VARCHAR},	
+       </if>
+	<if test="ZT != null " >	
+	ZT		=#{ZT,jdbcType=VARCHAR},
+	</if>
+	<if test="FYLB != null " >	
+	FYLB		=#{FYLB,jdbcType=VARCHAR},
+	</if>
+       XGSJ		=sysdate
+			where 
+				ID = #{ID}
+	</update>  
+        
+	<!-- 删除 -->
+	<update id="delete" parameterType="pd">
+		update  <include refid="tableName"></include>
+			set ZT = 9,
+			    XGSJ = sysdate
+		where 
+			ID = #{ID}
+	</update>
+	
+	<!-- 批量删除任务 -->
+	<update id="deleteAll" parameterType="String">
+		update <include refid="tableName"></include>
+		   set ZT = 9,
+		   XGSJ	 = sysdate
+		where 
+			ID in
+  			 <foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                  #{item}
+             </foreach>
+	</update>
+	
+	<!-- app分页查询-->
+	<select id="queryPage" parameterType="pd" resultType="pd">
+				SELECT *
+				  FROM ( 
+				       SELECT ROWNUM AS rowno, a.* 
+				           FROM 
+				          <include refid="tableName"></include>  a
+			where 1 = 1 
+			and a.ZT != 9
+			and a.ORG_CODE = #{ORG_CODE}
+		<if test="XM != null and XM != ''"><!-- 姓名检索 -->
+			and a.XM LIKE CONCAT(CONCAT('%', #{XM}),'%')
+		</if>
+		<if test="ZYRQSTART!=null and ZYRQSTART!=''"><!-- 住院日期起检索 -->
+			and a.ZYRQ &gt;=to_date(#{ZYRQSTART},'yyyy-mm-dd')
+		</if>
+		<if test="ZYRQEND!=null and ZYRQEND!=''"><!-- 住院日期止检索 -->
+			and a.ZYRQ &lt;=to_date(#{ZYRQEND},'yyyy-mm-dd')
+		</if>
+				           ) table_alias
+				           
+				 WHERE table_alias.rowno BETWEEN #{pageStart} and #{pageEnd}
+	</select>
+	
+	<!-- app新增-->
+	<!-- <insert id="addHospitalization" parameterType="pd">
+		insert into
+			<include refid="tableName"></include>
+		(
+             <include refid="Field"></include>
+
+		) values (
+		    #{ID,jdbcType=VARCHAR},
+			#{JZLSH,jdbcType=VARCHAR},
+			#{ZJHM,jdbcType=VARCHAR},
+			#{ZYH,jdbcType=VARCHAR},
+			#{XM,jdbcType=VARCHAR},
+			#{XB,jdbcType=VARCHAR},
+			#{NL,jdbcType=VARCHAR},
+			#{ZY,jdbcType=VARCHAR},
+			#{KSBM,jdbcType=VARCHAR},
+			#{KSMC,jdbcType=VARCHAR},
+			to_date(#{ZYZYRQ},'YYYY-MM-DD'),
+			#{YJZYF,jdbcType=DOUBLE},
+			#{JZZDBM,jdbcType=VARCHAR},
+			#{MZZDMC,jdbcType=VARCHAR},
+			#{BQ,jdbcType=VARCHAR},
+			#{TW,jdbcType=VARCHAR},
+			#{YSFS,jdbcType=VARCHAR},
+			#{GL,jdbcType=VARCHAR},
+			#{WSCL,jdbcType=VARCHAR},
+			to_date(#{ZYRQ},'YYYY-MM-DD'),
+			#{TSCLSY,jdbcType=VARCHAR},
+			#{LDCLYJ,jdbcType=VARCHAR},
+			#{ZZYSGH,jdbcType=VARCHAR},
+			#{ZZYSXM,jdbcType=VARCHAR},
+			#{JBR,jdbcType=VARCHAR},
+			#{DZ,jdbcType=VARCHAR},
+			#{JGBM,jdbcType=VARCHAR},
+			sysdate,
+			sysdate,
+			#{ZT,jdbcType=VARCHAR},
+			#{FYLB,jdbcType=VARCHAR}
+		)
+	</insert> -->
+</mapper>

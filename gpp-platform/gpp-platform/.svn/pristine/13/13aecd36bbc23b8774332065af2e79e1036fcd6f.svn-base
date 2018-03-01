@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="DepartmentsMapper">
+
+    <resultMap type="Departments" id="depResultMap">
+        <id column="DEP_ID" property="DEP_ID"/>
+        <!-- result column="DEP_ID" property="DEP_ID"/> -->
+		<result column="DEP_NAME" property="DEP_NAME"/>
+		<result column="DEP_TYPE_NAME" property="DEP_TYPE_NAME"/>
+		<result column="ADDRESS" property="ADDRESS"/>
+		<result column="TELECOM" property="TELECOM"/>
+		<result column="AUTHOR_NAME" property="AUTHOR_NAME"/>
+	</resultMap>
+	
+	<!--表名 --> 
+	<sql id="tableName">
+		"HM_DEPARTMENTS"
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		"DEP_ID",	
+		"DEP_NAME",	
+		"DEP_ROLE_NAME",	
+		"DEP_TYPE_CODE",	
+		"DEP_TYPE_NAME",	
+		"ADDRESS",	
+		"TELECOM",	
+		"PARENT_DEP_ID",	
+		"PARENT_DEP_NAME",	
+		"ROLE_STATUS",	
+		"EFFECTIVE_TIME_LOW",	
+		"EFFECTIVE_TIME_HIGH",	
+		"AUTHOR_ID",	
+		"AUTHOR_NAME",	
+		"AUTHOR_DEP_ID",	
+		"AUTHOR_DEP_NAME",	
+		"AUTHOR_DEP_CONTACTS",	
+		"CREATION_TIME",	
+		"ORG_CODE",	
+		"ISLEAF",	
+		"DEPARTMENTS_ID"
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+			#{DEP_ID},	
+			#{DEP_NAME},	
+			#{DEP_ROLE_NAME,jdbcType=VARCHAR},	
+			#{DEP_TYPE_CODE,jdbcType=VARCHAR},	
+			#{DEP_TYPE_NAME,jdbcType=VARCHAR},	
+			#{ADDRESS,jdbcType=VARCHAR},	
+			#{TELECOM,jdbcType=VARCHAR},	
+			#{PARENT_DEP_ID},	
+			#{PARENT_DEP_NAME,jdbcType=VARCHAR},	
+			#{ROLE_STATUS,jdbcType=VARCHAR},	
+			#{EFFECTIVE_TIME_LOW,jdbcType=VARCHAR},	
+			#{EFFECTIVE_TIME_HIGH,jdbcType=VARCHAR},	
+			#{AUTHOR_ID,jdbcType=VARCHAR},	
+			#{AUTHOR_NAME,jdbcType=VARCHAR},	
+			#{AUTHOR_DEP_ID,jdbcType=VARCHAR},	
+			#{AUTHOR_DEP_NAME,jdbcType=VARCHAR},	
+			#{AUTHOR_DEP_CONTACTS,jdbcType=VARCHAR},	
+			#{CREATION_TIME,jdbcType=VARCHAR},	
+			#{ORG_CODE,jdbcType=VARCHAR},	
+			#{ISLEAF,jdbcType=VARCHAR},	
+			#{DEPARTMENTS_ID}
+	</sql>
+	
+	<!-- 新增-->
+	<insert id="save" parameterType="pd">
+		insert into
+		<include refid="tableName"></include>
+		(
+		<include refid="Field"></include>
+		) values (
+		<include refid="FieldValue"></include>
+		)
+	</insert>
+	
+	<!-- 删除-->
+	<delete id="delete" parameterType="pd">
+		delete from
+		<include refid="tableName"></include>
+		where 
+			"DEPARTMENTS_ID" = #{DEPARTMENTS_ID}
+	</delete>
+	
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+		update
+		<include refid="tableName"></include>
+			set 
+				"DEP_ID" = #{DEP_ID},	
+				"DEP_NAME" = #{DEP_NAME},	
+				"DEP_ROLE_NAME" = #{DEP_ROLE_NAME},	
+				"DEP_TYPE_CODE" = #{DEP_TYPE_CODE},	
+				"DEP_TYPE_NAME" = #{DEP_TYPE_NAME},	
+				"ADDRESS" = #{ADDRESS},	
+				"TELECOM" = #{TELECOM},	
+				"PARENT_DEP_ID" = #{PARENT_DEP_ID},	
+				"PARENT_DEP_NAME" = #{PARENT_DEP_NAME},	
+				"ROLE_STATUS" = #{ROLE_STATUS},	
+				"EFFECTIVE_TIME_LOW" = #{EFFECTIVE_TIME_LOW},	
+				"EFFECTIVE_TIME_HIGH" = #{EFFECTIVE_TIME_HIGH},	
+				"AUTHOR_ID" = #{AUTHOR_ID},	
+				"AUTHOR_NAME" = #{AUTHOR_NAME},	
+				"AUTHOR_DEP_ID" = #{AUTHOR_DEP_ID},	
+				"AUTHOR_DEP_NAME" = #{AUTHOR_DEP_NAME},	
+				"AUTHOR_DEP_CONTACTS" = #{AUTHOR_DEP_CONTACTS},	
+				"CREATION_TIME" = #{CREATION_TIME},	
+				"ORG_CODE" = #{ORG_CODE},	
+				"ISLEAF" = #{ISLEAF},	
+			"DEPARTMENTS_ID" = "DEPARTMENTS_ID"
+			where 
+				"DEP_ID" = #{DEP_ID}
+	</update>
+	
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include>
+		where 
+			"DEPARTMENTS_ID" = #{DEPARTMENTS_ID}
+	</select>
+	
+	<!-- 通过科室标识DEP_ID获取数据 -->
+	<select id="findByDEP_ID" parameterType="pd" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from
+		<include refid="tableName"></include>
+		where
+		DEP_ID = #{DEP_ID}
+	</select>
+	
+	<!-- 通过机构编码ORG_CODE获取数据 -->
+	<select id="findByORG_CODE" parameterType="String" resultType="pd">
+		select
+		case when isleaf =0 then 'true' else 'false' end as isparent,
+		<include refid="Field"></include>
+		from
+		<include refid="tableName"></include>
+		where
+		ORG_CODE = #{ORG_CODE}
+		
+	</select>
+	
+	<!-- 通过上级科室标识PARENT_DEP_ID获取其子级列表 -->
+	<select id="listSubDepByPARENT_DEP_ID" parameterType="String" resultMap="depResultMap">
+		select
+		<include refid="Field"></include>
+		from
+		<include refid="tableName"></include>
+		where
+		PARENT_DEP_ID = #{PARENT_DEP_ID} <!-- order by ORDER_BY -->
+	</select>
+	
+	<!-- 通过P_DEP_ID获取其子级列表 -->
+	<select id="listSubDepByP_DEP_ID" parameterType="String" resultMap="depResultMap">
+		select 
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include>
+		where 
+		PARENT_DEP_ID = #{DEP_ID} <!-- order by ORDER_BY --> 
+	</select>
+	
+	
+	<!-- 列表 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include>
+		where
+			1=1
+		<if test="pd.ORG_CODE != null and pd.ORG_CODE != ''"><!-- 检索  -->
+		and ORG_CODE = #{pd.ORG_CODE}
+		</if>
+		<if test="pd.DEP_ID!= null and pd.DEP_ID != ''"><!-- 检索  -->
+		and PARENT_DEP_ID = #{pd.DEP_ID}
+		</if>
+		<if test="pd.keywords != null and pd.keywords != ''"> <!-- 关键词检索  -->
+			and
+				(		
+				 DEP_ID LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				 or
+				 DEP_NAME LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				 or 
+				 DEP_TYPE_NAME LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%') 
+			     
+				)
+		</if>
+	</select>
+	
+	<!-- 排查表检查是否被占用 -->
+	<select id="findFromTbs" parameterType="pd" resultType="pd">
+		select
+			count(*) zs
+		from 
+			${thisTable}
+		where
+			DEP_ID = #{DEP_ID}
+	</select>
+	
+	<!-- 将叶节点转换为父节点 -->
+	<update id="changeToParent" parameterType="pd">
+		update
+		<include refid="tableName"></include>
+		set
+		"ISLEAF" = #{ISLEAF}
+		where
+		"DEP_ID" = #{DEP_ID}
+	</update>
+	
+</mapper>

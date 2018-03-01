@@ -1,0 +1,172 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%
+	String path = request.getContextPath();
+	String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
+%>
+
+<% 
+java.text.SimpleDateFormat formatter = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+java.util.Date currentTime = new java.util.Date();//得到当前系统时间
+
+String nowtime = formatter.format(currentTime); //将日期时间格式化 
+
+
+%>
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	<base href="<%=basePath%>">
+	<!-- 下拉框 -->
+	<link rel="stylesheet" href="static/ace/css/chosen.css" />
+	<!-- jsp文件头和头部 -->
+	<%@ include file="../../system/index/top.jsp"%>
+	<!-- 日期框 -->
+	<link rel="stylesheet" href="static/ace/css/datepicker.css" />
+</head>
+<body class="no-skin">
+<!-- /section:basics/navbar.layout -->
+<div class="main-container" id="main-container">
+	<!-- /section:basics/sidebar -->
+	<div class="main-content">
+		<div class="main-content-inner">
+			<div class="page-content">
+				<div class="row">
+					<div class="col-xs-12">
+					<!-- 通知公告 新增修改页面 -->
+					<form action="notice/${msg }.do" name="Form" id="Form" method="post">
+						<input type="hidden" name="ID" id="ID" value="${pd.ID}"/>
+						<div id="zhongxin" style="padding-top: 13px;">
+						<table id="table_report" class="table table-striped table-bordered table-hover">
+							<tr>
+								<td style="width:130px;text-align: right;padding-top: 13px;"><span style="color:red; font-size:14px">*</span>类型:</td>
+								<td>
+									<select class="form-control" id="TYPE" name="TYPE" style="width:98%;">
+                                        <c:forEach items="${pd.EnumNotice}" var="item">
+                                             <option value="${item.key}" <c:if test="${pd.TYPE == item.key}"> selected="selected" </c:if> >${item.value}</option>
+                                         </c:forEach>
+                                    </select>
+								</td>  
+							</tr>
+                            <tr>
+								<td style="width:125px;text-align: right;padding-top: 13px;"><span style="color:red; font-size:14px">*</span>标题:</td>
+								<td><input type="text" name="BT" id="BT" value="${pd.BT}"   maxlength="50" placeholder="标题" title="标题" style="width:98%;"/></td>
+							</tr>
+							 <tr>
+								<td style="width:125px;text-align: right;padding-top: 13px;">内容:</td>
+								<td><textarea name="REMARK" id="REMARK" maxlength="255" placeholder="内容" title="内容" rows="6" cols="80">${pd.REMARK}</textarea></td>
+							</tr>
+							<tr>
+								<td style="width:130px;text-align: right;padding-top: 13px;"><span style="color:red; font-size:14px">*</span>状态:</td>
+								<td>
+									<select class="form-control" id="STATE" name="STATE" style="width:98%;">
+                                        <c:forEach items="${pd.EnumStatus}" var="item">
+                                             <option value="${item.key}" <c:if test="${pd.STATE == item.key}"> selected="selected" </c:if> >${item.value}</option>
+                                         </c:forEach>
+                                    </select>
+								</td>  
+							</tr>
+							<tr>
+								<td style="width:150px;text-align: right;padding-top: 13px;">创建时间：</td>
+								<td><input class="span10 date-picker" type="text" name="CREATETIME" id="CREATETIME"  value='<fmt:formatDate pattern="yyyy-MM-dd HH:mm:ss" value="${pd.CREATETIME}" />'  style="width: 98%" readonly="readonly"/></td>
+							</tr>
+							<tr>
+								<td style="width:150px;text-align: right;padding-top: 13px;">操作人：</td>
+								<td colspan="3">
+								<input type="text" name="CZR" id="CZR" value="${pd.CZR}" maxlength="50" placeholder="操作人"  title="操作人" style="width:98%;"/>
+								</td>
+							</tr>
+							<tr>
+								<td style="text-align: center;" colspan="10">
+									<a class="btn btn-mini btn-primary" onclick="save();">确定</a>
+									<a class="btn btn-mini btn-danger" onclick="top.Dialog.close();">取消</a>
+								</td>
+							</tr>
+						</table>
+						</div>
+						<div id="zhongxin2" class="center" style="display:none"><br/><br/><br/><br/><br/><img src="static/images/jiazai.gif" /><br/><h4 class="lighter block green">提交中...</h4></div>
+					</form>
+					<div id="zhongxin2" class="center" style="display:none"><img src="static/images/jzx.gif" style="width: 50px;" /><br/><h4 class="lighter block green"></h4></div>
+					</div>
+					<!-- /.col -->
+				</div>
+				<!-- /.row -->
+			</div>
+			<!-- /.page-content -->
+		</div>
+	</div>
+	<!-- /.main-content -->
+</div>
+<!-- /.main-container -->
+
+
+	<!-- 页面底部js¨ -->
+	<%@ include file="../../system/index/foot.jsp"%>
+	<!-- 下拉框 -->
+	<script src="static/ace/js/chosen.jquery.js"></script>
+	<!-- 日期框 -->
+	<script src="static/ace/js/date-time/bootstrap-datepicker.js"></script>
+	<script src="static/ace/js/date-time/bootstrap-datepicker.js"></script>
+	<script src="static/ace/js/date-time/bootstrap-timepicker.js"></script>
+	<script src="static/ace/js/date-time/moment.js"></script>
+	<script src="static/ace/js/date-time/bootstrap-datetimepicker.js"></script>
+	<script src="static/ace/js/bootstrap-multiselect.js"></script>
+	<script src="static/ace/js/select2.js"></script>	
+	<!--提示框-->
+	<script type="text/javascript" src="static/js/jquery.tips.js"></script>
+		<script type="text/javascript">
+		$(top.hangge());
+		//保存
+		function save(){
+			if($("#TYPE").val()==""){
+				$("#TYPE").tips({
+					side:3,
+		            msg:'请输入类型',
+		            bg:'#AE81FF',
+		            time:2
+		        });
+				$("#TYPE").focus();
+			return false;
+			}
+			if($("#BT").val()==""){
+				$("#BT").tips({
+					side:3,
+		            msg:'请输入标题',
+		            bg:'#AE81FF',
+		            time:2
+		        });
+				$("#BT").focus();
+			return false;
+			}
+			if($("#STATE").val()==""){
+				$("#STATE").tips({
+					side:3,
+		            msg:'请输入状态',
+		            bg:'#AE81FF',
+		            time:2
+		        });
+				$("#STATE").focus();
+			return false;
+			}
+			$("#Form").submit();
+			$("#zhongxin").hide();
+			$("#zhongxin2").show();
+		}
+		
+		$(function() {
+			//日期框
+			$('.date-picker').datetimepicker({
+				        format:'YYYY-MM-DD HH:mm:ss '
+			    }).next().on(ace.click_event, function(){
+					$(this).prev().focus();
+				});
+			
+			
+		});
+		
+		</script>
+</body>
+</html>

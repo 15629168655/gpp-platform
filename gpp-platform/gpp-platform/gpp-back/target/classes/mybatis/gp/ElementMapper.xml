@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ElementMapper">
+
+    <!--表名 -->
+	<sql id="tableName">
+		EMR_ELEMENT
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		<if test="ID != null and ID != ''">
+			ID,	
+		</if>
+		ZDM,
+		XSMC,
+		LX,
+		MRZ,
+		ZDBM,
+		ZDID,
+		XZX,
+		SFXS,
+		ZT,
+		SCSJ,
+		XGSJ,
+		CZR,
+		YSFLID
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+	    #{ID,jdbcType=VARCHAR},
+		#{ZDM,jdbcType=VARCHAR},
+		#{XSMC,jdbcType=VARCHAR},
+		#{LX,jdbcType=VARCHAR},
+		#{MRZ,jdbcType=VARCHAR},
+		#{ZDBM,jdbcType=VARCHAR},
+		#{ZDID,jdbcType=VARCHAR},
+		#{XZX,jdbcType=VARCHAR},
+		#{SFXS,jdbcType=VARCHAR},
+		#{ZT,jdbcType=VARCHAR},
+		sysdate,
+		sysdate,
+		#{CZR,jdbcType=VARCHAR},
+		#{YSFLID,jdbcType=VARCHAR}
+	</sql>
+	
+	<!-- 列表 -->
+	<select id="elementlistPage" parameterType="page" resultType="pd">
+		select
+			a.ID,
+			a.ZDM,
+			a.XSMC,
+			a.LX,
+			a.MRZ,
+			a.ZDBM,
+			a.ZDID,
+			a.XZX,
+			a.SFXS,
+			a.ZT,
+			a.SCSJ,
+			a.XGSJ,
+			a.CZR,
+			a.YSFLID
+		from 
+			<include refid="tableName"></include> a
+		where 1 = 1 and a.ZT != 9
+		<if test="pd.ZDM != null and pd.ZDM != ''"><!-- 字段名检索 -->
+			and a.ZDM LIKE CONCAT(CONCAT('%', #{pd.ZDM}),'%')
+		</if>
+		<if test="pd.XSMC != null and pd.XSMC != ''"><!-- 显示名称检索 -->
+			and a.XSMC LIKE CONCAT(CONCAT('%', #{pd.XSMC}),'%')
+		</if>
+		<if test="pd.elementTimeStart!=null and pd.elementTimeStart!=''"><!-- 生成时间起检索 -->
+			and to_char(a.SCSJ,'yyyymmdd') &gt;=to_char(to_date(#{pd.elementTimeStart},'YYYY-MM-DD'),'yyyymmdd')
+		</if>
+		<if test="pd.elementTimeEnd!=null and pd.elementTimeEnd!=''"><!-- 生成时间止检索 -->
+			and to_char(a.SCSJ,'yyyymmdd') &lt;=to_char(to_date(#{pd.elementTimeEnd},'YYYY-MM-DD'),'yyyymmdd')
+		</if>
+		<if test="pd.LX != null and pd.LX != ''"><!-- 类型检索 -->
+			and a.LX=#{pd.LX} 
+		</if>
+		<if test="pd.ZT != null and pd.ZT != ''"><!-- 状态检索 -->
+			and a.ZT=#{pd.ZT} 
+		</if>
+		order by a.SCSJ
+	</select>
+	
+	<!-- 通过id获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd" >
+		select 
+			*
+		from 
+			<include refid="tableName"></include>
+		where 
+			ID = #{ID}
+	</select>
+	
+	<!-- 新增保存 -->
+	<insert id="save" parameterType="pd">
+		insert into <include refid="tableName"></include> (
+			<include refid="Field"></include>
+		) values (
+			<include refid="FieldValue"></include>
+		)
+	</insert>
+	
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd" >
+	  update  <include refid="tableName"></include>
+		set			
+			ZDM				= #{ZDM,jdbcType=VARCHAR},
+			XSMC			= #{XSMC,jdbcType=VARCHAR},
+			LX				= #{LX,jdbcType=VARCHAR},
+			MRZ				= #{MRZ,jdbcType=VARCHAR},
+			ZDBM			= #{ZDBM,jdbcType=VARCHAR},
+			ZDID			= #{ZDID,jdbcType=VARCHAR},
+			XZX				= #{XZX,jdbcType=VARCHAR},
+			SFXS			= #{SFXS,jdbcType=VARCHAR},
+			ZT				= #{ZT,jdbcType=VARCHAR},
+			XGSJ			= sysdate,
+			CZR				= #{CZR,jdbcType=VARCHAR},
+			YSFLID			= #{YSFLID,jdbcType=VARCHAR},
+			ID              = ID
+			where 
+				ID = #{ID}
+	</update>
+	
+	<!-- 删除 -->
+	<update id="delete" parameterType="pd">
+		update  <include refid="tableName"></include>
+			set ZT = 9,
+			XGSJ  = sysdate
+		where 
+			ID = #{ID}
+	</update>
+	
+	
+	<!-- 批量删除任务 -->
+	<update id="deleteAll" parameterType="String">
+		update <include refid="tableName"></include>
+		   set ZT = 9,
+		   XGSJ  = sysdate
+		where 
+			ID in
+  			 <foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                  #{item}
+             </foreach>
+	</update>
+<!-- 通过元素分类获取数据 -->
+	<select id="findByYSFLID" parameterType="pd" resultType="pd" >
+		select 
+			*
+		from 
+			<include refid="tableName"></include>
+		where 
+			YSFLID = #{YSFLID}
+	</select>
+</mapper>

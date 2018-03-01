@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="InjectionMapper">
+	
+	<!--表名 -->
+	<sql id="tableName">
+		GPP_INJECTION_REGISTER
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		<if test="ID != null and ID != ''">
+			ID,	
+		</if>
+		YPMC,
+		YPID,
+		JL,
+		YF,
+		ZXSJ,
+		ZXRID,
+		ZXRXM,
+		ZXRCODE,
+		ORG_CODE,
+		MZJZLSH,
+		HZID,
+		HZXM,
+		BZSM,
+		SCSJ,
+		XGSJ,
+		LRRID,
+		LRR,
+		ZT
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{ID,jdbcType=VARCHAR},
+		#{YPMC,jdbcType=VARCHAR},
+		#{YPID,jdbcType=VARCHAR},
+		#{JL,jdbcType=VARCHAR},
+		#{YF,jdbcType=VARCHAR},
+		to_date(#{ZXSJ},'YYYY-MM-DD HH24:MI:SS'),
+		#{ZXRID,jdbcType=VARCHAR},
+		#{ZXRXM,jdbcType=VARCHAR},
+		#{ZXRCODE,jdbcType=VARCHAR},
+		#{ORG_CODE,jdbcType=VARCHAR},
+		#{MZJZLSH,jdbcType=VARCHAR},
+		#{HZID,jdbcType=VARCHAR},
+		#{HZXM,jdbcType=VARCHAR},
+		#{BZSM,jdbcType=VARCHAR},
+		sysdate,
+		sysdate,
+		#{LRRID,jdbcType=VARCHAR},
+		#{LRR,jdbcType=VARCHAR},
+		#{ZT,jdbcType=VARCHAR}
+	</sql>
+	
+	<select id="queryPage" parameterType="pd" resultType="pd">
+				SELECT *
+				  FROM ( SELECT ROWNUM AS rowno, t.*
+				          FROM GPP_INJECTION_REGISTER t
+			where 1=1
+			<if test="KEYWORDS != null and KEYWORDS!= ''"><!-- 关键词检索患者姓名或者执行人姓名 -->
+			and (
+				HZXM LIKE CONCAT(CONCAT('%', #{KEYWORDS}),'%')
+				or
+				ZXRXM LIKE CONCAT(CONCAT('%', #{KEYWORDS}),'%')
+				)
+			</if>
+			<if test="ZXSJSTART !=null and ZXSJSTART!=''"><!-- 执行时间检索 -->
+				and ZXSJ &gt;= to_date(#{ZXSJSTART},'yyyy-mm-dd')
+			</if>
+			<if test="ZXSJEND!=null and ZXSJEND!=''"><!-- 执行时间检索   -->
+				and ZXSJ &lt;= to_date(#{ZXSJEND},'yyyy-mm-dd')
+			</if>
+			<if test="MZJZLSH!=null and MZJZLSH!=''"><!-- 门诊就诊流水号   -->
+				and MZJZLSH = #{MZJZLSH}
+			</if>
+				           ) table_alias
+				 WHERE table_alias.rowno BETWEEN #{pageStart} and #{pageEnd}
+	</select>
+	
+	<!-- 新增-->
+	<insert id="saveApp" parameterType="pd">
+		insert into
+			GPP_INJECTION_REGISTER
+		(
+			 "ID","MZJZLSH","HZID","HZXM","YPID", "YPMC",
+			 "JL","YF","ZXSJ",
+			 "ZXRXM","BZSM","SCSJ","LRRID","LRR","ZT"
+		) values (
+			#{ID,jdbcType=VARCHAR},#{MZJZLSH,jdbcType=VARCHAR},#{HZID,jdbcType=VARCHAR},#{HZXM,jdbcType=VARCHAR},#{YPID,jdbcType=VARCHAR},#{YPMC,jdbcType=VARCHAR},
+			#{JL,jdbcType=VARCHAR},#{YF,jdbcType=VARCHAR},to_date(#{ZXSJ,jdbcType=DATE},'yyyy-mm-dd'),#{ZXRXM,jdbcType=VARCHAR},#{BZSM,jdbcType=VARCHAR},sysdate,#{LRRID,jdbcType=VARCHAR},#{LRR,jdbcType=VARCHAR},#{ZT,jdbcType=VARCHAR}
+		)
+	</insert>
+	
+	<!-- 修改 -->
+	<update id="editApp" parameterType="pd">
+		update
+		<include refid="tableName"></include>
+		set 
+		MZJZLSH = #{MZJZLSH,jdbcType=VARCHAR},
+		<if test="HZXM != null" >
+        HZXM = #{HZXM,jdbcType=VARCHAR},   
+        </if>
+  		YPMC = #{YPMC,jdbcType=VARCHAR},
+  		JL = #{JL,jdbcType=VARCHAR},
+  		YF = #{YF,jdbcType=VARCHAR},
+  		ZXSJ = to_date(#{ZXSJ,jdbcType=DATE},'yyyy-mm-dd'),
+  		ZXRXM = #{ZXRXM,jdbcType=VARCHAR},
+  		BZSM =  #{BZSM,jdbcType=VARCHAR},
+  		XGSJ = sysdate
+		where
+		ID = #{ID}
+	</update>
+	
+	<!-- 列表 -->
+	<select id="injectionlistPage" parameterType="page" resultType="pd">
+		select
+			a.ID,
+			a.YPMC,
+			a.YPID,
+			a.JL,
+			a.YF,
+			a.ZXSJ,
+			a.ZXRID,
+			a.ZXRXM,
+			a.ZXRCODE,
+			a.ORG_CODE,
+			a.MZJZLSH,
+			a.HZID,
+			a.HZXM,
+			a.BZSM,
+			a.SCSJ,
+			a.XGSJ,
+			a.LRRID,
+			a.LRR,
+			a.ZT
+			
+		from 
+			<include refid="tableName"></include> a
+		where 1 = 1 
+		and a.ZT != 9
+		<if test="pd.ORG_CODE!= null and pd.ORG_CODE != ''">
+              and a.ORG_CODE = #{pd.ORG_CODE}
+        </if>
+		<if test="pd.HZXM != null and pd.HZXM != ''"><!-- 患者姓名检索 -->
+			and a.HZXM LIKE CONCAT(CONCAT('%', #{pd.HZXM}),'%')
+		</if>
+		<if test="pd.ZXRXM != null and pd.ZXRXM != ''"><!-- 执行人姓名检索 -->
+			and a.ZXRXM LIKE CONCAT(CONCAT('%', #{pd.ZXRXM}),'%')
+		</if>
+		<if test="pd.zxsjStart!=null and pd.zxsjStart!=''"><!-- 执行时间起检索 -->
+			and to_char(a.ZXSJ,'yyyymmdd') &gt;=to_char(to_date(#{pd.zxsjStart},'YYYY-MM-DD'),'yyyymmdd')
+		</if>
+		<if test="pd.zxsjEnd!=null and pd.zxsjEnd!=''"><!-- 执行时间止检索 -->
+			and to_char(a.ZXSJ,'yyyymmdd') &lt;=to_char(to_date(#{pd.zxsjEnd},'YYYY-MM-DD'),'yyyymmdd')
+		</if>
+		<if test="pd.MZJZLSH != null and pd.MZJZLSH != ''"><!-- 健康卡号检索 -->
+			and a.MZJZLSH=#{pd.MZJZLSH} 
+		</if>
+		order by a.HZXM
+	</select>
+	
+	<!-- 新增 -->
+	<insert id="save" parameterType="pd">
+		insert into <include refid="tableName"></include> (
+			<include refid="Field"></include>
+		) values (
+			<include refid="FieldValue"></include>
+		)
+	</insert>
+	
+	<!-- 通过id获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd" >
+		select 
+			<include refid="Field"></include>
+		from 
+			<include refid="tableName"></include>
+		where 
+			ID = #{ID}
+	</select>
+	
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd" >
+		update  <include refid="tableName"></include>
+			set
+			ID				    = ID,
+			YPMC				= #{YPMC,jdbcType=VARCHAR},
+			YPID				= #{YPID,jdbcType=VARCHAR},
+			JL				    = #{JL,jdbcType=VARCHAR},
+			YF				    = #{YF,jdbcType=VARCHAR},
+			ZXSJ				= to_date(#{ZXSJ},'yyyy-mm-dd'),
+			ZXRID				= #{ZXRID,jdbcType=VARCHAR},
+			ZXRXM				= #{ZXRXM,jdbcType=VARCHAR},
+			ZXRCODE             = #{ZXRCODE,jdbcType=VARCHAR},
+			MZJZLSH				= #{MZJZLSH,jdbcType=VARCHAR},
+			HZID				= #{HZID,jdbcType=VARCHAR},
+			HZXM				= #{HZXM,jdbcType=VARCHAR},
+			BZSM				= #{BZSM,jdbcType=VARCHAR},
+			XGSJ				= sysdate,
+			LRRID				= #{LRRID,jdbcType=VARCHAR},
+			LRR				    = #{LRR,jdbcType=VARCHAR}
+			
+			where 
+				ID = #{ID}
+	</update>
+	
+	<!-- 删除 -->
+	<update id="delete" parameterType="pd">
+		update  <include refid="tableName"></include>
+			set ZT = 9,
+			XGSJ	 = sysdate
+		where 
+			ID = #{ID}
+	</update>
+	
+	<!-- 批量删除 -->
+	<update id="deleteAll" parameterType="String">
+		update <include refid="tableName"></include>
+		   set ZT = 9,
+		      XGSJ	= sysdate
+		where 
+			ID in
+  			 <foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                  #{item}
+             </foreach>
+	</update>
+	</mapper>

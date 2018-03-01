@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="IndexResultModelMapper">
+	<!--表名 指标管理结果模板表 -->
+	<sql id="tableName">
+		GPP_INDEX_RESULT_MODEL
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		ID,
+		INDEX_ID,
+		MODEL_CONTENT,
+		PY_CODE,
+		MODEL_ORDER,
+		IS_POSITIVE,
+		DISEASE_ID,
+		FIT_SEX,
+		MESSAGE_CONTENT,
+		DIAGNOSIS_DISCRIBE,
+		RESULT_MODEL_STATE,
+		CREAT_TIME,
+		EDIT_TIME,
+		MODEL_NAME,
+		MODEL_SCORE<!-- 模板评分 -->
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{ID, jdbcType=VARCHAR},
+		#{INDEX_ID, jdbcType=VARCHAR},
+		#{MODEL_CONTENT, jdbcType=VARCHAR},
+		#{PY_CODE, jdbcType=VARCHAR},
+		#{MODEL_ORDER, jdbcType=NUMERIC},
+		#{IS_POSITIVE, jdbcType=VARCHAR},
+		#{DISEASE_ID, jdbcType=VARCHAR},
+		#{FIT_SEX, jdbcType=VARCHAR},
+		#{MESSAGE_CONTENT, jdbcType=VARCHAR},
+		#{DIAGNOSIS_DISCRIBE, jdbcType=VARCHAR},
+		#{RESULT_MODEL_STATE, jdbcType=VARCHAR},
+		to_date(#{CREAT_TIME},'yyyy-mm-dd HH24:mi:ss'),
+		to_date(#{EDIT_TIME},'yyyy-mm-dd HH24:mi:ss'),
+		#{MODEL_NAME, jdbcType=VARCHAR},
+		#{MODEL_SCORE, jdbcType=NUMERIC}
+	</sql>
+	<!-- 查询全部 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select <include refid="Field"></include> from
+		<include refid="tableName"></include>
+		where 1=1 and RESULT_MODEL_STATE=#{pd.RESULT_MODEL_STATE, jdbcType=VARCHAR}
+		<if test="pd.INDEX_ID != null and pd.INDEX_ID !=''">
+			and INDEX_ID=#{pd.INDEX_ID, jdbcType=VARCHAR}
+		</if>
+        <if test="pd.keywords != null and pd.keywords !=''">
+        	and(
+        		 MODEL_NAME LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				 or
+				 FIT_SEX LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				 or 
+				 MODEL_ORDER LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%') 
+        	)
+        </if>
+         <if test="pd.MODEL_CONTENT != null and pd.MODEL_CONTENT !=''">
+        	and MODEL_CONTENT LIKE CONCAT(CONCAT('%', #{pd.MODEL_CONTENT}),'%')
+        </if>
+        <if test="pd.FIT_SEX != null and pd.FIT_SEX !=''">
+        	and FIT_SEX=#{pd.FIT_SEX, jdbcType=VARCHAR}
+        </if>
+        order by MODEL_ORDER desc
+	</select>
+	<!-- 查看详情 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+			<include refid="Field"></include>
+		from 
+			<include refid="tableName"></include>
+		where 
+			ID = #{ID,jdbcType=VARCHAR}
+	</select>
+	<!-- 编辑 -->
+	<update id="edit" parameterType="pd">
+		update
+			<include refid="tableName"></include>
+		set 
+			ID=#{ID, jdbcType=VARCHAR},
+			INDEX_ID=#{INDEX_ID, jdbcType=VARCHAR},
+			MODEL_CONTENT=#{MODEL_CONTENT, jdbcType=VARCHAR},
+			PY_CODE=#{PY_CODE, jdbcType=VARCHAR},
+			MODEL_ORDER=#{MODEL_ORDER, jdbcType=NUMERIC},
+			IS_POSITIVE=#{IS_POSITIVE, jdbcType=VARCHAR},
+			DISEASE_ID=#{DISEASE_ID, jdbcType=VARCHAR},
+			FIT_SEX=#{FIT_SEX, jdbcType=VARCHAR},
+			MESSAGE_CONTENT=#{MESSAGE_CONTENT, jdbcType=VARCHAR},
+			DIAGNOSIS_DISCRIBE=#{DIAGNOSIS_DISCRIBE, jdbcType=VARCHAR},
+			RESULT_MODEL_STATE=#{RESULT_MODEL_STATE, jdbcType=VARCHAR},
+			CREAT_TIME=to_date(#{CREAT_TIME},'yyyy-mm-dd HH24:mi:ss'),
+			EDIT_TIME=to_date(#{EDIT_TIME},'yyyy-mm-dd HH24:mi:ss'),
+			MODEL_NAME=#{MODEL_NAME, jdbcType=VARCHAR}
+			MODEL_SCORE=#{MODEL_SCORE, jdbcType=NUMERIC}
+		where
+			ID=#{ID, jdbcType=VARCHAR}
+	</update>
+	<!-- 删除 -->
+	<update id="delete" parameterType="pd">
+		update
+			<include refid="tableName"></include>
+		set
+			EDIT_TIME=to_date(#{EDIT_TIME},'yyyy-mm-dd HH24:mi:ss'),
+			RESULT_MODEL_STATE=#{RESULT_MODEL_STATE, jdbcType=VARCHAR}
+		where
+			ID=#{ID, jdbcType=VARCHAR}
+	</update>
+	<!-- 批量删除 -->
+	<delete id="deleteAll" parameterType="pd">
+		update
+			<include refid="tableName"></include>
+		set
+			EDIT_TIME=to_date(#{EDIT_TIME},'yyyy-mm-dd HH24:mi:ss'),
+			RESULT_MODEL_STATE=#{RESULT_MODEL_STATE, jdbcType=VARCHAR}
+		where 
+			ID in
+			${IDS}
+	</delete>
+	<!-- 增加-->
+	<insert id="save" parameterType="pd">
+		insert into 
+	<include refid="tableName"></include>
+	<trim prefix="(" suffix=")" suffixOverrides="," >
+		<if test="INDEX_ID != null" >INDEX_ID,</if>
+		<if test="MODEL_CONTENT != null" >MODEL_CONTENT,</if>
+		<if test="PY_CODE != null" >PY_CODE,</if>
+		<if test="MODEL_ORDER != null" >MODEL_ORDER,</if>
+		<if test="IS_POSITIVE != null" >IS_POSITIVE,</if>
+		<if test="DISEASE_ID != null" >DISEASE_ID,</if>
+		<if test="FIT_SEX != null" >FIT_SEX,</if>
+		<if test="MESSAGE_CONTENT != null" >MESSAGE_CONTENT,</if>
+		<if test="DIAGNOSIS_DISCRIBE != null" >DIAGNOSIS_DISCRIBE,</if>
+		<if test="RESULT_MODEL_STATE != null" >RESULT_MODEL_STATE,</if>
+		<if test="CREAT_TIME != null" >CREAT_TIME,</if>
+		<if test="EDIT_TIME != null" >EDIT_TIME,</if>
+		<if test="MODEL_NAME != null" >MODEL_NAME,</if>
+		<if test="MODEL_SCORE != null" >MODEL_SCORE,</if>
+		ID
+       </trim>
+            VALUES
+     <trim prefix="(" suffix=")" suffixOverrides="," >
+     <if test="INDEX_ID != null" >#{INDEX_ID, jdbcType=VARCHAR},</if>
+		<if test="MODEL_CONTENT != null" >#{MODEL_CONTENT, jdbcType=VARCHAR},</if>
+		<if test="PY_CODE != null" >#{PY_CODE, jdbcType=VARCHAR},</if>
+		<if test="MODEL_ORDER != null" >#{MODEL_ORDER, jdbcType=NUMERIC},</if>
+		<if test="IS_POSITIVE != null" >#{IS_POSITIVE, jdbcType=VARCHAR},</if>
+		<if test="DISEASE_ID != null" >#{DISEASE_ID, jdbcType=VARCHAR},</if>
+		<if test="FIT_SEX != null" >#{FIT_SEX, jdbcType=VARCHAR},</if>
+		<if test="MESSAGE_CONTENT != null" >#{MESSAGE_CONTENT, jdbcType=VARCHAR},</if>
+		<if test="DIAGNOSIS_DISCRIBE != null" >#{DIAGNOSIS_DISCRIBE, jdbcType=VARCHAR},</if>
+		<if test="RESULT_MODEL_STATE != null" >#{RESULT_MODEL_STATE, jdbcType=VARCHAR},</if>
+		<if test="CREAT_TIME != null" >to_date(#{CREAT_TIME},'yyyy-mm-dd HH24:mi:ss'),</if>
+		<if test="EDIT_TIME != null" >to_date(#{EDIT_TIME},'yyyy-mm-dd HH24:mi:ss'),</if>
+		<if test="MODEL_NAME != null" >#{MODEL_NAME, jdbcType=VARCHAR},</if>
+		<if test="MODEL_SCORE != null" >#{MODEL_SCORE, jdbcType=NUMERIC},</if>
+        #{ID,jdbcType=VARCHAR}
+      </trim>
+	</insert>
+	<update id="renew" parameterType="pd">
+		update
+			<include refid="tableName"></include>
+		set 
+			<if test="INDEX_ID != null and INDEX_ID != ''">
+				INDEX_ID=#{INDEX_ID, jdbcType=VARCHAR},
+			</if>
+			<if test="MODEL_CONTENT != null and MODEL_CONTENT != ''">
+				MODEL_CONTENT=#{MODEL_CONTENT, jdbcType=VARCHAR},
+			</if>
+			<if test="PY_CODE != null and PY_CODE != ''">
+				PY_CODE=#{PY_CODE, jdbcType=VARCHAR},
+			</if>	
+			<if test="MODEL_ORDER != null and MODEL_ORDER != ''">
+				MODEL_ORDER=#{MODEL_ORDER, jdbcType=NUMERIC},
+			</if>
+			<if test="IS_POSITIVE != null and IS_POSITIVE != ''">
+				IS_POSITIVE=#{IS_POSITIVE, jdbcType=VARCHAR},
+			</if>
+			<if test="DIDEASE_ID != null and DIDEASE_ID != ''">
+				DISEASE_ID=#{DISEASE_ID, jdbcType=VARCHAR},
+			</if>
+			<if test="FIT_SEX != null and FIT_SEX != ''">
+				FIT_SEX=#{FIT_SEX, jdbcType=VARCHAR},
+			</if>
+			<if test="MESSAGE_CONTENT != null and MESSAGE_CONTENT != ''">
+		    	MESSAGE_CONTENT=#{MESSAGE_CONTENT, jdbcType=VARCHAR},
+		    </if>
+		    <if test="DIAGNOSIS_DISCRIBE != null and DIAGNOSIS_DISCRIBE != ''">
+		    	DIAGNOSIS_DISCRIBE=#{DIAGNOSIS_DISCRIBE, jdbcType=VARCHAR},
+		    </if>
+		    <if test="RESULT_MODEL_STATE != null and RESULT_MODEL_STATE != ''">
+		    	RESULT_MODEL_STATE=#{RESULT_MODEL_STATE, jdbcType=VARCHAR},
+		    </if>
+		    <if test="CERAT_TIME != null and CERAT_TIME != ''">
+		    	CREAT_TIME=to_date(#{CREAT_TIME},'yyyy-mm-dd HH24:mi:ss'),
+		    </if>
+		    <if test="EDIT_TIME != null and EDIT_TIME != ''">
+		    	EDIT_TIME=to_date(#{EDIT_TIME},'yyyy-mm-dd HH24:mi:ss'),
+		    </if>
+		     <if test="RESULT_MODEL != null and RESULT_MODEL != ''">
+		    	MODEL_NAME=#{MODEL_NAME, jdbcType=VARCHAR},
+		    </if>
+		    <if test="MODEL_SCORE != null and MODEL_SCORE != ''">
+		    	MODEL_SCORE=#{MODEL_SCORE, jdbcType=NUMERIC},
+		    </if>
+		    ID=#{ID, jdbcType=VARCHAR}
+		where
+			ID=#{ID, jdbcType=VARCHAR}
+	</update>	
+	
+	<!-- 通过指标查询模板 -->
+	<select id="findByIndexId" parameterType="pd" resultType="pd">
+	select <include refid="Field"></include> from
+		<include refid="tableName"></include>
+		where 1=1
+		<if test="ID != null and ID !=''">
+			and INDEX_ID=#{ID, jdbcType=VARCHAR}
+		</if>
+			and RESULT_MODEL_STATE=#{RESULT_MODEL_STATE, jdbcType=VARCHAR}
+	</select>
+
+</mapper>

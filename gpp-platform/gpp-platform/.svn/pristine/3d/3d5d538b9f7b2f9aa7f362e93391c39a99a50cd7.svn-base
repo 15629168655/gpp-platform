@@ -1,0 +1,28 @@
+package com.tbyf.service.gp.treatecasedis.impl;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
+
+import com.tbyf.dao.DaoSupport;
+import com.tbyf.service.gp.treatecasedis.TreateCaseDisManager;
+import com.tbyf.util.PageData;
+/**
+ * 治疗方案诊断
+ * @author zanxc
+ * @创建日期2017年7月27日下午5:30:50
+ */
+@Service("treateCaseDisService")
+public class TreateCaseDisService implements TreateCaseDisManager{
+
+	@Resource(name = "daoSupport")
+	private DaoSupport dao;
+	/**保存信息
+	 * 
+	 */
+	@Override
+	public void save(PageData pd) throws Exception {
+		dao.save("TreateCaseDisMapper.save", pd);
+		
+	}
+}

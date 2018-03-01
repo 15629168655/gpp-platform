@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="IndexResidentQuesResultMapper">
+<!--表名居民问卷结果表  -->
+	<sql id="tableName">
+		GPP_INDEX_RESIDENT_Q_RESULT
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		ID,
+		RESIDENT_QUESTIONNAIRE_ID,
+		SCREENING_ID,
+		INDEX_COMBINATION_ID,
+		INDEX_COMBINATION_NAME,
+		COMPANY,
+		DEPARTMENT,
+		INDEX_ID,
+		INDEX_CODE,
+		INDEX_NAME,
+		RESULT_TYPE,
+		PY_CODE,
+		Q_RESULT_ORDER,
+		NORMAL_RESULT,
+		SCREENING_TYPE,
+		SCREENING_RESULT,
+		IS_POSITIVE,
+		IS_GIVE_UP,
+		REFER_RANGE,
+		DESCRIBE,
+		QUESTIONNAIRE_STATE,
+		CREAT_TIME,
+		EDIT_TIME
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{ID, jdbcType=VARCHAR},
+		#{RESIDENT_QUESTIONNAIRE_ID, jdbcType=VARCHAR},
+		#{SCREENING_ID, jdbcType=VARCHAR},
+		#{INDEX_COMBINATION_ID, jdbcType=VARCHAR},
+		#{INDEX_COMBINATION_NAME, jdbcType=VARCHAR},
+		#{COMPANY, jdbcType=VARCHAR},
+		#{DEPARTMENT, jdbcType=VARCHAR},
+		#{INDEX_ID, jdbcType=VARCHAR},
+		#{INDEX_CODE, jdbcType=VARCHAR},
+		#{INDEX_NAME, jdbcType=VARCHAR},
+		#{RESULT_TYPE, jdbcType=VARCHAR},
+		#{PY_CODE, jdbcType=VARCHAR},
+		#{Q_RESULT_ORDER, jdbcType=NUMERIC},
+		#{NORMAL_RESULT, jdbcType=VARCHAR},
+		#{SCREENING_TYPE, jdbcType=VARCHAR},
+		#{SCREENING_RESULT, jdbcType=VARCHAR},
+		#{IS_POSITIVE, jdbcType=VARCHAR},
+		#{IS_GIVE_UP, jdbcType=VARCHAR},
+		#{REFER_RANGE, jdbcType=VARCHAR},
+		#{DESCRIBE, jdbcType=VARCHAR},
+		#{QUESTIONNAIRE_STATE, jdbcType=VARCHAR},
+		to_date(#{CREAT_TIME},'yyyy-mm-dd HH24:mi:ss'),
+		to_date(#{EDIT_TIME},'yyyy-mm-dd HH24:mi:ss')
+	</sql>	
+	<!-- 查询全部 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select <include refid="Field"></include> from
+		<include refid="tableName"></include>
+		where 1=1 and QUESTIONNAIRE_STATE=#{pd.QUESTIONNAIRE_STATE, jdbcType=VARCHAR}
+        <if test="pd.keywords != null and pd.keywords !=''">
+        	and(
+        		 SCREENING_RESULT LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				 or
+				 REFER_RANGE LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				 or 
+				 DESCRIBE LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%') 
+        	)
+        </if>
+        order by Q_RESULT_ORDER desc
+	</select>
+	<!-- 查看详情 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+			<include refid="Field"></include>
+		from 
+			<include refid="tableName"></include>
+		where 
+			ID = #{ID,jdbcType=VARCHAR}
+	</select>
+	<!-- 编辑 -->
+	<update id="edit" parameterType="pd">
+		update
+			<include refid="tableName"></include>
+		set 
+			ID=#{ID, jdbcType=VARCHAR},
+			RESIDENT_QUESTIONNAIRE_ID=#{RESIDENT_QUESTIONNAIRE_ID, jdbcType=VARCHAR},
+			SCREENING_ID=#{SCREENING_ID, jdbcType=VARCHAR},
+			INDEX_COMBINATION_ID=#{INDEX_COMBINATION_ID, jdbcType=VARCHAR},
+			INDEX_COMBINATION_NAME=#{INDEX_COMBINATION_NAME, jdbcType=VARCHAR},
+			COMPANY=#{COMPANY, jdbcType=VARCHAR},
+			DEPARTMENT=#{DEPARTMENT, jdbcType=VARCHAR},
+			INDEX_ID=#{INDEX_ID, jdbcType=VARCHAR},
+			INDEX_CODE=#{INDEX_CODE, jdbcType=VARCHAR},
+			INDEX_NAME=#{INDEX_NAME, jdbcType=VARCHAR},
+			RESULT_TYPE=#{RESULT_TYPE, jdbcType=VARCHAR},
+			PY_CODE=#{PY_CODE, jdbcType=VARCHAR},
+			Q_RESULT_ORDER=#{Q_RESULT_ORDER, jdbcType=NUMERIC},
+			NORMAL_RESULT=#{NORMAL_RESULT, jdbcType=VARCHAR},
+			SCREENING_TYPE=#{SCREENING_TYPE, jdbcType=VARCHAR},
+			SCREENING_RESULT=#{SCREENING_RESULT, jdbcType=VARCHAR},
+			IS_POSITIVE=#{IS_POSITIVE, jdbcType=VARCHAR},
+			IS_GIVE_UP=#{IS_GIVE_UP, jdbcType=VARCHAR},
+			REFER_RANGE=#{REFER_RANGE, jdbcType=VARCHAR},
+			DESCRIBE=#{DESCRIBE, jdbcType=VARCHAR},
+			QUESTIONNAIRE_STATE=#{QUESTIONNAIRE_STATE, jdbcType=VARCHAR},
+			CREAT_TIME=to_date(#{CREAT_TIME},'yyyy-mm-dd HH24:mi:ss'),
+			EDIT_TIME=to_date(#{EDIT_TIME},'yyyy-mm-dd HH24:mi:ss')
+		where
+			ID=#{ID, jdbcType=VARCHAR}
+	</update>
+	<!-- 删除 -->
+	<update id="delete" parameterType="pd">
+		update
+			<include refid="tableName"></include>
+		set
+			QUESTIONNAIRE_STATE=#{QUESTIONNAIRE_STATE, jdbcType=VARCHAR}
+		where
+			ID=#{ID, jdbcType=VARCHAR}
+	</update>
+	<!-- 批量删除 -->
+	<delete id="deleteAll" parameterType="String">
+		delete from
+		<include refid="tableName"></include>
+		where 
+			ID in
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                 #{item}
+		</foreach>
+	</delete>
+	<!-- 增加-->
+	<insert id="save" parameterType="pd">
+		insert into 
+	<include refid="tableName"></include>
+	<trim prefix="(" suffix=")" suffixOverrides="," >
+		<if test="RESIDENT_QUESTIONNAIRE_ID != null" >RESIDENT_QUESTIONNAIRE_ID,</if>
+		<if test="SCREENING_ID != null" >SCREENING_ID,</if>
+		<if test="INDEX_COMBINATION_ID != null" >INDEX_COMBINATION_ID,</if>
+		<if test="INDEX_COMBINATION_NAME != null" >INDEX_COMBINATION_NAME,</if>
+		<if test="COMPANY != null" >COMPANY,</if>
+		<if test="DEPARTMENT != null" >DEPARTMENT,</if>
+		<if test="INDEX_ID != null" >INDEX_ID,</if>
+		<if test="INDEX_CODE != null" >INDEX_CODE,</if>
+		<if test="INDEX_NAME != null" >INDEX_NAME,</if>
+		<if test="RESULT_TYPE != null" >RESULT_TYPE,</if>
+		<if test="PY_CODE != null" >PY_CODE,</if>
+		<if test="Q_RESULT_ORDER != null" >Q_RESULT_ORDER,</if>
+		<if test="NORMAL_RESULT != null" >NORMAL_RESULT,</if>
+		<if test="SCREENING_TYPE != null" >SCREENING_TYPE,</if>
+		<if test="SCREENING_RESULT != null" >SCREENING_RESULT,</if>
+		<if test="IS_POSITIVE != null" >IS_POSITIVE,</if>
+		<if test="IS_GIVE_UP != null" >IS_GIVE_UP,</if>
+		<if test="REFER_RANGE != null" >REFER_RANGE,</if>
+		<if test="DESCRIBE != null" >DESCRIBE,</if>
+		<if test="QUESTIONNAIRE_STATE != null" >QUESTIONNAIRE_STATE,</if>
+		<if test="CREAT_TIME != null" >CREAT_TIME,</if>
+		<if test="EDIT_TIME != null" >EDIT_TIME,</if>
+		ID
+       </trim>
+            VALUES
+     <trim prefix="(" suffix=")" suffixOverrides="," >
+     	<if test="RESIDENT_QUESTIONNAIRE_ID != null" >#{RESIDENT_QUESTIONNAIRE_ID, jdbcType=VARCHAR},</if>
+		<if test="SCREENING_ID != null" >#{SCREENING_ID, jdbcType=VARCHAR},</if>
+		<if test="INDEX_COMBINATION_ID != null" >#{INDEX_COMBINATION_ID, jdbcType=VARCHAR},</if>
+		<if test="INDEX_COMBINATION_NAME != null" >#{INDEX_COMBINATION_NAME, jdbcType=VARCHAR},</if>
+		<if test="COMPANY != null" >#{COMPANY, jdbcType=VARCHAR},</if>
+		<if test="DEPARTMENT != null" >#{DEPARTMENT, jdbcType=VARCHAR},</if>
+		<if test="INDEX_ID != null" >#{INDEX_ID, jdbcType=VARCHAR},</if>
+		<if test="INDEX_CODE != null" >#{INDEX_CODE, jdbcType=VARCHAR},</if>
+		<if test="INDEX_NAME != null" >#{INDEX_NAME, jdbcType=VARCHAR},</if>
+		<if test="RESULT_TYPE != null" >#{RESULT_TYPE, jdbcType=VARCHAR},</if>
+		<if test="PY_CODE != null" >#{PY_CODE, jdbcType=VARCHAR},</if>
+		<if test="Q_RESULT_ORDER != null" >#{Q_RESULT_ORDER, jdbcType=NUMERIC},</if>
+		<if test="NORMAL_RESULT != null" >#{NORMAL_RESULT, jdbcType=VARCHAR},</if>
+		<if test="SCREENING_TYPE != null" >#{SCREENING_TYPE, jdbcType=VARCHAR},</if>
+		<if test="SCREENING_RESULT != null" >#{SCREENING_RESULT, jdbcType=VARCHAR},</if>
+		<if test="IS_POSITIVE != null" >#{IS_POSITIVE, jdbcType=VARCHAR},</if>
+		<if test="IS_GIVE_UP != null" >#{IS_GIVE_UP, jdbcType=VARCHAR},</if>
+		<if test="REFER_RANGE != null" >#{REFER_RANGE, jdbcType=VARCHAR},</if>
+		<if test="DESCRIBE != null" >#{DESCRIBE, jdbcType=VARCHAR},</if>
+		<if test="QUESTIONNAIRE_STATE != null" >#{QUESTIONNAIRE_STATE, jdbcType=VARCHAR},</if>
+		<if test="CREAT_TIME != null" >to_date(#{CREAT_TIME},'yyyy-mm-dd HH24:mi:ss'),</if>
+		<if test="EDIT_TIME != null" >to_date(#{EDIT_TIME},'yyyy-mm-dd HH24:mi:ss'),</if>
+        #{ID, jdbcType=VARCHAR}
+      </trim>
+	</insert>
+	<update id="renew" parameterType="pd">
+		update
+			<include refid="tableName"></include>
+		set 
+			<if test="RESIDENT_QUESTIONNAIRE_ID != null and RESIDENT_QUESTIONNAIRE_ID != ''">
+				RESIDENT_QUESTIONNAIRE_ID=#{RESIDENT_QUESTIONNAIRE_ID, jdbcType=VARCHAR},
+			</if>
+			<if test="SCREENING_ID != null and SCREENING_ID != ''">
+				SCREENING_ID=#{SCREENING_ID, jdbcType=VARCHAR},
+			</if>
+			<if test="INDEX_COMBINATION_ID != null and INDEX_COMBINATION_ID != ''">
+				INDEX_COMBINATION_ID=#{INDEX_COMBINATION_ID, jdbcType=VARCHAR},
+			</if>
+			<if test="INDEX_COMBINATION_NAME != null and INDEX_COMBINATION_NAME != ''">
+				INDEX_COMBINATION_NAME=#{INDEX_COMBINATION_NAME, jdbcType=VARCHAR},
+			</if>
+			<if test="COMPANY != null and COMPANY != ''">
+				COMPANY=#{COMPANY, jdbcType=VARCHAR},
+			</if>
+			<if test="DEPARTMENT != null and DEPARTMENT != ''">
+				DEPARTMENT=#{DEPARTMENT, jdbcType=VARCHAR},
+			</if>
+			<if test="INDEX_ID != null and INDEX_ID != ''">
+				INDEX_ID=#{INDEX_ID, jdbcType=VARCHAR},
+			</if>
+			<if test="INDEX_CODE != null and INDEX_CODE != ''">
+				INDEX_CODE=#{INDEX_CODE, jdbcType=VARCHAR},
+			</if>
+			<if test="INDEX_NAME != null and INDEX_NAME != ''">
+				INDEX_NAME=#{INDEX_NAME, jdbcType=VARCHAR},
+			</if>
+			<if test="RESULT_TYPE != null and RESULT_TYPE != ''">
+				RESULT_TYPE=#{RESULT_TYPE, jdbcType=VARCHAR},
+			</if>
+			<if test="PY_CODE != null and PY_CODE != ''">
+				PY_CODE=#{PY_CODE, jdbcType=VARCHAR},
+			</if>
+			<if test="Q_RESULT_ORDER != null and Q_RESULT_ORDER != ''">
+				Q_RESULT_ORDER=#{Q_RESULT_ORDER, jdbcType=NUMERIC},
+			</if>
+			<if test="NORMAL_RESULT != null and NORMAL_RESULT != ''">
+				NORMAL_RESULT=#{NORMAL_RESULT, jdbcType=VARCHAR},
+			</if>
+			<if test="SCREENING_TYPE != null and SCREENING_TYPE != ''">
+				SCREENING_TYPE=#{SCREENING_TYPE, jdbcType=VARCHAR},
+			</if>
+			<if test="QUESTIONNAIRE_PEOPLE != null and QUESTIONNAIRE_PEOPLE != ''">
+				SCREENING_RESULT=#{SCREENING_RESULT, jdbcType=VARCHAR},
+			</if>
+			<if test="IS_POSITIVE != null and IS_POSITIVE != ''">
+				IS_POSITIVE=#{IS_POSITIVE, jdbcType=VARCHAR},
+			</if>
+			<if test="IS_GIVE_UP != null and IS_GIVE_UP != ''">
+				IS_GIVE_UP=#{IS_GIVE_UP, jdbcType=VARCHAR},
+			</if>
+			<if test="REFER_RANGE != null and REFER_RANGE != ''">
+				REFER_RANGE=#{REFER_RANGE, jdbcType=VARCHAR},
+			</if>
+			<if test="DESCRIBE != null and DESCRIBE != ''">
+				DESCRIBE=#{DESCRIBE, jdbcType=VARCHAR},
+			</if>
+			<if test="QUESTIONNAIRE_STATE != null and QUESTIONNAIRE_STATE != ''">
+				QUESTIONNAIRE_STATE=#{QUESTIONNAIRE_STATE, jdbcType=VARCHAR},
+			</if>
+		    <if test="CERAT_TIME != null and CERAT_TIME != ''">
+		    	CREAT_TIME=to_date(#{CREAT_TIME},'yyyy-mm-dd HH24:mi:ss'),
+		    </if>
+		    <if test="EDIT_TIME != null and EDIT_TIME != ''">
+		    	EDIT_TIME=to_date(#{EDIT_TIME},'yyyy-mm-dd HH24:mi:ss'),
+		    </if>
+		    ID=#{ID, jdbcType=VARCHAR}
+		where
+			ID=#{ID, jdbcType=VARCHAR}
+	</update>
+	<!-- 通过居民问卷的ID查询问卷结果 -->
+	<select id="findByResidentQuesId" parameterType="page" resultType="pd">
+		select <include refid="Field"></include> from
+		<include refid="tableName"></include>
+		where 1=1 and QUESTIONNAIRE_STATE=#{pd.QUESTIONNAIRE_STATE, jdbcType=VARCHAR}
+        <if test="pd.QUES_ID != null and pd.QUES_ID !=''">
+        	and RESIDENT_QUESTIONNAIRE_ID = #{pd.QUES_ID, jdbcType=VARCHAR}
+        </if>
+        order by Q_RESULT_ORDER desc
+	</select>
+	<!--筛查人数统计-->
+	<select id="PeopleMount" parameterType="page" resultType="pd">
+			select NND, count(*) as MOUNT from(
+		select
+		case
+        when AGE &lt;= 17 then &apos;17岁以下&apos;
+		when AGE &gt;= 18 and AGE &lt;=29 then &apos;18-29岁&apos;
+		when AGE &gt;=30 and AGE &lt;=39 then &apos;30-39岁&apos;
+		when AGE &gt;=40 and AGE &lt;=49 then &apos;40-59岁&apos;
+		when AGE &gt;=50 and AGE &lt;=59 then &apos;50-59岁&apos;
+		when AGE &gt;=60 and AGE &lt;=69 then &apos;60-69岁&apos;
+		when AGE &gt;=70 and AGE &lt;=79 then &apos;70-79岁&apos; else &apos;80岁以上&apos;
+		end
+		  NND,SEX from 
+		(
+				SELECT 
+					floor(months_between(SYSDATE, BIRTHDAY_TIME)/ 12) AS AGE,SEX
+				from 
+					TB_USER_AGENT where SEX = #{ID, jdbcType=VARCHAR} and USER_AGENT_ID in (SELECT RESIDENT_ID from GPP_INDEX_RESIDENT_QUES where IS_FINISH = #{IS_POSITIVE, jdbcType=VARCHAR}
+						<if test="SCREENING_DATE_START != null and SCREENING_DATE_START !=''">
+							and EDIT_TIME &gt; to_date(#{SCREENING_DATE_START},'yyyy-mm-dd')
+						</if>
+						<if test="SCREENING_DATE_END != null and SCREENING_DATE_END !=''">
+							and EDIT_TIME &lt; to_date(#{SCREENING_DATE_END},'yyyy-mm-dd')
+						</if>
+					)
+		)
+		) group by NND
+	</select>
+	<!--  -->
+</mapper>

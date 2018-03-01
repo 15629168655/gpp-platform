@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="TreateCaseMapper">
+	<!--治疗方案表-->
+	<sql id="tableName">
+		GPP_TREATE_CASE
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		TREATE_ID,
+		TREATE_TYPE,
+		RESIDENT_TYPE,
+		RESIDENT_ID,
+		RESIDENT_NAME,
+		PROVIDER_ID,
+		PROVIDER_NAME,
+		CONTENT,
+		OPERATE_NAME,
+		PRESC_ID,
+		STATE,
+		TREATE_TIME,
+		CREAT_TIME,
+		EDIT_TIME
+	</sql>
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{TREATE_ID, jdbcType=VARCHAR},
+		#{TREATE_TYPE, jdbcType=VARCHAR},
+		#{RESIDENT_TYPE, jdbcType=VARCHAR},
+		#{RESIDENT_ID, jdbcType=VARCHAR},
+		#{RESIDENT_NAME, jdbcType=VARCHAR},
+		#{PROVIDER_ID, jdbcType=VARCHAR},
+		#{PROVIDER_NAME, jdbcType=VARCHAR},
+		#{CONTENT, jdbcType=VARCHAR},
+		#{OPERATE_NAME, jdbcType=VARCHAR},
+		#{PRESC_ID, jdbcType=VARCHAR},
+		#{STATE, jdbcType=VARCHAR},
+		to_date(#{TREATE_TIME},'yyyy-mm-dd'),
+		to_date(#{CREAT_TIME},'yyyy-mm-dd HH24:mi:ss'),
+		to_date(#{EDIT_TIME},'yyyy-mm-dd HH24:mi:ss')
+
+	</sql>
+	<!-- 查询全部 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select <include refid="Field"></include> from
+		<include refid="tableName"></include>
+		where <!-- 方案医生可以查看以及方案医生授权的公卫医生 -->
+			 (PROVIDER_ID = #{pd.PROVIDER_ID, jdbcType=VARCHAR} or PROVIDER_ID in (select HIG_PRIVIDE_ID from GPP_BOOKING_ACCREDIT where PUBLIC_PRIVIDE_ID=#{pd.PROVIDER_ID,jdbcType=VARCHAR}))
+		<if test="pd.RESIDENT_ID != null and pd.RESIDENT_ID !=''">
+		 	and RESIDENT_ID=#{pd.RESIDENT_ID, jdbcType=VARCHAR}
+		 </if>
+		<if test="pd.STATE != null and pd.STATE !=''">
+			and STATE &lt;&gt;#{pd.STATE,jdbcType=VARCHAR}
+		</if>
+        <if test="pd.keywords != null and pd.keywords !=''">
+        	and(
+        		 PROVIDER_NAME LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+        		 or
+        		 RESIDENT_NAME LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+        	)
+        </if>
+        order by EDIT_TIME desc
+	</select>
+	<!-- 查看详情 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+			<include refid="Field"></include>
+		from 
+			<include refid="tableName"></include>
+		where 
+			TREATE_ID = #{TREATE_ID,jdbcType=VARCHAR}
+	</select>
+	<!-- 编辑 -->
+	<update id="edit" parameterType="pd">
+		update
+			<include refid="tableName"></include>
+		set 
+			TREATE_ID=#{TREATE_ID, jdbcType=VARCHAR},
+			TREATE_TYPE=#{TREATE_TYPE, jdbcType=VARCHAR},
+			RESIDENT_TYPE=#{RESIDENT_TYPE, jdbcType=VARCHAR},
+			RESIDENT_ID=#{RESIDENT_ID, jdbcType=VARCHAR},
+			RESIDENT_NAME=#{RESIDENT_NAME, jdbcType=VARCHAR},
+			PROVIDER_ID=#{PROVIDER_ID, jdbcType=VARCHAR},
+			PROVIDER_NAME=#{PROVIDER_NAME, jdbcType=VARCHAR},
+			CONTENT=#{CONTENT, jdbcType=VARCHAR},
+			OPERATE_NAME=#{OPERATE_NAME, jdbcType=VARCHAR},
+			PRESC_ID=#{PRESC_ID, jdbcType=VARCHAR},
+			STATE=#{STATE, jdbcType=VARCHAR},
+			TREATE_TIME=to_date(#{TREATE_TIME},'yyyy-mm-dd'),
+			EDIT_TIME=to_date(#{EDIT_TIME},'yyyy-mm-dd HH24:mi:ss')
+		where
+			TREATE_ID=#{TREATE_ID, jdbcType=VARCHAR}
+	</update>
+	<!-- 删除 -->
+	<update id="delete" parameterType="pd">
+		update
+			<include refid="tableName"></include>
+		set
+			EDIT_TIME=to_date(#{EDIT_TIME},'yyyy-mm-dd HH24:mi:ss'),
+			STATE=#{STATE, jdbcType=VARCHAR}
+		where
+			TREATE_ID=#{TREATE_ID, jdbcType=VARCHAR}
+	</update>
+	<insert id="save" parameterType="pd">
+		insert into 
+	<include refid="tableName"></include>
+	(<include refid="Field"></include>)
+            VALUES
+     (<include refid="FieldValue"></include>)
+	</insert>
+	<!-- 删除 -->
+	<update id="deleteAll" parameterType="pd">
+		update
+			<include refid="tableName"></include>
+		set
+			EDIT_TIME=to_date(#{EDIT_TIME},'yyyy-mm-dd HH24:mi:ss'),
+			STATE=#{STATE, jdbcType=VARCHAR}
+		where
+			TREATE_ID in ${IDS}
+	</update>
+	<!-- 删除 改变执行方案的状态-->
+	<update id="saveState" parameterType="pd">
+		update
+			<include refid="tableName"></include>
+		set
+			EDIT_TIME=to_date(#{EDIT_TIME},'yyyy-mm-dd HH24:mi:ss'),
+			STATE=#{STATE, jdbcType=VARCHAR}
+		where
+			TREATE_ID =#{TREATE_ID, jdbcType=VARCHAR}
+	</update>
+</mapper>

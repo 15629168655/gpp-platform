@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MzregappMapper">
+	<!-- APP预约挂号表 -->
+	
+	<!--表名 -->
+	<sql id="tableName">
+		GPP_HIS_MZ_REGAPP
+	</sql>
+	
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		SELECT * FROM GPP_HIS_MZ_REGAPP
+			where 1=1 
+			<if test="pd.keywords != null and pd.keywords!= ''"><!-- 关键词检索 -->
+				and (
+					PERSON_ID LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+					or
+					PERSON_NAME LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+					or
+					DEPTNAME LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+					or
+					DOCTORCODE LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+					or
+					DOCTORNAME LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+					)
+			</if>
+			<if test="pd.start!=null and pd.start!=''"> 
+				and "APPLYTIME" &gt;=to_date(#{pd.start},'yyyy-mm-dd hh24:mi:ss')
+			</if>
+			<if test="pd.end!=null and pd.end!=''">
+				and "APPLYTIME" &lt;=to_date(#{pd.end},'yyyy-mm-dd hh24:mi:ss')
+		</if>
+		order by APPLYTYPE,STATUS
+	</select>	
+	
+	
+	
+	<!-- 新增-->
+	<insert id="save" parameterType="pd">
+		insert into <include refid="tableName"></include>
+		(
+			ID,PERSON_ID,PERSON_NAME,ORG_CODE,DEPTCODE,
+			DEPTNAME,DOCTORCODE,DOCTORNAME,APPLYTIME,APPLYTYPE,
+			CREATE_TIME,STATUS
+		) values (
+			#{ID,jdbcType=VARCHAR},
+			#{PERSON_ID,jdbcType=VARCHAR},
+			#{PERSON_NAME,jdbcType=VARCHAR},
+			#{ORG_CODE,jdbcType=VARCHAR},
+			#{DEPTCODE,jdbcType=VARCHAR},
+			#{DEPTNAME,jdbcType=VARCHAR},
+			#{DOCTORCODE,jdbcType=VARCHAR},
+			#{DOCTORNAME,jdbcType=VARCHAR},
+			to_date(#{APPLYTIME},'yyyy-mm-dd hh24:mi:ss'),
+			#{APPLYTYPE,jdbcType=VARCHAR},
+			sysdate,#{STATUS,jdbcType=VARCHAR}
+			
+		)
+	</insert>
+	<delete id="delete" parameterType="pd">
+		delete from
+		GPP_HIS_MZ_REGAPP
+		where 
+			"ID" = #{id}
+	</delete>
+	
+	<update id="cancel" parameterType="pd">
+		update
+		GPP_HIS_MZ_REGAPP
+			set 
+				"APPLYTYPE" = #{APPLYTYPE}
+			where 
+				"ID" = #{ID}
+	</update>
+	
+	<!-- APP 预约信息查询 -->
+	<select id="queryData" parameterType="pd" resultType="pd">
+		select * from( 
+			SELECT ROWNUM AS rowno, t.* from GPP_HIS_MZ_REGAPP t
+			where 1=1 
+			<if test="STARTTIME!=null and STARTTIME!=''"> 
+				and "APPLYTIME" &gt;=to_date(#{STARTTIME},'yyyy-mm-dd hh24:mi:ss')
+			</if>
+			<if test="ENDTIME!=null and ENDTIME!=''">
+				and "APPLYTIME" &lt;=to_date(#{ENDTIME},'yyyy-mm-dd hh24:mi:ss')
+			</if>
+			<if test="PERSON_ID!=null and PERSON_ID!=''"> 
+				and PERSON_ID =#{PERSON_ID}
+			</if>
+			<if test="PERSON_NAME !=null and PERSON_NAME!=''"> 
+				and PERSON_NAME =#{PERSON_NAME}
+			</if>
+			<if test="DEPTCODE!=null and DEPTCODE!=''"> 
+				and DEPTCODE =#{DEPTCODE}
+			</if>
+			<if test="DEPTNAME!=null and DEPTNAME!=''"> 
+				and DEPTNAME =#{DEPTNAME}
+			</if>
+			<if test="DOCTORCODE!=null and DOCTORCODE!=''"> 
+				and DOCTORCODE =#{DOCTORCODE}
+			</if>
+			<if test="DOCTORNAME!=null and DOCTORNAME!=''"> 
+				and DOCTORNAME =#{DOCTORNAME}
+			</if>
+			<if test="APPLYTYPE!=null and APPLYTYPE!=''"> 
+				and APPLYTYPE =#{APPLYTYPE}
+			</if>
+			<if test="ID!=null and ID!=''"> 
+				and ID =#{ID}
+			</if>
+		) table_alias
+				 WHERE table_alias.rowno BETWEEN #{PAGESTART} and #{PAGEEND}
+		
+	</select>
+</mapper>

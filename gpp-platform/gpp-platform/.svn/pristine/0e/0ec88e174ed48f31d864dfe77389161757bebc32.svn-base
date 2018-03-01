@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="OrganizationMapper">
+
+	<resultMap type="Organization" id="orgResultMap">
+		<id column="ORGANIZATION_ID" property="ORGANIZATION_ID"/>
+		<result column="ORG_CODE" property="ORG_CODE"/>
+		<result column="ORG_NAME" property="ORG_NAME"/>
+		<result column="ORG_LOGIN_CODE" property="ORG_LOGIN_CODE"/>
+		<result column="ORG_NAME2" property="ORG_NAME2"/>
+		<result column="ORG_CLASSCODE" property="ORG_CLASSCODE"/>
+		<result column="ORG_CLASSVALUE" property="ORG_CLASSVALUE"/>
+		<result column="ORG_TYPECODE" property="ORG_TYPECODE"/>
+		<result column="ORG_TYPEVALUE" property="ORG_TYPEVALUE"/>
+		<result column="REGIONCODE" property="REGIONCODE"/>
+		<result column="REGIONVALUE" property="REGIONVALUE"/>
+		<result column="ADDRESS" property="ADDRESS"/>
+		<result column="TOWN_STREET_CODE" property="TOWN_STREET_CODE"/>
+		<result column="TOWN_STREET_NAME" property="TOWN_STREET_NAME"/>
+		<result column="HOST_UNITCODE" property="HOST_UNITCODE"/>
+		<result column="HOST_UNITVALUE" property="HOST_UNITVALUE"/>
+		<result column="SUP_DEPARTMENTCODE" property="SUP_DEPARTMENTCODE"/>
+		<result column="SUP_DEPARTMENTVALUE" property="SUP_DEPARTMENTVALUE"/>
+		<result column="RELATIONSCODE" property="RELATIONSCODE"/>
+		<result column="RELATIONSVALUE" property="RELATIONSVALUE"/>
+		<result column="POST_CODE" property="POST_CODE"/>
+		<result column="TEL" property="TEL"/>
+		<result column="MAIL" property="MAIL"/>
+		<result column="CORP_REPRESENTATIVE" property="CORP_REPRESENTATIVE"/>
+		<result column="PRINC_PERSON" property="PRINC_PERSON"/>
+		<result column="UNIT_SETUP_TIME" property="UNIT_SETUP_TIME"/>
+		<result column="UNIT_WEB_SET" property="UNIT_WEB_SET"/>
+		<result column="PHONETIC_MNEMONIC" property="PHONETIC_MNEMONIC"/>
+		<result column="ORG_STATUS" property="ORG_STATUS"/>
+		<result column="AUTHOR_ID" property="AUTHOR_ID"/>
+		<result column="AUTHOR_NAME" property="AUTHOR_NAME"/>
+		<result column="AUTHOR_DEP_ID" property="AUTHOR_DEP_ID"/>
+		<result column="AUTHOR_DEP_NAME" property="AUTHOR_DEP_NAME"/>
+		<result column="AUTHOR_DEP_CONTACTS" property="AUTHOR_DEP_CONTACTS"/>
+		<result column="CREATION_TIME" property="CREATION_TIME"/>
+		<result column="P_ORG_CODE" property="P_ORG_CODE"/>
+		<result column="ISLEAF" property="ISLEAF"/>
+		<result column="HOSPITAL_RANK" property="HOSPITAL_RANK"/>
+	</resultMap>
+
+	<!--表名 -->
+	<sql id="tableName">
+		"HM_ORGANIZATION"
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		"ORG_CODE",	
+		"ORG_NAME",	
+		"ORG_LOGIN_CODE",	
+		"ORG_NAME2",	
+		"ORG_CLASSCODE",	
+		"ORG_CLASSVALUE",	
+		"ORG_TYPECODE",	
+		"ORG_TYPEVALUE",	
+		"REGIONCODE",	
+		"REGIONVALUE",	
+		"ADDRESS",	
+		"TOWN_STREET_CODE",	
+		"TOWN_STREET_NAME",	
+		"HOST_UNITCODE",	
+		"HOST_UNITVALUE",	
+		"SUP_DEPARTMENTCODE",	
+		"SUP_DEPARTMENTVALUE",	
+		"RELATIONSCODE",	
+		"RELATIONSVALUE",	
+		"POST_CODE",	
+		"TEL",	
+		"MAIL",	
+		"CORP_REPRESENTATIVE",	
+		"PRINC_PERSON",	
+		"UNIT_SETUP_TIME",	
+		"UNIT_WEB_SET",	
+		"PHONETIC_MNEMONIC",	
+		"ORG_STATUS",	
+		"AUTHOR_ID",	
+		"AUTHOR_NAME",	
+		"AUTHOR_DEP_ID",	
+		"AUTHOR_DEP_NAME",	
+		"AUTHOR_DEP_CONTACTS",	
+		"CREATION_TIME",	
+		"P_ORG_CODE",	
+		"ISLEAF",
+		"HOSPITAL_RANK",
+		"ORGANIZATION_ID"
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+			#{ORG_CODE},	
+			#{ORG_NAME},	
+			#{ORG_LOGIN_CODE},	
+			#{ORG_NAME2,jdbcType=VARCHAR},
+			#{ORG_CLASSCODE,jdbcType=VARCHAR},
+			#{ORG_CLASSVALUE,jdbcType=VARCHAR},
+			#{ORG_TYPECODE,jdbcType=VARCHAR},
+			#{ORG_TYPEVALUE,jdbcType=VARCHAR},
+			#{REGIONCODE,jdbcType=VARCHAR},
+			#{REGIONVALUE,jdbcType=VARCHAR},
+			#{ADDRESS,jdbcType=VARCHAR},
+			#{TOWN_STREET_CODE,jdbcType=VARCHAR},
+			#{TOWN_STREET_NAME,jdbcType=VARCHAR},
+			#{HOST_UNITCODE,jdbcType=VARCHAR},
+			#{HOST_UNITVALUE,jdbcType=VARCHAR},
+			#{SUP_DEPARTMENTCODE,jdbcType=VARCHAR},
+			#{SUP_DEPARTMENTVALUE,jdbcType=VARCHAR},
+			#{RELATIONSCODE,jdbcType=VARCHAR},
+			#{RELATIONSVALUE,jdbcType=VARCHAR},
+			#{POST_CODE,jdbcType=VARCHAR},
+			#{TEL,jdbcType=VARCHAR},
+			#{MAIL,jdbcType=VARCHAR},
+			#{CORP_REPRESENTATIVE,jdbcType=VARCHAR},
+			#{PRINC_PERSON,jdbcType=VARCHAR},
+			to_date(#{UNIT_SETUP_TIME,jdbcType=DATE},'yyyy-mm-dd'),
+			#{UNIT_WEB_SET,jdbcType=VARCHAR},
+			#{PHONETIC_MNEMONIC,jdbcType=VARCHAR},
+			#{ORG_STATUS,jdbcType=VARCHAR},
+			#{AUTHOR_ID,jdbcType=VARCHAR},
+			#{AUTHOR_NAME,jdbcType=VARCHAR},
+			#{AUTHOR_DEP_ID,jdbcType=VARCHAR},
+			#{AUTHOR_DEP_NAME,jdbcType=VARCHAR},
+			#{AUTHOR_DEP_CONTACTS,jdbcType=VARCHAR},
+			to_date(#{CREATION_TIME,jdbcType=DATE},'yyyy-mm-dd'),
+			#{P_ORG_CODE},
+			#{ISLEAF,jdbcType=VARCHAR},
+			#{HOSPITAL_RANK,jdbcType=VARCHAR},
+			#{ORGANIZATION_ID}
+	</sql>
+	
+	<!-- 新增-->
+	<insert id="save" parameterType="pd">
+		insert into
+		<include refid="tableName"></include>
+		(
+		<include refid="Field"></include>
+		) values (
+		<include refid="FieldValue"></include>
+		)
+	</insert>
+	
+	<!-- 删除-->
+	<delete id="delete" parameterType="pd">
+		delete from
+		<include refid="tableName"></include>
+		where 
+			"ORGANIZATION_ID" = #{ORGANIZATION_ID}
+	</delete>
+	
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+		update
+		<include refid="tableName"></include>
+			set 
+				"ORG_CODE" = #{ORG_CODE},	
+				"ORG_NAME" = #{ORG_NAME},	
+				"ORG_LOGIN_CODE" = #{ORG_LOGIN_CODE},	
+				"ORG_NAME2" = #{ORG_NAME2},	
+				"ORG_CLASSCODE" = #{ORG_CLASSCODE},	
+				"ORG_CLASSVALUE" = #{ORG_CLASSVALUE},	
+				"ORG_TYPECODE" = #{ORG_TYPECODE},	
+				"ORG_TYPEVALUE" = #{ORG_TYPEVALUE},	
+				"REGIONCODE" = #{REGIONCODE},	
+				"REGIONVALUE" = #{REGIONVALUE},	
+				"ADDRESS" = #{ADDRESS},	
+				"TOWN_STREET_CODE" = #{TOWN_STREET_CODE},	
+				"TOWN_STREET_NAME" = #{TOWN_STREET_NAME},	
+				"HOST_UNITCODE" = #{HOST_UNITCODE},	
+				"HOST_UNITVALUE" = #{HOST_UNITVALUE},	
+				"SUP_DEPARTMENTCODE" = #{SUP_DEPARTMENTCODE},	
+				"SUP_DEPARTMENTVALUE" = #{SUP_DEPARTMENTVALUE},	
+				"RELATIONSCODE" = #{RELATIONSCODE},	
+				"RELATIONSVALUE" = #{RELATIONSVALUE},	
+				"POST_CODE" = #{POST_CODE},	
+				"TEL" = #{TEL},	
+				"MAIL" = #{MAIL},	
+				"CORP_REPRESENTATIVE" = #{CORP_REPRESENTATIVE},	
+				"PRINC_PERSON" = #{PRINC_PERSON},	
+				"UNIT_SETUP_TIME" = to_date(#{UNIT_SETUP_TIME},'yyyy-mm-dd'),
+				"UNIT_WEB_SET" = #{UNIT_WEB_SET},	
+				"PHONETIC_MNEMONIC" = #{PHONETIC_MNEMONIC},	
+				"ORG_STATUS" = #{ORG_STATUS},	
+				"AUTHOR_ID" = #{AUTHOR_ID},	
+				"AUTHOR_NAME" = #{AUTHOR_NAME},	
+				"AUTHOR_DEP_ID" = #{AUTHOR_DEP_ID},	
+				"AUTHOR_DEP_NAME" = #{AUTHOR_DEP_NAME},	
+				"AUTHOR_DEP_CONTACTS" = #{AUTHOR_DEP_CONTACTS},	
+				"CREATION_TIME" = to_date(#{CREATION_TIME},'yyyy-mm-dd'),
+				"P_ORG_CODE" = #{P_ORG_CODE},	
+				"ISLEAF" = #{ISLEAF,jdbcType=VARCHAR},
+				"HOSPITAL_RANK" = #{HOSPITAL_RANK},
+			"ORGANIZATION_ID" = #{ORGANIZATION_ID}
+			where 
+				"ORGANIZATION_ID" = #{ORGANIZATION_ID}
+	</update>
+	
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include>
+		where 
+			"ORGANIZATION_ID" = #{ORGANIZATION_ID}
+	</select>
+
+	<!-- 通过组织机构代码获取数据 -->
+	<select id="findByORG_CODE" parameterType="pd" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from
+		<include refid="tableName"></include>
+		where
+		ORG_CODE = #{ORG_CODE}
+	</select>
+
+	<!-- 通过登记号获取数据 -->
+	<select id="findByORG_LOGIN_CODE" parameterType="pd" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from
+		<include refid="tableName"></include>
+		where
+		ORG_LOGIN_CODE = #{ORG_LOGIN_CODE}
+	</select>
+	<select id="listAllByRegionCode" parameterType="pd" resultType="pd">
+		select
+		 ORG_CODE,ORG_NAME
+		from
+		<include refid="tableName"></include>
+		where REGIONCODE LIKE CONCAT(CONCAT('%', #{REGION_CODE}),'%') 
+		and ORG_CODE  LIKE CONCAT(CONCAT('%', 'A'),'%') 
+	</select>
+	<!-- 列表 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include>
+		where 1=1
+		<if test="pd.keywords!= null and pd.keywords != ''"><!-- 关键词检索 -->
+			and
+				(
+				<!--	根据需求自己加检索条件
+					字段1 LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+					 or 
+					字段2 LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%') 
+				-->
+				)
+		</if>
+	</select>
+
+	<!-- 通过上级机构代码获取其子级列表 -->
+	<select id="listSubOrgByP_ORG_CODE" parameterType="String" resultMap="orgResultMap">
+		select
+		<include refid="Field"></include>
+		from
+		<include refid="tableName"></include>
+		where
+		P_ORG_CODE = #{P_ORG_CODE}  order by ORG_CODE 
+	</select>
+
+	<!-- 排查表检查是否被占用 -->
+	<select id="findFromTbs" parameterType="pd" resultType="pd">
+		select
+		count(*) zs
+		from
+		${thisTable}
+		where
+		ORG_CODE = #{ORG_CODE}
+	</select>
+
+	<!-- 将叶节点转换为父节点 -->
+	<update id="changeToParent" parameterType="pd">
+		update
+		<include refid="tableName"></include>
+		set
+		"ISLEAF" = #{ISLEAF}
+		where
+		"ORG_CODE" = #{ORG_CODE}
+	</update>
+	
+</mapper>

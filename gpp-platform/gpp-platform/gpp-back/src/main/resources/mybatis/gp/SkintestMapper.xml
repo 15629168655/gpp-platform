@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="SkintestMapper">
+
+    <!--表名 -->
+	<sql id="tableName">
+		GPP_SKINTEST_ADVERSENESS
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		<if test="ID != null and ID != ''">
+			ID,	
+		</if>
+		PSYP,
+		PSYPID,
+		PSYBM,
+		PSYMC,
+		PSLX,
+		GMFY,
+		KSSJ,
+		JSSJ,
+		BZ,
+		HZXM,
+		HZID,
+		SCSJ,
+		XGSJ,
+		LRR,
+		LRRID,
+		ZXRID,
+		ZXRXM,
+		ZXRCODE,
+		ORG_CODE,
+		MZJZLSH,
+		ZT
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+			#{ID,jdbcType=VARCHAR},
+			#{PSYP,jdbcType=VARCHAR},
+			#{PSYPID,jdbcType=VARCHAR},
+			#{PSYBM,jdbcType=VARCHAR},
+			#{PSYMC,jdbcType=VARCHAR},
+			#{PSLX,jdbcType=VARCHAR},
+			#{GMFY,jdbcType=VARCHAR},
+			to_date(#{KSSJ,jdbcType=DATE},'YYYY-MM-DD HH24:MI:SS'),
+		    to_date(#{JSSJ,jdbcType=DATE},'YYYY-MM-DD HH24:MI:SS'),
+			#{BZ,jdbcType=VARCHAR},
+			#{HZXM,jdbcType=VARCHAR},
+			#{HZID,jdbcType=VARCHAR},
+			sysdate,
+			sysdate,
+			#{LRR,jdbcType=VARCHAR},
+			#{LRRID,jdbcType=VARCHAR},
+			#{ZXRID,jdbcType=VARCHAR},
+		    #{ZXRXM,jdbcType=VARCHAR},
+		    #{ZXRCODE,jdbcType=VARCHAR},
+		    #{ORG_CODE,jdbcType=VARCHAR},
+		    #{MZJZLSH,jdbcType=VARCHAR},
+			#{ZT,jdbcType=VARCHAR}
+	</sql>
+	
+	<!-- 列表 -->
+	<select id="skintestlistPage" parameterType="page" resultType="pd">
+		select
+			a.ID,
+			a.PSYP,
+			a.PSYPID,
+			a.PSYBM,
+			a.PSYMC,
+			a.PSLX,
+			a.GMFY,
+			a.KSSJ,
+			a.JSSJ,
+			a.BZ,
+			a.HZXM,
+			a.HZID,
+			a.SCSJ,
+			a.XGSJ,
+			a.LRR,
+			a.LRRID,
+			a.ZXRID,
+		    a.ZXRXM,
+		    a.ZXRCODE,
+		    a.ORG_CODE,
+		    a.MZJZLSH,
+			a.ZT
+		from 
+			<include refid="tableName"></include> a
+		where 1 = 1 
+		and a.ZT != 9
+		<if test="pd.ORG_CODE!= null and pd.ORG_CODE != ''">
+              and a.ORG_CODE = #{pd.ORG_CODE}
+        </if>
+		<if test="pd.HZXM != null and pd.HZXM != ''"><!-- 患者姓名检索 -->
+			and a.HZXM LIKE CONCAT(CONCAT('%', #{pd.HZXM}),'%')
+		</if>
+		<if test="pd.PSYP != null and pd.PSYP != ''"><!-- 皮试药品检索 -->
+			and a.PSYP LIKE CONCAT(CONCAT('%', #{pd.PSYP}),'%')
+		</if>
+		<if test="pd.PSYMC != null and pd.PSYMC != ''"><!-- 皮试液检索 -->
+			and a.PSYMC LIKE CONCAT(CONCAT('%', #{pd.PSYMC}),'%')
+		</if>
+		<if test="pd.skintestTimeStart!=null and pd.skintestTimeStart!=''"><!-- 生成时间起检索 -->
+			and to_char(a.SCSJ,'yyyymmdd') &gt;=to_char(to_date(#{pd.skintestTimeStart},'YYYY-MM-DD'),'yyyymmdd')
+		</if>
+		<if test="pd.skintestTimeEnd!=null and pd.skintestTimeEnd!=''"><!-- 生成时间止检索 -->
+			and to_char(a.SCSJ,'yyyymmdd') &lt;=to_char(to_date(#{pd.skintestTimeEnd},'YYYY-MM-DD'),'yyyymmdd')
+		</if>
+		<if test="pd.PSLX != null and pd.PSLX != ''"><!-- 皮试类型检索 -->
+			and a.PSLX=#{pd.PSLX} 
+		</if>
+		<if test="pd.GMFY != null and pd.GMFY != ''"><!-- 过敏反应检索 -->
+			and a.GMFY=#{pd.GMFY} 
+		</if>
+		
+		order by a.XGSJ
+	</select>
+	
+	<!-- 新增 -->
+	<insert id="save" parameterType="pd">
+		insert into <include refid="tableName"></include>
+	<trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="ID != null" >
+        ID,
+      </if>
+         <if test="PSYP	!= null" >	PSYP,	</if>
+         <if test="PSYPID != null" >	PSYPID,	</if>
+         <if test="PSYBM	!= null" >	PSYBM,	</if>
+         <if test="PSYMC	!= null" >	PSYMC,	</if>
+         <if test="PSLX	!= null" >	PSLX,	</if>
+         <if test="GMFY	!= null" >	GMFY,	</if>
+         <if test="KSSJ	!= null" >	KSSJ,	</if>
+         <if test="JSSJ	!= null" >	JSSJ,	</if>
+         <if test="BZ	!= null" >	BZ,	</if>
+         <if test="HZXM	!= null" >	HZXM,	</if>
+         <if test="HZID	!= null" >	HZID,	</if>
+         <if test="LRR	!= null" >	LRR,	</if>
+         <if test="LRRID	!= null" >	LRRID,	</if>
+         <if test="ZXRXM	!= null" >	ZXRXM,	</if>
+         <if test="ZXRID	!= null" >	ZXRID,	</if>
+         <if test="ZXRCODE	!= null" >	ZXRCODE,	</if>
+         <if test="ORG_CODE	!= null" >	ORG_CODE,	</if>
+         <if test="MZJZLSH	!= null" >	MZJZLSH,	</if>
+         <if test="ZT	!= null" >	ZT,	</if>
+          SCSJ,
+          XGSJ
+      </trim>
+            VALUES
+     <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="ID != null" >
+        #{ID,jdbcType=VARCHAR},
+      </if>
+    <if test="PSYP	!= null" >	#{PSYP,jdbcType=VARCHAR},	</if>
+	<if test="PSYPID != null" >	#{PSYPID,jdbcType=VARCHAR},	</if>
+	<if test="PSYBM	!= null" >	#{PSYBM,jdbcType=VARCHAR},	</if>
+	<if test="PSYMC	!= null" >	#{PSYMC,jdbcType=VARCHAR},	</if>
+	<if test="PSLX	!= null" >	#{PSLX,jdbcType=VARCHAR},	</if>
+	<if test="GMFY	!= null" >	#{GMFY,jdbcType=VARCHAR},	</if>
+	<if test="KSSJ	!= null" >	to_date(#{KSSJ,jdbcType=DATE},'YYYY-MM-DD HH24:MI:SS'),	</if>
+	<if test="JSSJ	!= null" >	to_date(#{JSSJ,jdbcType=DATE},'YYYY-MM-DD HH24:MI:SS'),	</if>
+	<if test="BZ	!= null" >	#{BZ,jdbcType=VARCHAR},	</if>
+	<if test="HZXM	!= null" >	#{HZXM,jdbcType=VARCHAR},	</if>
+	<if test="HZID	!= null" >	#{HZID,jdbcType=VARCHAR},	</if>
+	<if test="LRR	!= null" >	#{LRR,jdbcType=VARCHAR},	</if>
+	<if test="LRRID	!= null" >	#{LRRID,jdbcType=VARCHAR},	</if>
+    <if test="ZXRXM	!= null" >	#{ZXRXM,jdbcType=VARCHAR},	</if>
+    <if test="ZXRID	!= null" >	#{ZXRID,jdbcType=VARCHAR},	</if>
+    <if test="ZXRCODE	!= null" >	#{ZXRCODE,jdbcType=VARCHAR},	</if>
+    <if test="ORG_CODE	!= null" >	#{ORG_CODE,jdbcType=VARCHAR},	</if>
+    <if test="MZJZLSH	!= null" >	#{MZJZLSH,jdbcType=VARCHAR},	</if>
+	<if test="ZT	!= null" >	#{ZT,jdbcType=VARCHAR},	</if>
+      sysdate,
+      sysdate
+       </trim>
+      </insert> 
+      
+      
+	<!-- 通过id获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd" >
+		select 
+			<include refid="Field"></include>
+		from 
+			<include refid="tableName"></include>
+		where 
+			ID = #{ID}
+	</select>
+	
+	<!-- 修改 -->
+	<!-- <update id="edit" parameterType="pd" >
+	  update  <include refid="tableName"></include>
+		 set 
+			PSYP				= #{PSYP,jdbcType=VARCHAR},
+			PSYPID				= #{PSYPID,jdbcType=VARCHAR},
+			PSYBM				= #{PSYBM,jdbcType=VARCHAR},
+			PSYMC				= #{PSYMC,jdbcType=VARCHAR},
+			PSLX				= #{PSLX,jdbcType=VARCHAR},
+			GMFY				= #{GMFY,jdbcType=VARCHAR},
+			KSSJ				= to_date(#{KSSJ},'YYYY-MM-DD HH24:MI:SS'),
+			JSSJ				= to_date(#{JSSJ},'YYYY-MM-DD HH24:MI:SS'),
+			BZ				    = #{BZ,jdbcType=VARCHAR},
+			HZXM				= #{HZXM,jdbcType=VARCHAR},
+			HZID				= #{HZID,jdbcType=VARCHAR},
+			XGSJ				= sysdate,
+			LRR				    = #{LRR,jdbcType=VARCHAR},
+			LRRID				= #{LRRID,jdbcType=VARCHAR},
+			JGID				= #{JGID,jdbcType=VARCHAR},
+
+			ID                      = ID
+			where 
+				ID = #{ID}
+	</update> -->
+	
+	
+	<update id="edit" parameterType="pd" >
+		update  <include refid="tableName"></include>
+			set 
+	 <if test="PSYP != null " >	
+	PSYP		 = #{PSYP,jdbcType=VARCHAR},
+    </if>
+     <if test="PSYPID != null " >	
+	PSYPID		 = #{PSYPID,jdbcType=VARCHAR},
+     </if>
+      <if test="PSYBM != null " >	
+	PSYBM		 = #{PSYBM,jdbcType=VARCHAR},
+     </if>
+    <if test="PSYMC != null " >
+	PSYMC		 = #{PSYMC,jdbcType=VARCHAR},
+    </if>
+    <if test="PSLX != null " >	
+	PSLX		 = #{PSLX,jdbcType=VARCHAR},
+    </if>
+     <if test="GMFY != null " >	
+	GMFY		 = #{GMFY,jdbcType=VARCHAR},	
+    </if>
+    <if test="KSSJ != null  " >	
+	KSSJ		 = to_date(#{KSSJ,jdbcType=DATE},'YYYY-MM-DD HH24:MI:SS'),	
+    </if>
+    <if test="JSSJ != null " >	
+	JSSJ		 = to_date(#{JSSJ,jdbcType=DATE},'YYYY-MM-DD HH24:MI:SS'),	
+    </if>
+    <if test="BZ != null " >	
+	BZ		 = #{BZ,jdbcType=VARCHAR},	
+    </if>
+    <if test="HZXM != null  " >	
+	HZXM		 = #{HZXM,jdbcType=VARCHAR},	
+    </if>
+    <if test="HZID != null " >	
+	HZID		 = #{HZID,jdbcType=VARCHAR},	
+    </if>
+    <if test="ZXRXM	!= null" >ZXRXM =	#{ZXRXM,jdbcType=VARCHAR},	</if>
+    <if test="ZXRID	!= null" >ZXRID = 	#{ZXRID,jdbcType=VARCHAR},	</if>
+    <if test="ZXRCODE	!= null" >ZXRCODE  =	#{ZXRCODE,jdbcType=VARCHAR},	</if>
+    <if test="MZJZLSH	!= null" >MZJZLSH  = 	#{MZJZLSH,jdbcType=VARCHAR},	</if>
+    XGSJ		 = sysdate,
+	 ID           = ID
+			where 
+				ID = #{ID}
+	</update>
+	
+	
+	
+	<!-- 删除 -->
+	<update id="delete" parameterType="pd">
+		update  <include refid="tableName"></include>
+			set ZT = 9,
+			XGSJ = sysdate
+		where 
+			ID = #{ID}
+	</update>
+	
+	
+	<!-- 批量删除任务 -->
+	<update id="deleteAll" parameterType="String">
+		update <include refid="tableName"></include>
+		   set ZT = 9,
+		   XGSJ	 = sysdate
+		where 
+			ID in
+  			 <foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                  #{item}
+             </foreach>
+	</update>
+	
+	<!-- app分页查询-->
+	<select id="queryPage" parameterType="pd" resultType="pd">
+				SELECT *
+				  FROM ( 
+				       SELECT ROWNUM AS rowno, a.* 
+				           FROM 
+				          <include refid="tableName"></include>  a
+			where 1 = 1
+			 and a.ZT != 9
+		<if test="ORG_CODE!= null and ORG_CODE != ''">
+              and a.ORG_CODE = #{pd.ORG_CODE}
+        </if>
+		<if test="HZXM != null and HZXM != ''"><!-- 患者姓名检索 -->
+			and a.HZXM LIKE CONCAT(CONCAT('%', #{HZXM}),'%')
+		</if>
+		<if test="PSYP != null and PSYP != ''"><!-- 皮试药品检索 -->
+			and a.PSYP LIKE CONCAT(CONCAT('%', #{PSYP}),'%')
+		</if>
+		<if test="PSYMC != null and PSYMC != ''"><!-- 皮试液检索 -->
+			and a.PSYMC LIKE CONCAT(CONCAT('%', #{PSYMC}),'%')
+		</if>
+		<if test="TIMESTART!=null and TIMESTART!=''"><!-- 生成时间起检索 -->
+			and a.SCSJ &gt;=to_date(#{TIMESTART},'YYYY-MM-DD HH24:MI:SS')
+		</if>
+		<if test="TIMEEND!=null and TIMEEND!=''"><!-- 生成时间止检索 -->
+			and a.SCSJ &lt;=to_date(#{TIMEEND},'YYYY-MM-DD HH24:MI:SS')
+		</if>
+		<if test="PSLX != null and PSLX != ''"><!-- 皮试类型检索 -->
+			and a.PSLX=#{PSLX} 
+		</if>
+		<if test="GMFY != null and GMFY != ''"><!-- 过敏反应检索 -->
+			and a.GMFY=#{GMFY} 
+		</if>
+				           ) table_alias
+				           
+				 WHERE table_alias.rowno BETWEEN #{pageStart} and #{pageEnd}
+	</select>
+	
+	<!-- app新增 -->
+	<!-- <insert id="addSkintest" parameterType="pd">
+		insert into <include refid="tableName"></include> (
+			<include refid="Field"></include>
+		) values (
+			#{ID,jdbcType=VARCHAR},
+			#{PSYP,jdbcType=VARCHAR},
+			#{PSYPID,jdbcType=VARCHAR},
+			#{PSYBM,jdbcType=VARCHAR},
+			#{PSYMC,jdbcType=VARCHAR},
+			#{PSLX,jdbcType=VARCHAR},
+			#{GMFY,jdbcType=VARCHAR},
+			to_date(#{KSSJ},'YYYY-MM-DD HH24:MI:SS'),
+			to_date(#{JSSJ},'YYYY-MM-DD HH24:MI:SS'),
+			#{BZ,jdbcType=VARCHAR},
+			#{HZXM,jdbcType=VARCHAR},
+			#{HZID,jdbcType=VARCHAR},
+			sysdate,
+			sysdate,
+			#{LRR,jdbcType=VARCHAR},
+			#{LRRID,jdbcType=VARCHAR},
+			#{JGID,jdbcType=VARCHAR},
+			#{ZT,jdbcType=VARCHAR}
+		)
+	</insert> -->
+
+</mapper>

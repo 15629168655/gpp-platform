@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="LcxmdzbMapper">
+	<!--              临床项目对照表                                                   -->
+	<!--表名 -->
+	<sql id="tableName">
+		GPP_CLINICAL_PROJECT_DZB
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+	  	LCFLDM,
+		LCXM,
+		SFXM,
+		GG,
+		DW,
+		SL,
+		XH,
+		JFGZ,
+		ID,
+		SFXMMC
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{LCFLDM,jdbcType=VARCHAR},
+		#{LCXM,jdbcType=VARCHAR},
+		#{SFXM,jdbcType=VARCHAR},
+		#{GG,jdbcType=VARCHAR},
+		#{DW,jdbcType=VARCHAR},
+		#{SL,jdbcType=VARCHAR},
+		#{XH,jdbcType=VARCHAR},
+		#{JFGZ,jdbcType=VARCHAR},
+		#{ID,jdbcType=VARCHAR},
+		#{SFXMMC,jdbcType=VARCHAR}
+	</sql>
+	
+	<!-- 临床项目对照表列表 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select 
+			<include refid="Field"></include> 
+		from 
+			<include refid="tableName"></include>
+			where 1 = 1 
+			<if test="pd.BM !=null and pd.BM !=''">
+				and LCXM = #{pd.BM}<!-- 临床项目对照表列表根据临床项目的BM显示 -->
+			</if>
+			<if test="pd.keywords != null and pd.keywords != ''"> <!-- 关键词检索  -->
+			and (
+				 SFXMMC LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%') 
+				) 
+		</if>
+	</select>
+	
+	<!-- 新增 -->
+	<insert id="save" parameterType="pd">
+		insert into <include refid="tableName"></include> (
+			<include refid="Field"></include>
+		) values (
+			<include refid="FieldValue"></include>
+		)
+	</insert>
+	
+	<!--通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select  
+			<include refid="Field"></include>
+		 from 
+			<include refid="tableName"></include>
+		 where ID=#{ID} 
+	</select>
+	
+	<!--删除-->
+	<delete id="delete" parameterType="pd">
+		delete from
+		<include refid="tableName"></include>
+		where 
+			ID = #{ID}
+	</delete>
+	
+	<!--通过收费项目编码查询数据 -->
+	<select id="findBySFXM" parameterType="pd" resultType="pd">
+		select  
+			<include refid="Field"></include>
+		 from 
+			<include refid="tableName"></include>
+		 where SFXM=#{SFXM} and LCXM=#{LCXM}
+	</select>
+	
+	<!--修改数量 -->
+	<update id="edit" parameterType="Menu">
+		update 
+		<include refid="tableName"></include> 
+		set 
+			SL 	=#{SL,jdbcType=VARCHAR}
+		where 
+			ID=#{ID}
+	</update>
+	<select id="queryByBM" parameterType="pd" resultType="pd">
+		select * from 
+			<include refid="tableName"></include>
+			where LCXM = #{BM}
+	</select>
+</mapper>

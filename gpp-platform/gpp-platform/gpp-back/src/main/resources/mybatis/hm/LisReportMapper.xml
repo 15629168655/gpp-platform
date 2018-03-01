@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="LisReportMapper">
+
+<!--表名 -->
+	<sql id="tableName">
+		TB_LIS_REPORT
+	</sql>
+
+<!-- 字段 -->
+	<sql id="Field">
+		<if test="ID != null and ID != ''">
+			ID,
+		</if>
+			YLJGDM,
+			BGDH,
+			BGRQ,
+			JZLSH,
+			YYLSH,
+			MZZYBZ,
+			KH,
+			KLX,
+			BRXM,
+			BRXB,
+			BRNL,
+			SQRGH,
+			SQRXM,
+			BGRGH,
+			BGRXM,
+			SHRGH,
+			SHRXM,
+			SQKS,
+			SQKSMC,
+			BQ,
+			CH,
+			DYRQ,
+			SQRQ,
+			CJRQ,
+			JYRQ,
+			BGBZ,
+			BBDM,
+			BBMC,
+			BGDLBBM,
+			BGDLB,
+			MJ,
+			PERSONID,
+			WJLJ,
+			XGBZ,
+			YLYL1,
+			YLYL2
+
+	</sql>
+	
+<!-- 字段值 -->
+	<sql id="FieldValue">
+			#{ID,jdbcType=VARCHAR},
+			#{YLJGDM,jdbcType=VARCHAR},
+			#{BGDH,jdbcType=VARCHAR},
+			#{BGRQ,jdbcType=VARCHAR},
+			#{JZLSH,jdbcType=VARCHAR},
+			#{YYLSH,jdbcType=VARCHAR},
+			#{MZZYBZ,jdbcType=VARCHAR},
+			#{KH,jdbcType=VARCHAR},
+			#{KLX,jdbcType=VARCHAR},
+			#{BRXM,jdbcType=VARCHAR},
+			#{BRXB,jdbcType=VARCHAR},
+			#{BRNL,jdbcType=VARCHAR},
+			#{SQRGH,jdbcType=VARCHAR},
+			#{SQRXM,jdbcType=VARCHAR},
+			#{BGRGH,jdbcType=VARCHAR},
+			#{BGRXM,jdbcType=VARCHAR},
+			#{SHRGH,jdbcType=VARCHAR},
+			#{SHRXM,jdbcType=VARCHAR},
+			#{SQKS,jdbcType=VARCHAR},
+			#{SQKSMC,jdbcType=VARCHAR},
+			#{BQ,jdbcType=VARCHAR},
+			#{CH,jdbcType=VARCHAR},
+			to_date(#{DYRQ},'yyyy-mm-dd'),
+			to_date(#{SQRQ},'yyyy-mm-dd'),
+			to_date(#{CJRQ},'yyyy-mm-dd'),
+			to_date(#{JYRQ},'yyyy-mm-dd'),
+			#{BGBZ,jdbcType=VARCHAR},
+			#{BBDM,jdbcType=VARCHAR},
+			#{BBMC,jdbcType=VARCHAR},
+			#{BGDLBBM,jdbcType=VARCHAR},
+			#{BGDLB,jdbcType=VARCHAR},
+			#{MJ,jdbcType=VARCHAR},
+			#{PERSONID,jdbcType=VARCHAR},
+			#{WJLJ,jdbcType=VARCHAR},
+			#{XGBZ,jdbcType=DOUBLE},
+			#{YLYL1,jdbcType=VARCHAR},
+			#{YLYL2,jdbcType=VARCHAR}
+
+	</sql>
+	
+	<!-- 列表 -->
+	<select id="listPage" parameterType="page" resultType="pd">
+		select
+		
+			a.YLJGDM,
+			a.BGDH,
+			a.BGRQ,
+			a.JZLSH,
+			a.YYLSH,
+			a.MZZYBZ,
+			a.KH,
+			a.KLX,
+			a.BRXM,
+			a.BRXB,
+			a.BRNL,
+			a.SQRGH,
+			a.SQRXM,
+			a.BGRGH,
+			a.BGRXM,
+			a.SHRGH,
+			a.SHRXM,
+			a.SQKS,
+			a.SQKSMC,
+			a.BQ,
+			a.CH,
+			a.DYRQ,
+			a.SQRQ,
+			a.CJRQ,
+			a.JYRQ,
+			a.BGBZ,
+			a.BBDM,
+			a.BBMC,
+			a.BGDLBBM,
+			a.BGDLB,
+			a.MJ,
+			a.PERSONID,
+			a.WJLJ,
+			a.XGBZ,
+			a.YLYL1,
+			a.YLYL2,
+			a.ID,
+			a.ID_NUMBER
+
+		from 
+			<include refid="tableName"></include> a
+		where 1 = 1 and a.XGBZ != 1
+		<if test="pd.BRXM != null and pd.BRXM != ''"><!-- 姓名检索 -->
+			and a.BRXM LIKE CONCAT(CONCAT('%', #{pd.BRXM}),'%')
+		</if>
+		<if test="pd.BRXB != null and pd.BRXB != ''"><!-- 性别检索 -->
+			and a.BRXB=#{pd.BRXB}
+		</if>
+		<if test="pd.BRNL != null and pd.BRNL != ''"><!-- 年龄检索 -->
+			and a.BRNL=#{pd.BRNL}
+		</if>
+		<if test="pd.BGDH != null and pd.BGDH != ''"><!-- 检验报告单号检索 -->
+			and a.BGDH=#{pd.BGDH} 
+		</if>
+		<if test="pd.JZLSH != null and pd.JZLSH != ''"><!-- 门诊就诊流水号检索 -->
+			and a.JZLSH=#{pd.JZLSH} 
+		</if>
+		<if test="pd.YLJGDM != null and pd.YLJGDM!= ''"> <!-- 医疗机构代码 -->
+			and a.YLJGDM = #{pd.YLJGDM}
+		</if>
+		<if test="pd.KH != null and pd.KH != ''"><!-- 卡号检索 -->
+			and a.KH=#{pd.KH} 
+		</if> 
+		<if test="pd.KLX != null and pd.KLX != ''"> <!-- 患者卡类型 -->
+			and a.KLX = #{pd.KLX}
+		</if>
+	    <if test="pd.PERSONID != null and pd.PERSONID != ''"> <!-- 患者卡ID -->
+			and a.PERSONID = #{pd.PERSONID}
+		</if>
+		<if test="pd.id != null and pd.id != ''">
+		    and a.ID_NUMBER = #{pd.id}
+		 </if>
+		order by a.JYRQ
+		
+
+	</select>
+	
+	<!-- 通过id获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd" >
+		select 
+			<include refid="Field"></include>
+		from 
+			<include refid="tableName"></include>
+		where 
+			ID = #{ID}
+	</select>
+	
+	
+	<!-- app分页查询-->
+	<select id="queryPage" parameterType="pd" resultType="pd">
+		SELECT *
+			 FROM ( 
+				    SELECT ROWNUM AS rowno, a.* 
+				           FROM 
+				          <include refid="tableName"></include>  a
+			where 1 = 1 
+		<if test="YLJGDM != null and YLJGDM != ''"><!-- 医疗机构代码检索 -->
+			and a.YLJGDM=#{YLJGDM}
+		</if>
+		<if test="JZLSH != null and JZLSH != ''"><!-- 住院就诊流水号检索 -->
+			and a.JZLSH=#{JZLSH} 
+		</if>
+		<if test="BRXM != null and BRXM != ''"><!-- 住院号患者姓名检索 -->
+			and a.BRXM=#{BRXM}
+		</if>
+		<if test="PERSONID != null and PERSONID != ''"><!-- 院内患者唯一ID号检索 -->
+			and a.PERSONID=#{PERSONID} 
+		</if>
+				           ) table_alias
+				           
+				 WHERE table_alias.rowno BETWEEN #{pageStart} and #{pageEnd}
+	</select>
+	
+		<!-- 保存 -->
+	<insert id="save" parameterType="pd">
+		insert into <include refid="tableName"></include> (
+			<include refid="Field"></include>
+		) values (
+			<include refid="FieldValue"></include>
+		)
+	</insert>
+	
+	<insert id ="batchSave" parameterType="java.util.List" useGeneratedKeys="false">
+	  insert into TB_LIS_REPORT
+	   (ID,
+	    YLJGDM,
+			BGDH,
+			BGRQ,
+			JZLSH,
+			YYLSH,
+			MZZYBZ,
+			KH,
+			KLX,
+			BRXM,
+			BRXB,
+			BRNL,
+			SQRGH,
+			SQRXM,
+			BGRGH,
+			BGRXM,
+			SHRGH,
+			SHRXM,
+			SQKS,
+			SQKSMC,
+			BQ,
+			CH,
+			DYRQ,
+			SQRQ,
+			CJRQ,
+			JYRQ,
+			BGBZ,
+			BBDM,
+			BBMC,
+			BGDLBBM,
+			BGDLB,
+			MJ,
+			PERSONID,
+			WJLJ,
+			XGBZ,
+			YLYL1,
+			YLYL2)
+        <foreach open="(" close=")" collection="list" item="item" index="index" separator="union">
+			select
+			#{item.ID,jdbcType=VARCHAR},
+			#{item.YLJGDM,jdbcType=VARCHAR},
+			#{item.BGDH,jdbcType=VARCHAR},
+			#{item.BGRQ,jdbcType=VARCHAR},
+			#{item.JZLSH,jdbcType=VARCHAR},
+			 <choose>
+				 <when test="item.containsKey('YYLSH')">
+				 	#{item.YYLSH,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			#{item.MZZYBZ,jdbcType=VARCHAR},
+			#{item.KH,jdbcType=VARCHAR},
+			#{item.KLX,jdbcType=VARCHAR},
+			#{item.BRXM,jdbcType=VARCHAR},
+			#{item.BRXB,jdbcType=VARCHAR},
+			#{item.BRNL,jdbcType=VARCHAR},
+			#{item.SQRGH,jdbcType=VARCHAR},
+			#{item.SQRXM,jdbcType=VARCHAR},
+			#{item.BGRGH,jdbcType=VARCHAR},
+			#{item.BGRXM,jdbcType=VARCHAR},
+			#{item.SHRGH,jdbcType=VARCHAR},
+			#{item.SHRXM,jdbcType=VARCHAR},
+			#{item.SQKS,jdbcType=VARCHAR},
+			#{item.SQKSMC,jdbcType=VARCHAR},
+			 <choose>
+				 <when test="item.containsKey('BQ')">
+				 	#{item.BQ,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			<choose>
+				 <when test="item.containsKey('CH')">
+				 	#{item.CH,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			TO_DATE(#{item.DYRQ,jdbcType=DATE},'yyyy-mm-dd'),
+			TO_DATE(#{item.SQRQ,jdbcType=DATE},'yyyy-mm-dd'),
+			TO_DATE(#{item.CJRQ,jdbcType=DATE},'yyyy-mm-dd'),
+			TO_DATE(#{item.JYRQ,jdbcType=DATE},'yyyy-mm-dd'),
+			<choose>
+				 <when test="item.containsKey('BGBZ')">
+				 	#{item.BGBZ,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			#{item.BBDM,jdbcType=VARCHAR},
+			#{item.BBMC,jdbcType=VARCHAR},
+			#{item.BGDLBBM,jdbcType=VARCHAR},
+			#{item.BGDLB,jdbcType=VARCHAR},
+			<choose>
+				 <when test="item.containsKey('MJ')">
+				 	#{item.MJ,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			#{item.PERSONID,jdbcType=VARCHAR},
+			<choose>
+				 <when test="item.containsKey('WJLJ')">
+				 	#{item.WJLJ,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			</choose>,
+			#{item.XGBZ,jdbcType=DOUBLE},
+			<choose>
+				 <when test="item.containsKey('YLYL1')">
+				 	#{item.YLYL1,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>,
+			<choose>
+				 <when test="item.containsKey('YLYL2')">
+				 	#{item.YLYL2,jdbcType=VARCHAR}
+				 </when>
+				 <otherwise>
+				 	null
+				 </otherwise>
+			 </choose>
+			from dual 
+		</foreach>
+	</insert>
+
+</mapper>

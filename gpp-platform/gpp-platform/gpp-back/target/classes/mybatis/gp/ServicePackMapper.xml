@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ServicePackMapper">
+	<!--表名 --><!-- 服务包表 -->
+	<sql id="tableName">
+		GPP_SERVICE_PACK
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+	 	 	ID,
+			LX,
+			BM,
+			MC,
+			NR,
+			ZT,
+			FY,
+			SX
+	</sql>
+
+	<!-- 新增字段值 -->
+	<sql id="FieldValue">
+	  #{ID,jdbcType=VARCHAR},
+	  #{LX,jdbcType=VARCHAR},
+	  #{BM,jdbcType=VARCHAR},
+	  #{MC,jdbcType=VARCHAR},
+	  #{NR,jdbcType=VARCHAR},
+	  #{ZT_BC,jdbcType=VARCHAR},<!-- 新增时为保存状态 -->
+	  #{FY,jdbcType=VARCHAR},
+	  #{SX,jdbcType=VARCHAR}
+	</sql>
+
+	<!-- 服务包列表 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select 
+			<include refid="Field"></include> 
+		from 
+			<include refid="tableName"></include> 
+		<where>
+				ZT &lt;&gt; #{pd.ZT_SC}     <!-- 不等于删除状态 -->
+			<if test="pd.MC != null and pd.MC != ''"> <!-- 名称  --> 
+				and MC LIKE CONCAT(CONCAT('%', #{pd.MC}),'%')
+			</if>
+			<if test="pd.BM !=null and pd.BM !=''"> <!-- 编码 --> 
+				and BM LIKE CONCAT(CONCAT('%', #{pd.BM}),'%')
+			</if>
+			<if test="pd.LX !=null and pd.LX !=''"><!-- 类型 -->
+				and LX = #{pd.LX}
+			</if>
+			
+			<if test="pd.ZT != null and pd.ZT != ''"> <!-- 状态-->
+				and ZT = #{pd.ZT} 
+			</if>
+		</where>
+	</select>
+		<!-- 服务包列表 -->
+	<select id="querylistforApp" parameterType="pd" resultType="pd">
+	    	SELECT *
+				  FROM ( SELECT ROWNUM AS rowno, 
+	      
+		ID,
+			LX,
+			BM,
+			MC, 
+			ZT,
+			FY,
+			SX
+		from 
+			<include refid="tableName"></include> 
+			<where>
+				ZT &lt;&gt; #{ZT_SC}     <!-- 不等于删除状态 -->
+				<if test="ZT != null and ZT != ''"> <!-- 状态-->
+					and ZT = #{ZT} 
+				</if>
+			</where>
+	       ) table_alias
+				 WHERE table_alias.rowno BETWEEN #{pageStart} and #{pageEnd}
+	</select>
+	
+	<!-- 签约管理新增时选取服务包 -->
+	<select id="PackBM" parameterType="page" resultType="pd">
+		select 
+			<include refid="Field"></include> 
+		from 
+			<include refid="tableName"></include> 
+			<where>
+				ZT = #{pd.ZT_QY}     <!-- 只有启用状态下的服务包在签约的时候才可以选取 -->
+			</where>
+	</select>
+	
+	<!-- 新增-->
+	<insert id="save" parameterType="pd">
+		insert into 
+	<include refid="tableName"></include>
+		(
+	<include refid="Field"></include>
+		) values (
+	<include refid="FieldValue"></include>
+		)
+	</insert>
+	
+	<!-- 根据编码查询是否存在，确保唯一 -->
+	<select id="findByBM" parameterType="pd" resultType="pd">
+		select 
+			<include refid="Field"></include> 
+		from 
+			<include refid="tableName"></include> 
+		<where>
+			 BM = #{BM,jdbcType=VARCHAR}
+		</where>
+	</select>
+	
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+			<include refid="Field"></include>
+		from 
+			<include refid="tableName"></include>
+		where 
+			ID = #{ID,jdbcType=VARCHAR}
+	</select>
+	
+	<!-- 修改 服务包-->
+	<update id="edit" parameterType="pd">
+		update  <include refid="tableName"></include>
+		<set>
+	      	<if test="BM != null" >
+				BM				= #{BM,jdbcType=VARCHAR},
+			</if>
+			<if test="MC != null" >
+            	MC				= #{MC,jdbcType=VARCHAR},
+            </if>
+            <if test="NR != null" >
+            	NR					= #{NR,jdbcType=NUMERIC},
+            </if>
+            <if test="ZT != null" >
+            	ZT				= #{ZT,jdbcType=VARCHAR},
+            </if>
+            <if test="FY != null" >
+            	FY					= #{FY,jdbcType=VARCHAR},
+            </if>
+            <if test="SX != null" >
+            	SX					= #{SX,jdbcType=VARCHAR},
+            </if>
+            	LX	= #{LX,jdbcType=VARCHAR}
+        </set>
+		where 
+			ID = #{ID,jdbcType=VARCHAR}
+	</update>
+	
+	<!-- 修改服务包状态 -->
+	<update id="delete" parameterType="pd">
+		update  <include refid="tableName"></include>
+			set 	ZT = #{ZT}
+		where 
+			ID = #{ID,jdbcType=VARCHAR}
+	</update>
+	
+</mapper>

@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="IndexResidentQuesMapper">
+	<!--表名居民问卷表  -->
+	<sql id="tableName">
+		GPP_INDEX_RESIDENT_QUES
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		ID,
+		RESIDENT_ID,
+		SCREENING_QUESTIONNAIRE_ID,
+		SCREENING_TIME,
+		QUESTIONNAIRE_RESULT,
+		QUESTIONNAIRE_SUGGESTION,
+		QUESTIONNAIRE_COMPANY,
+		QUESTIONNAIRE_DEPARTMENT,
+		QUESTIONNAIRE_PEOPLE,
+		QUESTIONNAIRE_STATE,
+		IS_FINISH,
+		CREAT_TIME,
+		EDIT_TIME,
+		SCORE,
+		RANK
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{ID, jdbcType=VARCHAR},
+		#{RESIDENT_ID, jdbcType=VARCHAR},
+		#{SCREENING_QUESTIONNAIRE_ID, jdbcType=VARCHAR},
+		to_date(#{SCREENING_TIME},'yyyy-mm-dd'),
+		#{QUESTIONNAIRE_RESULT, jdbcType=VARCHAR},
+		#{QUESTIONNAIRE_SUGGESTION,jdbcType=VARCHAR},
+		#{QUESTIONNAIRE_COMPANY, jdbcType=VARCHAR},
+		#{QUESTIONNAIRE_DEPARTMENT, jdbcType=VARCHAR},
+		#{QUESTIONNAIRE_PEOPLE, jdbcType=VARCHAR},
+		#{QUESTIONNAIRE_STATE, jdbcType=VARCHAR},
+		#{IS_FINISH, jdbcType=VARCHAR},
+		to_date(#{CREAT_TIME},'yyyy-mm-dd HH24:mi:ss'),
+		to_date(#{EDIT_TIME},'yyyy-mm-dd HH24:mi:ss'),
+		#{SCORE, jdbcType=NUMERIC},
+		#{RANK, jdbcType=VARCHAR}
+	</sql>
+	<!-- 查询全部 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select <include refid="Field"></include> from
+		<include refid="tableName"></include>
+		where 1=1 and QUESTIONNAIRE_STATE=#{pd.QUESTIONNAIRE_STATE, jdbcType=VARCHAR}
+        <if test="pd.keywords != null and pd.keywords !=''">
+        	and(
+        		 QUESTIONNAIRE_DEPARTMENT LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				 or
+				 QUESTIONNAIRE_PEOPLE LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				 or 
+				 QUESTIONNAIRE_STATE LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%') 
+        	)
+        </if>
+        order by EDIT_TIME desc
+	</select>
+	<!-- 查看详情 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+			<include refid="Field"></include>
+		from 
+			<include refid="tableName"></include>
+		where 
+			ID = #{ID,jdbcType=VARCHAR}
+	</select>
+	<!-- 编辑 -->
+	<update id="edit" parameterType="pd">
+		update
+			<include refid="tableName"></include>
+		set 
+			ID=#{ID, jdbcType=VARCHAR},
+			RESIDENT_ID=#{RESIDENT_ID, jdbcType=VARCHAR},
+			SCREENING_QUESTIONNAIRE_ID=#{SCREENING_QUESTIONNAIRE_ID, jdbcType=VARCHAR},
+			SCREENING_TIME=to_date(#{SCREENING_TIME},'yyyy-mm-dd'),
+			QUESTIONNAIRE_RESULT=#{QUESTIONNAIRE_RESULT,jdbcType=VARCHAR},
+			QUESTIONNAIRE_SUGGESTION=#{QUESTIONNAIRE_SUGGESTION,jdbcType=VARCHAR},
+			QUESTIONNAIRE_COMPANY=#{QUESTIONNAIRE_COMPANY, jdbcType=VARCHAR},
+			QUESTIONNAIRE_DEPARTMENT=#{QUESTIONNAIRE_DEPARTMENT, jdbcType=VARCHAR},
+			QUESTIONNAIRE_PEOPLE=#{QUESTIONNAIRE_PEOPLE, jdbcType=VARCHAR},
+			QUESTIONNAIRE_STATE=#{QUESTIONNAIRE_STATE, jdbcType=VARCHAR},
+			IS_FINISH=#{IS_FINISH, jdbcType=VARCHAR},
+			CREAT_TIME=to_date(#{CREAT_TIME},'yyyy-mm-dd HH24:mi:ss'),
+			EDIT_TIME=to_date(#{EDIT_TIME},'yyyy-mm-dd HH24:mi:ss'),
+			SCORE=#{SCORE, jdbcType=NUMERIC}
+		where
+			ID=#{ID, jdbcType=VARCHAR}
+	</update>
+	<!-- 删除 -->
+	<update id="delete" parameterType="pd">
+		update
+			<include refid="tableName"></include>
+		set
+			QUESTIONNAIRE_STATE=#{QUESTIONNAIRE_STATE, jdbcType=VARCHAR}
+		where
+			ID=#{ID, jdbcType=VARCHAR}
+	</update>
+	<!-- 批量删除 -->
+	<delete id="deleteAll" parameterType="String">
+		delete from
+		<include refid="tableName"></include>
+		where 
+			ID in
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                 #{item}
+		</foreach>
+	</delete>
+	<!-- 增加-->
+	<insert id="save" parameterType="pd">
+		insert into 
+	<include refid="tableName"></include>
+	<trim prefix="(" suffix=")" suffixOverrides="," >
+		<if test="RESIDENT_ID != null" >RESIDENT_ID,</if>
+		<if test="SCREENING_QUESTIONNAIRE_ID != null" >SCREENING_QUESTIONNAIRE_ID,</if>
+		<if test="SCREENING_TIME != null" >SCREENING_TIME,</if>
+		<if test="QUESTIONNAIRE_RESULT != null" >QUESTIONNAIRE_RESULT,</if>
+		<if test="QUESTIONNAIRE_SUGGESTION != null" >QUESTIONNAIRE_SUGGESTION,</if>
+		<if test="QUESTIONNAIRE_COMPANY != null" >QUESTIONNAIRE_COMPANY,</if>
+		<if test="QUESTIONNAIRE_DEPARTMENT != null" >QUESTIONNAIRE_DEPARTMENT,</if>
+		<if test="QUESTIONNAIRE_PEOPLE != null" >QUESTIONNAIRE_PEOPLE,</if>
+		<if test="QUESTIONNAIRE_STATE != null" >QUESTIONNAIRE_STATE,</if>
+		<if test="IS_FINISH != null" >IS_FINISH,</if>
+		<if test="CREAT_TIME != null" >CREAT_TIME,</if>
+		<if test="EDIT_TIME != null" >EDIT_TIME,</if>
+		<if test="SCORE != null" >SCORE,</if>
+		ID
+       </trim>
+            VALUES
+     <trim prefix="(" suffix=")" suffixOverrides="," >
+     	<if test="RESIDENT_ID != null" >#{RESIDENT_ID, jdbcType=VARCHAR},</if>
+		<if test="SCREENING_QUESTIONNAIRE_ID != null" >#{SCREENING_QUESTIONNAIRE_ID, jdbcType=VARCHAR},</if>
+		<if test="SCREENING_TIME != null" >to_date(#{SCREENING_TIME},'yyyy-mm-dd'),</if>
+		<if test="QUESTIONNAIRE_RESULT != null" >#{QUESTIONNAIRE_RESULT,jdbcType=VARCHAR},</if>
+		<if test="QUESTIONNAIRE_SUGGESTION != null" >#{QUESTIONNAIRE_SUGGESTION,jdbcType=VARCHAR},</if>
+		<if test="QUESTIONNAIRE_COMPANY != null" >#{QUESTIONNAIRE_COMPANY, jdbcType=VARCHAR},</if>
+		<if test="QUESTIONNAIRE_DEPARTMENT != null" >#{QUESTIONNAIRE_DEPARTMENT, jdbcType=VARCHAR},</if>
+		<if test="QUESTIONNAIRE_PEOPLE != null" >#{QUESTIONNAIRE_PEOPLE, jdbcType=VARCHAR},</if>
+		<if test="QUESTIONNAIRE_STATE != null" >#{QUESTIONNAIRE_STATE, jdbcType=VARCHAR},</if>
+		<if test="IS_FINISH != null" >#{IS_FINISH, jdbcType=VARCHAR},</if>
+		<if test="CREAT_TIME != null" >to_date(#{CREAT_TIME},'yyyy-mm-dd HH24:mi:ss'),</if>
+		<if test="EDIT_TIME != null" >to_date(#{EDIT_TIME},'yyyy-mm-dd HH24:mi:ss'),</if>
+		<if test="SCORE != null" >#{SCORE, jdbcType=NUMERIC},</if>
+        #{ID, jdbcType=VARCHAR}
+      </trim>
+	</insert>
+	<update id="renew" parameterType="pd">
+		update
+			<include refid="tableName"></include>
+		set 
+			<if test="RESIDENT_ID != null and RESIDENT_ID != ''">
+				RESIDENT_ID=#{RESIDENT_ID, jdbcType=VARCHAR},
+			</if>
+			<if test="SCREENING_QUESTIONNAIRE_ID != null and SCREENING_QUESTIONNAIRE_ID != ''">
+				SCREENING_QUESTIONNAIRE_ID=#{SCREENING_QUESTIONNAIRE_ID, jdbcType=VARCHAR},
+			</if>
+			<if test="SCREENING_TIME != null and SCREENING_TIME != ''">
+				SCREENING_TIME=to_date(#{SCREENING_TIME},'yyyy-mm-dd'),
+			</if>
+			<if test="QUESTIONNAIRE_RESULT != null and QUESTIONNAIRE_RESULT != ''">
+				QUESTIONNAIRE_RESULT=#{QUESTIONNAIRE_RESULT, jdbcType=VARCHAR},
+			</if>
+			<if test="QUESTIONNAIRE_SUGGESTION != null and QUESTIONNAIRE_SUGGESTION != ''">
+				QUESTIONNAIRE_SUGGESTION=#{QUESTIONNAIRE_SUGGESTION,jdbcType=VARCHAR},
+			</if>
+			<if test="QUESTIONNAIRE_COMPANY != null and QUESTIONNAIRE_COMPANY != ''">
+				QUESTIONNAIRE_COMPANY=#{QUESTIONNAIRE_COMPANY, jdbcType=VARCHAR},
+			</if>
+			<if test="QUESTIONNAIRE_DEPARTMENT != null and QUESTIONNAIRE_DEPARTMENT != ''">
+				QUESTIONNAIRE_DEPARTMENT=#{QUESTIONNAIRE_DEPARTMENT, jdbcType=VARCHAR},
+			</if>
+			<if test="QUESTIONNAIRE_PEOPLE != null and QUESTIONNAIRE_PEOPLE != ''">
+				QUESTIONNAIRE_PEOPLE=#{QUESTIONNAIRE_PEOPLE, jdbcType=VARCHAR},
+			</if>
+			<if test="QUESTIONNAIRE_STATE != null and QUESTIONNAIRE_STATE != ''">
+				QUESTIONNAIRE_STATE=#{QUESTIONNAIRE_STATE, jdbcType=VARCHAR},
+			</if>
+			<if test="IS_FINISH != null and IS_FINISH != ''">
+				IS_FINISH=#{IS_FINISH, jdbcType=VARCHAR},
+			</if>
+		    <if test="CERAT_TIME != null and CERAT_TIME != ''">
+		    	CREAT_TIME=to_date(#{CREAT_TIME},'yyyy-mm-dd HH24:mi:ss'),
+		    </if>
+		    <if test="EDIT_TIME != null and EDIT_TIME != ''">
+		    	EDIT_TIME=to_date(#{EDIT_TIME},'yyyy-mm-dd HH24:mi:ss'),
+		    </if>
+		    <if test="SCORE != null and SCORE != ''">
+				SCORE=#{SCORE, jdbcType=NUMERIC},
+			</if>
+		    ID=#{ID, jdbcType=VARCHAR}
+		where
+			ID=#{ID, jdbcType=VARCHAR}
+	</update>	
+	<!-- 通过居民ID查询问卷信息 -->
+	<select id="findByResidentId"  parameterType="pd" resultType="pd">
+		select <include refid="Field"></include> from
+		<include refid="tableName"></include>
+		where 1=1 and RESIDENT_ID=#{USER_AGENT_ID, jdbcType=VARCHAR}
+        <if test="keywords != null and keywords !=''">
+        	and(
+        		 QUESTIONNAIRE_DEPARTMENT LIKE CONCAT(CONCAT('%', #{keywords}),'%')
+				 or
+				 QUESTIONNAIRE_PEOPLE LIKE CONCAT(CONCAT('%', #{keywords}),'%')
+				 or 
+				 QUESTIONNAIRE_STATE LIKE CONCAT(CONCAT('%', #{keywords}),'%') 
+        	)
+        </if>
+        order by EDIT_TIME desc
+	</select>
+
+	<!-- 更新分数和结果 -->
+	<update id="updateScore" parameterType="pd">
+		update
+			<include refid="tableName"></include>
+		set 
+			QUESTIONNAIRE_RESULT=#{QUESTIONNAIRE_RESULT,jdbcType=VARCHAR},
+			IS_FINISH=#{IS_FINISH, jdbcType=VARCHAR},
+			EDIT_TIME=to_date(#{EDIT_TIME},'yyyy-mm-dd HH24:mi:ss'),
+			SCORE=#{SCORE, jdbcType=NUMERIC},
+			RANK=#{RANK, jdbcType=VARCHAR}
+		where
+			ID=#{ID, jdbcType=VARCHAR}
+	</update>
+</mapper>

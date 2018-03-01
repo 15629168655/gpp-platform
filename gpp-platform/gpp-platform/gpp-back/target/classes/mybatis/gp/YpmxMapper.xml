@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="YpmxMapper">
+	<!-- 药品明细字典表 -->
+	<sql id="tableName">
+		TB_DRUG_DETAIL
+	</sql>
+	
+	
+	<select id="datalistPage" parameterType="pd" resultType="pd">
+		select * from 
+			<include refid="tableName"></include> 
+		where 1=1 
+			<if test="pd.keywords != null and pd.keywords!= ''"><!-- 关键词检索 -->
+			and (
+				YPMC LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				or
+				YPDM LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				)
+			</if>
+	</select>
+	
+</mapper>

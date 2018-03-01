@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="RegAppMapper">
+<!-- 表名 -->
+	<sql id="tableName">
+		"HM_REGAPPOINTMENT"
+	</sql>
+	<!-- 字段 -->
+	<sql id="Field">
+		"GUID",
+		"REGID",
+		"NAME",
+		"CARDNO",
+		"BIRTHDAY",
+		"PHONE",
+		"ADDRESS",
+		"APPTIME",
+		"ORGID",
+		"ORGNAME",
+		"DEPTID",
+		"DEPTNAME",
+		"DOCTORID",
+		"DOCTORNAME",
+		"YLZD",
+		"REFERRAL_ID",<!-- 和转诊申请关联的ID -->
+		"ARRANGEID",<!-- 和医生排班表关联的ID -->
+		"STATE"<!-- 预约的状态 -->
+	</sql>
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{GUID,jdbcType=VARCHAR},
+		#{REGID,jdbcType=VARCHAR},
+		#{NAME,jdbcType=VARCHAR},
+		#{CARDNO,jdbcType=VARCHAR},
+		to_date(#{BIRTHDAY},'yyyy-mm-dd HH24:mi:ss'),
+		#{PHONE,jdbcType=VARCHAR},
+		#{ADDRESS,jdbcType=VARCHAR},
+		to_date(#{APPTIME},'yyyy-mm-dd HH24:mi:ss'),
+		#{ORGID,jdbcType=VARCHAR},
+		#{ORGNAME,jdbcType=VARCHAR},
+		#{DEPTID,jdbcType=VARCHAR},
+		#{DEPTNAME,jdbcType=VARCHAR},
+		#{DOCTORID,jdbcType=VARCHAR},
+		#{DOCTORNAME,jdbcType=VARCHAR},
+		#{YLZD,jdbcType=VARCHAR},
+		#{REFERRAL_ID,jdbcType=VARCHAR},
+		#{ARRANGEID,jdbcType=VARCHAR},
+		#{STATE,jdbcType=VARCHAR}
+	</sql>
+	<!-- 新增-->
+	<insert id="save" parameterType="pd">
+		insert into
+		<include refid="tableName"></include>
+		(
+		<include refid="Field"></include>
+		) values (
+		<include refid="FieldValue"></include>
+		)
+	</insert>
+	<!-- 条件查询 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include>
+		where 1=1
+		<!-- 姓名 -->
+		<if test="pd.NAME!=null and pd.NAME!=''">
+			and NAME LIKE CONCAT(CONCAT('%',#{pd.NAME}),'%')
+		</if>	
+		<!-- 身份证号 -->
+		<if test="pd.CARDNO != null and pd.CARDNO != ''">
+			and CARDNO = #{pd.CARDNO}
+		</if>	
+		<!-- 预约时间 -->
+		<if test="pd.reqAppDateStart != null and pd.reqAppDateStart !=''">
+			and APPTIME &gt; to_date(#{pd.reqAppDateStart},'yyyy-mm-dd ')
+		</if>
+		<if test="pd.reqAppDateEnd != null and pd.reqAppDateEnd != ''">
+            and APPTIME &lt;  to_date(#{pd.reqAppDateEnd},'yyyy-mm-dd ')
+        </if>
+		
+	</select>
+	<!-- 查询全部 -->
+	<select id="listAll" parameterType="page" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from
+		<include refid="tableName"></include>
+	</select>
+	<!-- 通过接诊ID获得预约的信息 -->
+	<select id="findByReferralID" parameterType="pd" resultType="pd">
+	select * from(
+		select
+			<include refid="Field"></include>
+		from 
+			<include refid="tableName"></include>
+		where
+		   REFERRAL_ID=#{REFERRAL_ID,jdbcType=VARCHAR}
+		   <if test="GUID != null and GUID != ''">
+				and GUID=#{GUID,jdbcType=VARCHAR} 	<!--主键  -->
+		   </if>
+		   order by APPTIME DESC) where rownum=1
+	</select>
+
+	<!-- 改变预约的转台 -->
+	<update id="changeState" parameterType="pd">
+		update 
+			<include refid="tableName"></include>
+			set
+			STATE=#{STATE,jdbcType=VARCHAR}
+			where GUID=#{RGUID,jdbcType=VARCHAR}
+	</update>
+	<!-- 通过ID查询预约的信息 -->
+	<select id="findById" parameterType="page" resultType="pd" >
+		select 
+			<include refid="Field"></include> 
+		from
+			<include refid="tableName"></include>
+		where
+			GUID=#{GUID,jdbcType=VARCHAR}<!-- 主键 -->
+	</select>
+</mapper>

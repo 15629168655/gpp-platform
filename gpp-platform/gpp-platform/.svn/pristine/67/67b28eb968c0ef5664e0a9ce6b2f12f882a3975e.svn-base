@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="DevicePushMapper">
+<!-- 表名 -->
+<!-- 用户推送表-->
+	<sql id="tableName">
+		 GPP_DEVICE
+	</sql>
+	<!-- 字段 -->
+	<sql id="Field">
+		GUID,
+		TYPE,
+		USERID,
+		DEVUSERID,
+		DEVICETYPE,
+		DEVICENAME,
+		ISBROAD,
+	    ISPMSG,
+	    ISZXMSG,
+	    ISWORKMSG,
+    	BIND_DATE
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{GUID, jdbcType=VARCHAR},
+		#{TYPE, jdbcType=VARCHAR},
+		#{USERID, jdbcType=VARCHAR},
+		#{DEVUSERID, jdbcType=VARCHAR},
+		#{DEVICETYPE, jdbcType=VARCHAR},
+		#{DEVICENAME, jdbcType=VARCHAR},
+		#{ISBROAD, jdbcType=NUMERIC},
+	    #{ISPMSG, jdbcType=NUMERIC},
+	    #{ISZXMSG, jdbcType=NUMERIC},
+	    #{ISWORKMSG, jdbcType=NUMERIC},
+    	to_date(#{BIND_DATE},'yyyy-mm-dd HH24:mi:ss')
+	</sql>
+	<!-- 打开app保存接口 -->
+	<insert id="saveDevice" parameterType="pd">
+		insert into 
+			<include refid="tableName"></include>	
+			(
+			GUID,
+			DEVICETYPE,
+			<if test="DEVICENAME != null" >DEVICENAME,</if>
+			DEVUSERID
+			) values(
+			#{GUID, jdbcType=VARCHAR},
+			#{DEVICETYPE, jdbcType=VARCHAR},
+			<if test="DEVICENAME != null" >#{DEVICENAME, jdbcType=VARCHAR},</if>
+			#{DEVUSERID, jdbcType=VARCHAR}
+			)
+	</insert>
+	<!-- 通过设备ID查询推送情况 -->
+	<select id="findByDeviceID"  parameterType="pd" resultType="pd">
+		select 
+			<include refid="Field"></include>
+		from 
+			<include refid="tableName"></include>
+		where 
+			DEVUSERID = #{DEVUSERID,jdbcType=VARCHAR}
+	</select>
+	<!-- 通过用户ID查询推送情况 -->
+	<select id="findByUserID"   parameterType="pd" resultType="pd" >
+		select 
+			<include refid="Field"></include>
+		from 
+			<include refid="tableName"></include>
+		where 
+			USERID = #{USERID,jdbcType=VARCHAR}
+	</select>
+	<!-- 通过用户类型查询推送 -->
+	<select id="findByUserType"   parameterType="pd" resultType="pd">
+		select 
+			<include refid="Field"></include>
+		from 
+			<include refid="tableName"></include>
+		where 
+			TYPE = #{TYPE,jdbcType=VARCHAR}
+	</select>
+	<!-- 通过设备类型查询推送 -->
+	<select id="findByDeviceType"   parameterType="pd" resultType="pd">
+		select 
+			<include refid="Field"></include>
+		from 
+			<include refid="tableName"></include>
+		where 
+			DEVICETYPE = #{DEVICETYPE,jdbcType=VARCHAR}
+	</select>
+	<!-- 通过设备ID更新推送 -->
+	<update id="edit" parameterType="pd">
+		update
+			<include refid="tableName"></include>
+		set 
+		<if test="TYPE != null and TYPE != ''">
+			TYPE=#{TYPE, jdbcType=VARCHAR},
+		</if>
+		<if test="USERID != null and USERID != ''">
+			USERID=#{USERID, jdbcType=VARCHAR},
+		</if>
+		<if test="DEVICETYPE != null and DEVICETYPE != ''">
+			DEVICETYPE=#{DEVICETYPE, jdbcType=VARCHAR},
+		</if>
+		<if test="DEVICENAME != null and DEVICENAME != ''">
+			DEVICENAME=#{DEVICENAME, jdbcType=VARCHAR},
+		</if>
+		<if test="ISBROAD != null and TYPE != ''">
+			ISBROAD=#{ISBROAD, jdbcType=NUMERIC},
+		</if>
+		<if test="ISPMSG != null and ISPMSG != ''">
+	   	 	ISPMSG=#{ISPMSG, jdbcType=NUMERIC},
+	    </if>
+		<if test="ISZXMSG != null and ISZXMSG != ''">
+	    	ISZXMSG=#{ISZXMSG, jdbcType=NUMERIC},
+	    </if>
+		<if test="ISWORKMSG != null and ISWORKMSG != ''">
+	    	ISWORKMSG=#{ISWORKMSG, jdbcType=NUMERIC},
+	    </if>
+		<if test="BIND_DATE != null and BIND_DATE != ''">
+    		BIND_DATE=to_date(#{BIND_DATE},'yyyy-mm-dd HH24:mi:ss'),
+    	</if>
+    		DEVUSERID=#{DEVUSERID, jdbcType=VARCHAR}
+		where
+			DEVUSERID=#{DEVUSERID, jdbcType=VARCHAR}
+	</update>
+	<!-- 换手机保存信息 -->
+	<insert id="saveAnotherDevice" parameterType="pd">
+		insert into 
+	<include refid="tableName"></include>
+	<trim prefix="(" suffix=")" suffixOverrides="," >
+		<if test="TYPE != null" >TYPE,</if>
+		<if test="USERID != null" >USERID,</if>
+		<if test="DEVUSERID != null" >DEVUSERID,</if>
+		<if test="DEVICETYPE != null" >DEVICETYPE,</if>
+		<if test="DEVICENAME != null" >DEVICENAME,</if>
+		<if test="ISBROAD != null" >ISBROAD,</if>
+	    <if test="ISPMSG != null" > ISPMSG,</if>
+	    <if test="ISZXMSG != null" > ISZXMSG,</if>
+	    <if test="ISWORKMSG != null" > ISWORKMSG,</if>
+    	<if test="BIND_DATE != null" >BIND_DATE,</if>
+    	GUID
+       </trim>
+            VALUES
+     <trim prefix="(" suffix=")" suffixOverrides="," >
+		<if test="TYPE != null" >#{TYPE, jdbcType=VARCHAR},</if>
+		<if test="USERID != null" >#{USERID, jdbcType=VARCHAR},</if>
+		<if test="DEVUSERID != null" >#{DEVUSERID, jdbcType=VARCHAR},</if>
+		<if test="DEVICETYPE != null" >#{DEVICETYPE, jdbcType=VARCHAR},</if>
+		<if test="DEVICENAME != null" >#{DEVICENAME, jdbcType=VARCHAR},</if>
+		<if test="ISBROAD != null" >#{ISBROAD, jdbcType=NUMERIC},</if>
+	    <if test="ISPMSG != null" > #{ISPMSG, jdbcType=NUMERIC},</if>
+	    <if test="ISZXMSG != null" >#{ISZXMSG, jdbcType=NUMERIC},</if>
+	    <if test="ISWORKMSG != null" >#{ISWORKMSG, jdbcType=NUMERIC},</if>
+    	<if test="BIND_DATE != null" >to_date(#{BIND_DATE},'yyyy-mm-dd HH24:mi:ss'),</if>
+    	#{GUID, jdbcType=VARCHAR}
+      </trim>
+	</insert>
+	<!-- 将USERID置空 -->
+	<update id ="emptyUserId"  parameterType="pd">
+		update
+			<include refid="tableName"></include>
+		set 
+			USERID=#{EMPTY, jdbcType=VARCHAR}
+		where
+			USERID=#{USERID, jdbcType=VARCHAR}
+	</update>
+</mapper>

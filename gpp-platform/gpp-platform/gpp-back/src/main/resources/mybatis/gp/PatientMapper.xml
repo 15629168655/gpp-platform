@@ -1,0 +1,514 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="PatientMapper">
+
+<!--表名 -->
+	<sql id="tableName">
+		TB_YL_PATIENT_INFORMATION
+	</sql>
+
+<!-- 字段 -->
+	<sql id="Field">
+		<if test="ID != null and ID != ''">
+			ID,
+		</if>
+
+			KH,
+			KLX,
+			YLJGDM,
+			JKKH,
+			FKDQ,
+			ZJHM,
+			ZJLX,
+			XB,
+			XM,
+			HZGSD,
+			HYZK,
+			CSRQ,
+			CSD,
+			MZ,
+			GJ,
+			DHHM,
+			SJHM,
+			GZDWYB,
+			GZDWMC,
+			GZDWDZ,
+			JZDZ,
+			HKDZ,
+			HKDZYB,
+			LXRXM,
+			LXRGX,
+			LXRDZ,
+			LXRYB,
+			LXRDH,
+			MJ,
+			XGBZ,
+			YWSCSJ,
+			PERSONID,
+			YLYL1,
+			YLYL2
+
+	</sql>
+	
+<!-- 字段值 -->
+	<sql id="FieldValue">
+			#{ID,jdbcType=VARCHAR},
+			#{KH,jdbcType=VARCHAR},
+			#{KLX,jdbcType=VARCHAR},
+			#{YLJGDM,jdbcType=VARCHAR},
+			#{JKKH,jdbcType=VARCHAR},
+			#{FKDQ,jdbcType=VARCHAR},
+			#{ZJHM,jdbcType=VARCHAR},
+			#{ZJLX,jdbcType=VARCHAR},
+			#{XB,jdbcType=VARCHAR},
+			#{XM,jdbcType=VARCHAR},
+			#{HZGSD,jdbcType=VARCHAR},
+			#{HYZK,jdbcType=VARCHAR},
+			#{CSRQ,jdbcType=VARCHAR},
+			#{CSD,jdbcType=VARCHAR},
+			#{MZ,jdbcType=VARCHAR},
+			#{GJ,jdbcType=VARCHAR},
+			#{DHHM,jdbcType=VARCHAR},
+			#{SJHM,jdbcType=VARCHAR},
+			#{GZDWYB,jdbcType=VARCHAR},
+			#{GZDWMC,jdbcType=VARCHAR},
+			#{GZDWDZ,jdbcType=VARCHAR},
+			#{JZDZ,jdbcType=VARCHAR},
+			#{HKDZ,jdbcType=VARCHAR},
+			#{HKDZYB,jdbcType=VARCHAR},
+			#{LXRXM,jdbcType=VARCHAR},
+			#{LXRGX,jdbcType=VARCHAR},
+			#{LXRDZ,jdbcType=VARCHAR},
+			#{LXRYB,jdbcType=VARCHAR},
+			#{LXRDH,jdbcType=VARCHAR},
+			#{MJ,jdbcType=VARCHAR},
+			#{XGBZ,jdbcType=DOUBLE},
+			sysdate,
+			#{PERSONID,jdbcType=VARCHAR},
+			#{YLYL1,jdbcType=VARCHAR},
+			#{YLYL2,jdbcType=VARCHAR}
+		
+	</sql>
+	
+	<!-- 列表 -->
+	<select id="patientlistPage" parameterType="page" resultType="pd">
+		select
+		
+		a.ID,
+		a.KH,
+		a.KLX,
+		a.YLJGDM,
+		a.JKKH,
+		a.FKDQ,
+		a.ZJHM,
+		a.ZJLX,
+		a.XB,
+		a.XM,
+		a.HZGSD,
+		a.HYZK,
+		a.CSRQ,
+		a.CSD,
+		a.MZ,
+		a.GJ,
+		a.DHHM,
+		a.SJHM,
+		a.GZDWYB,
+		a.GZDWMC,
+		a.GZDWDZ,
+		a.JZDZ,
+		a.HKDZ,
+		a.HKDZYB,
+		a.LXRXM,
+		a.LXRGX,
+		a.LXRDZ,
+		a.LXRYB,
+		a.LXRDH,
+		a.MJ,
+		a.XGBZ,
+		a.YWSCSJ,
+		a.PERSONID,
+		a.YLYL1,
+		a.YLYL2
+
+		
+		from 
+			<include refid="tableName"></include> a
+		where 1 = 1
+		 and a.XGBZ != 1
+		 and a.YLJGDM = #{pd.YLJGDM}
+		  <if test="pd.keywords != null and pd.keywords!= ''"><!-- 关键词检索 -->
+			and (
+				a.XM LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				or
+				a.JKKH LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				or
+				a.ZJHM LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				)
+			</if>
+		<if test="pd.birthStart!=null and pd.birthStart!=''"><!-- 出生日期起检索 -->
+			and a.CSRQ &gt;=#{pd.Start}
+		</if>
+		<if test="pd.birthEnd!=null and pd.birthEnd!=''"><!-- 出生日期止检索 -->
+			and a.CSRQ &lt;=#{pd.End}
+		</if>
+		<if test="pd.XB != null and pd.XB != ''"><!-- 性别检索 -->
+			and a.XB=#{pd.XB}
+		</if>
+		order by a.XM
+
+	</select>
+	
+	<!-- 通过id获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd" >
+		select 
+			<include refid="Field"></include>
+		from 
+			<include refid="tableName"></include>
+		where 
+			ID = #{ID}
+	</select>
+	
+	<!-- 新增患者信息 -->
+	<!-- <insert id="save" parameterType="pd">
+		insert into <include refid="tableName"></include> (
+			<include refid="Field"></include>
+		) values (
+			<include refid="FieldValue"></include>
+		)
+	</insert> -->
+	
+	
+	<insert id="save" parameterType="pd">
+		insert into <include refid="tableName"></include>
+	<trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="ID != null" > ID, </if>
+    <if test="KH != null" >	KH,	</if>
+	<if test="KLX != null" >	KLX,	</if>
+	<if test="YLJGDM != null" >	YLJGDM,	</if>
+	<if test="JKKH != null" >	JKKH,	</if>
+	<if test="FKDQ != null" >	FKDQ,	</if>
+	<if test="ZJHM != null" >	ZJHM,	</if>
+	<if test="ZJLX != null" >	ZJLX,	</if>
+	<if test="XB != null" >	XB,	</if>
+	<if test="XM != null" >	XM,	</if>
+	<if test="HZGSD != null" >	HZGSD,	</if>
+	<if test="HYZK != null" >	HYZK,	</if>
+	<if test="CSRQ != null" >	CSRQ,	</if>
+	<if test="CSD != null" >	CSD,	</if>
+	<if test="MZ != null" >	MZ,	</if>
+	<if test="GJ != null" >	GJ,	</if>
+	<if test="DHHM != null" >	DHHM,	</if>
+	<if test="SJHM != null" >	SJHM,	</if>
+	<if test="GZDWYB != null" >	GZDWYB,	</if>
+	<if test="GZDWMC != null" >	GZDWMC,	</if>
+	<if test="GZDWDZ != null" >	GZDWDZ,	</if>
+	<if test="JZDZ != null" >	JZDZ,	</if>
+	<if test="HKDZ != null" >	HKDZ,	</if>
+	<if test="HKDZYB != null" >	HKDZYB,	</if>
+	<if test="LXRXM != null" >	LXRXM,	</if>
+	<if test="LXRGX != null" >	LXRGX,	</if>
+	<if test="LXRDZ != null" >	LXRDZ,	</if>
+	<if test="LXRYB != null" >	LXRYB,	</if>
+	<if test="LXRDH != null" >	LXRDH,	</if>
+	<if test="MJ != null" >	MJ,	</if>
+	<if test="XGBZ != null" >	XGBZ,	</if>
+	<if test="PERSONID != null" >	PERSONID,	</if>
+	<if test="YLYL1 != null" >	YLYL1,	</if>
+	<if test="YLYL2 != null" >	YLYL2,	</if>
+      YWSCSJ
+      </trim>
+        VALUES
+     <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="ID != null" >
+        #{ID,jdbcType=VARCHAR},
+      </if>
+      	<if test="KH != null" >	#{KH,jdbcType=VARCHAR},	</if>
+	<if test="KLX != null" >	#{KLX,jdbcType=VARCHAR},	</if>
+	<if test="YLJGDM != null" >	#{YLJGDM,jdbcType=VARCHAR},	</if>
+	<if test="JKKH != null" >	#{JKKH,jdbcType=VARCHAR},	</if>
+	<if test="FKDQ != null" >	#{FKDQ,jdbcType=VARCHAR},	</if>
+	<if test="ZJHM != null" >	#{ZJHM,jdbcType=VARCHAR},	</if>
+	<if test="ZJLX != null" >	#{ZJLX,jdbcType=VARCHAR},	</if>
+	<if test="XB != null" >	#{XB,jdbcType=VARCHAR},	</if>
+	<if test="XM != null" >	#{XM,jdbcType=VARCHAR},	</if>
+	<if test="HZGSD != null" >	#{HZGSD,jdbcType=VARCHAR},	</if>
+	<if test="HYZK != null" >	#{HYZK,jdbcType=VARCHAR},	</if>
+	<if test="CSRQ != null" >	#{CSRQ,jdbcType=VARCHAR},	</if>
+	<if test="CSD != null" >	#{CSD,jdbcType=VARCHAR},	</if>
+	<if test="MZ != null" >	#{MZ,jdbcType=VARCHAR},	</if>
+	<if test="GJ != null" >	#{GJ,jdbcType=VARCHAR},	</if>
+	<if test="DHHM != null" >	#{DHHM,jdbcType=VARCHAR},	</if>
+	<if test="SJHM != null" >	#{SJHM,jdbcType=VARCHAR},	</if>
+	<if test="GZDWYB != null" >	#{GZDWYB,jdbcType=VARCHAR},	</if>
+	<if test="GZDWMC != null" >	#{GZDWMC,jdbcType=VARCHAR},	</if>
+	<if test="GZDWDZ != null" >	#{GZDWDZ,jdbcType=VARCHAR},	</if>
+	<if test="JZDZ != null" >	#{JZDZ,jdbcType=VARCHAR},	</if>
+	<if test="HKDZ != null" >	#{HKDZ,jdbcType=VARCHAR},	</if>
+	<if test="HKDZYB != null" >	#{HKDZYB,jdbcType=VARCHAR},	</if>
+	<if test="LXRXM != null" >	#{LXRXM,jdbcType=VARCHAR},	</if>
+	<if test="LXRGX != null" >	#{LXRGX,jdbcType=VARCHAR},	</if>
+	<if test="LXRDZ != null" >	#{LXRDZ,jdbcType=VARCHAR},	</if>
+	<if test="LXRYB != null" >	#{LXRYB,jdbcType=VARCHAR},	</if>
+	<if test="LXRDH != null" >	#{LXRDH,jdbcType=VARCHAR},	</if>
+	<if test="MJ != null" >	#{MJ,jdbcType=VARCHAR},	</if>
+	<if test="XGBZ != null" >	#{XGBZ,jdbcType=DOUBLE},	</if>
+	<if test="PERSONID != null" >	#{PERSONID,jdbcType=VARCHAR},	</if>
+	<if test="YLYL1 != null" >	#{YLYL1,jdbcType=VARCHAR},	</if>
+	<if test="YLYL2 != null" >	#{YLYL2,jdbcType=VARCHAR},	</if>
+	sysdate	
+      
+     </trim>
+      </insert> 
+	
+	<!-- 修改 -->
+	<!-- <update id="edit" parameterType="pd" >
+		update  <include refid="tableName"></include>
+		set  	ID				    = #{ID,jdbcType=VARCHAR},
+				KH				    = #{KH,jdbcType=VARCHAR},
+				KLX				    = #{KLX,jdbcType=VARCHAR},
+				YLJGDM				= #{YLJGDM,jdbcType=VARCHAR},
+				JKKH				= #{JKKH,jdbcType=VARCHAR},
+				FKDQ				= #{FKDQ,jdbcType=VARCHAR},
+				ZJHM				= #{ZJHM,jdbcType=VARCHAR},
+				ZJLX				= #{ZJLX,jdbcType=VARCHAR},
+				XB				    = #{XB,jdbcType=VARCHAR},
+				XM				    = #{XM,jdbcType=VARCHAR},
+				HZGSD				= #{HZGSD,jdbcType=VARCHAR},
+				HYZK				= #{HYZK,jdbcType=VARCHAR},
+				CSRQ				= #{CSRQ,jdbcType=VARCHAR},
+				CSD				    = #{CSD,jdbcType=VARCHAR},
+				MZ				    = #{MZ,jdbcType=VARCHAR},
+				GJ				    = #{GJ,jdbcType=VARCHAR},
+				DHHM				= #{DHHM,jdbcType=VARCHAR},
+				SJHM				= #{SJHM,jdbcType=VARCHAR},
+				GZDWYB				= #{GZDWYB,jdbcType=VARCHAR},
+				GZDWMC				= #{GZDWMC,jdbcType=VARCHAR},
+				GZDWDZ				= #{GZDWDZ,jdbcType=VARCHAR},
+				JZDZ				= #{JZDZ,jdbcType=VARCHAR},
+				HKDZ				= #{HKDZ,jdbcType=VARCHAR},
+				HKDZYB				= #{HKDZYB,jdbcType=VARCHAR},
+				LXRXM				= #{LXRXM,jdbcType=VARCHAR},
+				LXRGX				= #{LXRGX,jdbcType=VARCHAR},
+				LXRDZ				= #{LXRDZ,jdbcType=VARCHAR},
+				LXRYB				= #{LXRYB,jdbcType=VARCHAR},
+				LXRDH				= #{LXRDH,jdbcType=VARCHAR},
+				MJ				    = #{MJ,jdbcType=VARCHAR},
+				XGBZ				= #{XGBZ,jdbcType=DOUBLE},
+				YWSCSJ				= #{YWSCSJ},
+				PERSONID			= #{PERSONID,jdbcType=VARCHAR},
+				YLYL1				= #{YLYL1,jdbcType=VARCHAR},
+				YLYL2				= #{YLYL2,jdbcType=VARCHAR}
+
+			where 
+				ID = #{ID}
+	</update> -->
+	
+	<update id="edit" parameterType="pd" >
+		update  <include refid="tableName"></include>
+			set 
+	<if test="KH != null and  KH != ''" >
+		KH	= #{KH,jdbcType=VARCHAR},	
+    </if>
+	<if test="KLX != null and KLX != ''" >	
+		KLX	= #{KLX,jdbcType=VARCHAR},	
+    </if>
+	<!-- <if test="YLJGDM != null and YLJGDM != ''" >			
+         YLJGDM	= #{YLJGDM,jdbcType=VARCHAR},	
+    </if> -->
+	<if test="JKKH != null and JKKH != ''" >		
+        JKKH	= #{JKKH,jdbcType=VARCHAR},	
+    </if>
+	<if test="FKDQ != null and FKDQ != ''" >	
+		FKDQ	= #{FKDQ,jdbcType=VARCHAR},	
+    </if>
+	<if test="ZJHM != null and ZJHM != ''" >	
+		ZJHM	= #{ZJHM,jdbcType=VARCHAR},	
+    </if>
+	<if test="ZJLX != null and ZJLX != ''" >	
+		ZJLX	= #{ZJLX,jdbcType=VARCHAR},
+	</if>
+	<if test="XB != null and XB != ''" >		
+        XB	= #{XB,jdbcType=VARCHAR},
+	</if>
+	<if test="XM != null and XM != ''" >	
+		XM	= #{XM,jdbcType=VARCHAR},
+	</if>
+	<if test="HZGSD != null and HZGSD != ''" >	
+		HZGSD	= #{HZGSD,jdbcType=VARCHAR},
+	</if>
+	<if test="HYZK != null and HYZK != ''" >	
+		HYZK	= #{HYZK,jdbcType=VARCHAR},
+	</if>
+	<if test="CSRQ != null and CSRQ != ''" >	
+		CSRQ	= #{CSRQ,jdbcType=VARCHAR},
+	</if>
+	<if test="CSD != null and CSD != ''" >	
+		CSD	= #{CSD,jdbcType=VARCHAR},
+	</if>
+	<if test="MZ != null and MZ != ''" >	
+		MZ	= #{MZ,jdbcType=VARCHAR},
+	</if>
+	<if test="GJ != null and GJ != ''" >	
+		GJ	= #{GJ,jdbcType=VARCHAR},
+	</if>
+	<if test="DHHM != null and DHHM != ''" >	
+		DHHM	= #{DHHM,jdbcType=VARCHAR},
+	</if>
+	<if test="SJHM != null and SJHM != ''" >	
+		SJHM	= #{SJHM,jdbcType=VARCHAR},
+	</if>
+	<if test="GZDWYB != null and GZDWYB != ''" >	
+		GZDWYB	= #{GZDWYB,jdbcType=VARCHAR},
+	</if>
+	<if test="GZDWMC != null and GZDWMC != ''" >	
+		GZDWMC	= #{GZDWMC,jdbcType=VARCHAR},
+	</if>
+	<if test="GZDWDZ != null and GZDWDZ != ''" >	
+		GZDWDZ	= #{GZDWDZ,jdbcType=VARCHAR},
+	</if>
+	<if test="JZDZ != null and JZDZ != ''" >	
+		JZDZ	= #{JZDZ,jdbcType=VARCHAR},
+	</if>
+	<if test="HKDZ != null and HKDZ != ''" >	
+		HKDZ	= #{HKDZ,jdbcType=VARCHAR},
+	</if>
+	<if test="HKDZYB != null and HKDZYB != ''" >	
+		HKDZYB	= #{HKDZYB,jdbcType=VARCHAR},
+	</if>
+	<if test="LXRXM != null and LXRXM != ''" >	
+		LXRXM	= #{LXRXM,jdbcType=VARCHAR},
+	</if>
+	<if test="LXRGX != null and LXRGX != ''" >	
+		LXRGX	= #{LXRGX,jdbcType=VARCHAR},
+	</if>
+	<if test="LXRDZ != null and LXRDZ != ''" >	
+		LXRDZ	= #{LXRDZ,jdbcType=VARCHAR},
+	</if>
+	<if test="LXRYB != null and LXRYB != ''" >	
+		LXRYB	= #{LXRYB,jdbcType=VARCHAR},
+	</if>
+	<if test="LXRDH != null and LXRDH != ''" >	
+		LXRDH	= #{LXRDH,jdbcType=VARCHAR},
+	</if>
+	<if test="MJ != null and MJ != ''" >	
+		MJ	= #{MJ,jdbcType=VARCHAR},
+	</if>
+	<if test="PERSONID != null and PERSONID != ''" >	
+		PERSONID	= #{PERSONID,jdbcType=VARCHAR},
+	</if>
+	<if test="YLYL1 != null and YLYL1 != ''" >	
+		YLYL1	= #{YLYL1,jdbcType=VARCHAR},
+	</if>
+	<if test="YLYL2 != null and YLYL2 != ''" >	
+		YLYL2	= #{YLYL2,jdbcType=VARCHAR},
+	</if>								
+	    ID      = ID
+	 where 
+		ID = #{ID}
+	</update>
+	
+	<!-- 删除 -->
+	<update id="delete" parameterType="pd">
+		update  <include refid="tableName"></include>
+			set XGBZ = 1
+		where 
+			ID = #{ID}
+	</update>
+	
+	<!-- 批量删除 -->
+	<update id="deleteAll" parameterType="String">
+		update <include refid="tableName"></include>
+		   set XGBZ = 1
+		where 
+			ID in
+  			 <foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                  #{item}
+             </foreach>
+	</update>
+	
+	<!-- 列出所有患者 -->
+	<select id="listAllPatients" parameterType="pd" resultType="pd" >
+		select
+		ID,XM
+		from
+		<include refid="tableName"></include>
+	</select>
+	
+	<!-- app分页查询-->
+	<select id="queryPage" parameterType="pd" resultType="pd">
+				SELECT *
+				  FROM ( 
+				       SELECT ROWNUM AS rowno, a.* 
+				           FROM 
+		<include refid="tableName"></include>  a
+			where 1 = 1 and a.XGBZ != 1
+		<if test="XM != null and XM != ''"><!-- 姓名检索 -->
+			and a.XM LIKE CONCAT(CONCAT('%', #{XM}),'%')
+		</if>
+		<if test="BIRTHSTART!=null and BIRTHSTART!=''"><!-- 出生日期起检索 -->
+			and a.CSRQ &gt;=#{BIRTHSTART}
+		</if>
+		<if test="BIRTHEND!=null and BIRTHEND!=''"><!-- 出生日期止检索 -->
+			and a.CSRQ &lt;=#{BIRTHEND}
+		</if>
+		<if test="XB != null and XB != ''"><!-- 性别检索 -->
+			and a.XB=#{XB}
+		</if>
+		<if test="JKKH != null and JKKH != ''"><!-- 健康卡号检索 -->
+			and a.JKKH=#{JKKH} 
+		</if>
+		<if test="ZJHM != null and ZJHM != ''"><!-- 证件号码检索 -->
+			and a.ZJHM=#{ZJHM} 
+		</if> 
+				           ) table_alias
+				           
+				 WHERE table_alias.rowno BETWEEN #{pageStart} and #{pageEnd}
+	</select>
+	
+	<!-- app新增-->
+<!-- 	<insert id="addPatient" parameterType="pd">
+		insert into
+			<include refid="tableName"></include>
+		(
+             <include refid="Field"></include>
+
+		) values (
+		    #{ID,jdbcType=VARCHAR},
+			#{KH,jdbcType=VARCHAR},
+			#{KLX,jdbcType=VARCHAR},
+			#{YLJGDM,jdbcType=VARCHAR},
+			#{JKKH,jdbcType=VARCHAR},
+			#{FKDQ,jdbcType=VARCHAR},
+			#{ZJHM,jdbcType=VARCHAR},
+			#{ZJLX,jdbcType=VARCHAR},
+			#{XB,jdbcType=VARCHAR},
+			#{XM,jdbcType=VARCHAR},
+			#{HZGSD,jdbcType=VARCHAR},
+			#{HYZK,jdbcType=VARCHAR},
+			#{CSRQ,jdbcType=VARCHAR},
+			#{CSD,jdbcType=VARCHAR},
+			#{MZ,jdbcType=VARCHAR},
+			#{GJ,jdbcType=VARCHAR},
+			#{DHHM,jdbcType=VARCHAR},
+			#{SJHM,jdbcType=VARCHAR},
+			#{GZDWYB,jdbcType=VARCHAR},
+			#{GZDWMC,jdbcType=VARCHAR},
+			#{GZDWDZ,jdbcType=VARCHAR},
+			#{JZDZ,jdbcType=VARCHAR},
+			#{HKDZ,jdbcType=VARCHAR},
+			#{HKDZYB,jdbcType=VARCHAR},
+			#{LXRXM,jdbcType=VARCHAR},
+			#{LXRGX,jdbcType=VARCHAR},
+			#{LXRDZ,jdbcType=VARCHAR},
+			#{LXRYB,jdbcType=VARCHAR},
+			#{LXRDH,jdbcType=VARCHAR},
+			#{MJ,jdbcType=VARCHAR},
+			#{XGBZ,jdbcType=DOUBLE},
+			sysdate,
+			#{PERSONID,jdbcType=VARCHAR},
+			#{YLYL1,jdbcType=VARCHAR},
+			#{YLYL2,jdbcType=VARCHAR}
+		)
+	</insert> -->
+
+</mapper>

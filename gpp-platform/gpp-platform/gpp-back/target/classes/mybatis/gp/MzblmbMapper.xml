@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MzblmbMapper">
+
+
+<!-- 表名 -->
+<!-- 门诊病历模板表 -->
+	<sql id="tableName">
+		GPP_OUTPATIENT_RECORDS_MB
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="FieldSave">
+	    ID,
+		BLMC,
+		JM,
+		LX,
+		ZS,
+		XBS,
+		JWS,
+		TJ,
+		FZJCJG,
+		CBPD,
+		ZLYJ,
+		LRRID,
+		LRSJ,
+		BZ
+	</sql>
+	
+	<!-- 新增字段值 -->
+	<sql id="FieldValue">
+	  #{ID,jdbcType=VARCHAR},
+	  #{BLMC,jdbcType=VARCHAR},
+	  #{JM,jdbcType=VARCHAR},
+	  #{LX,jdbcType=VARCHAR},
+	  #{ZS,jdbcType=VARCHAR},
+	  #{XBS,jdbcType=VARCHAR},
+	  #{JWS,jdbcType=VARCHAR},
+	  #{TJ,jdbcType=VARCHAR},
+	  #{FZJCJG,jdbcType=VARCHAR},
+	  #{CBPD,jdbcType=VARCHAR},
+	  #{ZLYJ,jdbcType=VARCHAR},
+	  #{LRRID,jdbcType=VARCHAR},
+	  sysdate,
+	  #{BZ,jdbcType=VARCHAR}
+	</sql>
+	
+	<!-- 查询全部 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select
+		*
+		from
+		<include refid="tableName"></include>
+			where 1=1
+		<if test="pd.patientid != null and pd.patientid != ''"><!-- 患者ID -->
+			and	HZID = #{pd.patientid} 
+		</if>
+	</select>
+	
+	<!-- 通过ID号获取数据 ,查看详情 -->
+	<select id="findByID" parameterType="pd" resultType="pd">
+		select 
+			*
+		from 
+			<include refid="tableName"></include>
+		where 
+			ID = #{ID,jdbcType=VARCHAR}
+	</select>
+	
+	<!-- 新增-->
+	<insert id="save" parameterType="pd">
+		insert into 
+	<include refid="tableName"></include>
+		(
+	<include refid="FieldSave"></include>
+		) values (
+	<include refid="FieldValue"></include>
+		)
+	</insert>
+	
+	<!--修改数量 -->
+	<update id="edit" parameterType="Menu">
+		update 
+		<include refid="tableName"></include> 
+		set 
+			BLMC 	=#{BLMC,jdbcType=VARCHAR},
+			JM 		=#{JM,jdbcType=VARCHAR},
+			LX 		=#{LX,jdbcType=VARCHAR},
+			ZS 		=#{ZS,jdbcType=VARCHAR},
+			XBS 	=#{XBS,jdbcType=VARCHAR},
+			JWS 	=#{JWS,jdbcType=VARCHAR},
+			TJ 		=#{TJ,jdbcType=VARCHAR},
+			FZJCJG 	=#{FZJCJG,jdbcType=VARCHAR},
+			CBPD 	=#{CBPD,jdbcType=VARCHAR},
+			ZLYJ 	=#{ZLYJ,jdbcType=VARCHAR},
+			LRRID 	=#{LRRID,jdbcType=VARCHAR},
+			LRSJ 	=sysdate,
+			BZ 		=#{BZ,jdbcType=VARCHAR}
+		where 
+			ID=#{ID,jdbcType=VARCHAR}
+	</update>
+	
+	<delete id="delete" parameterType="pd">
+		delete from
+		<include refid="tableName"></include> 
+		where 
+			ID = #{ID}
+	</delete>
+</mapper>

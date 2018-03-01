@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="BookingAccreditMapper">
+	<!--表名 指标管理结果范围表 -->
+	<sql id="tableName">
+		GPP_BOOKING_ACCREDIT
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		BOOKING_ACCREDIT_ID,
+		HIG_PRIVIDE_ID,
+		HIG_PRIVIDE_NAME,
+		PUBLIC_PRIVIDE_ID,
+		PUBLIC_PRIVIDE_NAME,
+		STATE,
+		OPERATION_NAME,
+		CREAT_TIME,
+		EDIT_TIME
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{BOOKING_ACCREDIT_ID, jdbcType=VARCHAR},
+		#{HIG_PRIVIDE_ID, jdbcType=VARCHAR},
+		#{HIG_PRIVIDE_NAME, jdbcType=VARCHAR},
+		#{PUBLIC_PRIVIDE_ID, jdbcType=VARCHAR},
+		#{PUBLIC_PRIVIDE_NAME, jdbcType=VARCHAR},
+		#{STATE, jdbcType=VARCHAR},
+		#{OPERATION_NAME, jdbcType=VARCHAR},
+		to_date(#{CREAT_TIME},'yyyy-mm-dd HH24:mi:ss'),
+		to_date(#{EDIT_TIME},'yyyy-mm-dd HH24:mi:ss')
+	</sql>
+	<!-- 查询全部 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select <include refid="Field"></include> from
+		<include refid="tableName"></include>
+		where 1=1 
+		<if test="pd.HIG_PRIVIDE_ID != null and pd.HIG_PRIVIDE_ID !=''">
+			and HIG_PRIVIDE_ID = #{pd.HIG_PRIVIDE_ID, jdbcType=VARCHAR}
+		</if>
+		<if test="pd.STATE != null and pd.STATE  !='' "  >
+			and STATE = #{pd.STATE, jdbcType=VARCHAR}
+		</if>
+        order by EDIT_TIME desc
+	</select>
+	<!-- 查看详情 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+			<include refid="Field"></include>
+		from 
+			<include refid="tableName"></include>
+		where 
+			ID = #{ID,jdbcType=VARCHAR}
+	</select>
+	<!-- 编辑授权状态 -->
+	<update id="edit" parameterType="pd">
+		update
+			<include refid="tableName"></include>
+		set 
+			BOOKING_ACCREDIT_ID=#{BOOKING_ACCREDIT_ID, jdbcType=VARCHAR},
+			STATE=#{STATE, jdbcType=VARCHAR},
+			EDIT_TIME=to_date(#{EDIT_TIME},'yyyy-mm-dd HH24:mi:ss')
+		where
+			BOOKING_ACCREDIT_ID=#{BOOKING_ACCREDIT_ID, jdbcType=VARCHAR}
+	</update>
+	<!-- 增加-->
+	<insert id="save" parameterType="pd">
+		insert into 
+	<include refid="tableName"></include>
+		(
+	<include refid="Field"></include>
+		) values (
+	<include refid="FieldValue"></include>
+		)
+	</insert>
+	
+
+</mapper>

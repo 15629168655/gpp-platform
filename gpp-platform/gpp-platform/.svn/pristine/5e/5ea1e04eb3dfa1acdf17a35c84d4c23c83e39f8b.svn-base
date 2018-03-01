@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+<mapper namespace="LcxmMapper">
+
+	<resultMap type="Lcxm" id="menuResultMap">
+		<id column="ID" property="ID"/>
+		<result column="PID" property="PID"/>
+		<result column="XMFL" property="XMFL"/>
+		<result column="BM" property="BM"/>
+		<result column="MC" property="MC"/>
+		<result column="DW" property="DW"/>
+		<result column="PYM" property="PYM"/>
+		<result column="KS" property="KS"/>
+		<result column="YZSX" property="YZSX"/>
+		<result column="JJBZ" property="JJBZ"/>
+		<result column="SFTY" property="SFTY"/>
+		<result column="DY" property="DY"/>
+		<result column="LX" property="LX"/>
+		<result column="XZBW" property="XZBW"/>		
+	</resultMap>
+	
+	<!-- ztree -->
+	<resultMap type="Lcxm" id="menuZtreeResultMap">
+		<id column="ID" property="ID"/>
+		<result column="PID" property="PID"/>
+		<result column="XMFL" property="XMFL"/>
+		<result column="BM" property="BM"/>
+		<result column="MC" property="MC"/>
+		<result column="DW" property="DW"/>
+		<result column="PYM" property="PYM"/>
+		<result column="KS" property="KS"/>
+		<result column="YZSX" property="YZSX"/>
+		<result column="JJBZ" property="JJBZ"/>
+		<result column="SFTY" property="SFTY"/>
+		<result column="DY" property="DY"/>
+		<result column="LX" property="LX"/>
+		<result column="XZBW" property="XZBW"/>	
+	</resultMap>
+	<!--              临床项目表                                                   -->
+	<!--表名 -->
+	<sql id="tableName">
+		GPP_CLINICAL_PROJECT
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		XMFL,
+		BM,
+		MC,
+		DW,
+		PYM,
+		KS,
+		YZSX,
+		JJBZ,
+		SFTY,
+		DY,
+		LX,
+		XZBW,
+		ID,
+		PID
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{XMFL,jdbcType=VARCHAR},
+ 		#{BM,jdbcType=VARCHAR},
+ 		#{MC,jdbcType=VARCHAR},
+ 		#{DW,jdbcType=VARCHAR},
+ 		#{PYM,jdbcType=VARCHAR},
+ 		#{KS,jdbcType=VARCHAR},
+ 		#{YZSX,jdbcType=VARCHAR},
+ 		#{JJBZ,jdbcType=VARCHAR},
+ 		#{SFTY,jdbcType=VARCHAR},
+ 		#{DY,jdbcType=VARCHAR},
+ 		#{LX,jdbcType=VARCHAR},
+ 		#{XZBW,jdbcType=VARCHAR},
+ 		#{ID,jdbcType=VARCHAR},
+ 		#{PID,jdbcType=VARCHAR}
+	</sql>
+	
+	<!--通过ID获取其子一级菜单 -->
+	<select id="listSubMenuByParentIdlistPage" parameterType="page" resultType="pd">
+		select  
+			*
+		from 
+			<include refid="tableName"></include>
+		where 1=1
+		<if test="pd.keywords != null and pd.keywords != ''"> <!-- 关键词检索  -->
+			and (
+				 MC LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				 or
+				 BM LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				) 
+		</if>
+		<if test="pd.PId != null and pd.PId != ''">
+		and  PID = #{pd.PId} 
+		</if>
+	</select>
+	<!--通过ID获取其子一级菜单 -->
+	<select id="treeData" parameterType="java.lang.String" resultMap="menuResultMap">
+		select  
+			<include refid="Field"></include>
+		from 
+			<include refid="tableName"></include>
+		where PID = #{ID} 
+	</select>
+	
+	<!--通过菜单ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select  
+			<include refid="Field"></include>
+		 from 
+			<include refid="tableName"></include>
+		 where ID=#{ID} 
+	</select>
+	
+	<!--新增 -->
+	<insert id="save" parameterType="pd">
+		insert into 
+			<include refid="tableName"></include> 
+		(
+			<include refid="Field"></include>
+		) values (
+			<include refid="FieldValue"></include>
+		)
+	</insert>
+	
+	<!--取最大ID-->
+	<select id="findMaxId" parameterType="pd" resultType="pd">
+		select MAX(cast(ID as int)) ID from 
+		<include refid="tableName"></include>
+	</select>
+	
+	<!--删除菜单-->
+	<delete id="delete" parameterType="pd">
+		delete from
+		<include refid="tableName"></include>
+		where 
+			ID = #{ID}
+	</delete>
+	
+	<!--编辑 -->
+	<update id="edit" parameterType="Menu">
+		update 
+		<include refid="tableName"></include> 
+		set 
+			XMFL 	=#{XMFL,jdbcType=VARCHAR},
+			BM		=#{BM,jdbcType=VARCHAR},
+			MC		=#{MC,jdbcType=VARCHAR},
+			DW 		=#{DW,jdbcType=VARCHAR},
+			PYM		=#{PYM,jdbcType=VARCHAR},
+			KS		=#{KS,jdbcType=VARCHAR},
+			YZSX 	=#{YZSX,jdbcType=VARCHAR},
+			JJBZ	=#{JJBZ,jdbcType=VARCHAR},
+			SFTY	=#{SFTY,jdbcType=VARCHAR},
+			DY 		=#{DY,jdbcType=VARCHAR},
+			LX		=#{LX,jdbcType=VARCHAR},
+			XZBW	=#{XZBW,jdbcType=VARCHAR}
+		where 
+			ID=#{ID}
+	</update>
+	
+	<!--列出所有元素分类 -->
+	<select id="listAll" parameterType="pd" resultType="pd">
+		select  
+			*
+		 from 
+			<include refid="tableName"></include>
+	</select>
+
+	<!-- 根据编码查询是否有记录 -->
+	<select id="findByBM" parameterType="pd" resultType="pd">
+		select 
+			<include refid="Field"></include> 
+		from 
+			<include refid="tableName"></include> 
+		<where>
+			 BM = #{BM,jdbcType=VARCHAR}
+		</where>
+	</select>
+	
+	<select id="getParentMenu" parameterType="pd" resultType="pd">
+		select  
+			<include refid="Field"></include>
+		from 
+			<include refid="tableName"></include>
+		where PID = #{ID} 
+	</select>
+</mapper>

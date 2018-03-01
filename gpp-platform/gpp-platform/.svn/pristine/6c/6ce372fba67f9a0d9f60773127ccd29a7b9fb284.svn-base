@@ -1,0 +1,141 @@
+package com.tbyf.controller.gp.treatecaseimp;
+
+
+import java.util.Date;
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.tbyf.controller.base.BaseController;
+import com.tbyf.entity.enums.EnumDisType;
+import com.tbyf.entity.enums.EnumDiseaseCode;
+import com.tbyf.entity.enums.EnumSex;
+import com.tbyf.entity.enums.EnumTreatCaseState;
+import com.tbyf.plugin.Page;
+import com.tbyf.service.gp.treatecase.TreateCaseManager;
+import com.tbyf.service.gp.treatecaseimpl.TreateCaseImplManager;
+import com.tbyf.service.hm.yhry.YhryManager;
+import com.tbyf.util.Jurisdiction;
+import com.tbyf.util.PageData;
+import com.tbyf.util.Tools;
+
+/**
+ * 执行方案记录
+ * @author zanxc
+ * @创建日期2017年8月1日下午2:56:16
+ */
+@Controller
+@RequestMapping(value="/treateCaseImpl")
+public class TreateCaseImpController extends BaseController{
+
+	String menuUrl = "treateCaseImpl/list.do"; //菜单地址(权限用)
+	@Resource(name="treateCaseImplService")	
+	private TreateCaseImplManager treateCaseImplService;//执行记录Service
+	@Resource(name="treateCaseService")	
+	private TreateCaseManager treateCaseService;//执行方案Service
+	@Resource(name="yhryService")	
+	private YhryManager yhryService;//执行方案Service
+	/**
+	 * 执行记录界面
+	 */
+	@RequestMapping(value="/add")
+	public ModelAndView add() throws Exception{
+		logBefore(logger, Jurisdiction.getUsername()+"执行记录界面");
+		ModelAndView mv = this.getModelAndView();
+		PageData pd = new PageData();
+		mv.addObject("DISTYPE", EnumDisType.toMap());//治疗类型的枚举(健康医嘱，治疗医嘱)
+		mv.addObject("STATE", EnumTreatCaseState.toMap());//方案的状态
+		mv.addObject("RESIDENTTYPE", EnumDiseaseCode.toMap());//人群的类型
+		pd = this.getPageData();
+		pd = treateCaseService.findById(pd);
+		mv.addObject("pd", pd);
+		mv.setViewName("gp/treatecaseimpl/impl_record_edit");
+		mv.addObject("msg", "save");
+		return mv;
+	}
+	/**
+	 * 保存执行记录
+	 */
+	@RequestMapping(value="/save")
+	public ModelAndView save() throws Exception{
+		logBefore(logger, Jurisdiction.getUsername()+"添加治疗方案");
+		if(!Jurisdiction.buttonJurisdiction(menuUrl, "add")){return null;} //校验权限
+		ModelAndView mv = this.getModelAndView();
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		pd.put("ID", this.get32UUID());//给执行记录添加主键
+		if(null != pd.getString("CONTENT") && !"".equals(pd.getString("CONTENT"))){			
+			byte[] CONTENT = pd.getString("CONTENT").getBytes();//将blob类型转换
+			pd.put("CONTENT", CONTENT);//内容
+		}
+		if(null != pd.getString("SUGGESTION") && !"".equals(pd.getString("SUGGESTION"))){			
+			byte[] SUGGESTION = pd.getString("SUGGESTION").getBytes();//将blob类型转换
+			pd.put("SUGGESTION", SUGGESTION);//内容
+		}
+		treateCaseImplService.save(pd);
+		pd.put("STATE", EnumTreatCaseState.COM.getCode());
+		String nowDate = Tools.date2Str(new Date());
+		pd.put("EDIT_TIME", nowDate);		//修改时间
+		//改变执行方案的状态
+		treateCaseService.saveState(pd);
+		mv.addObject("msg","success");
+		mv.setViewName("save_result");
+		return mv;
+	}
+	/**
+	 * 该方案能查看的医生
+	 * @param page
+	 * @return
+	 * @throws Exception
+	 
+	@RequestMapping(value="/getChooseYhryList")
+	public ModelAndView getChooseYhryList(Page page) throws Exception{
+		logBefore(logger, Jurisdiction.getUsername()+"获取选择医生列表");
+		ModelAndView mv = this.getModelAndView();
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		String PROVIDER_NAME = pd.getString("PROVIDER_NAME");	//查询条件：医生姓名
+		if(null != PROVIDER_NAME && !"".equals(PROVIDER_NAME)){
+			pd.put("keywords", PROVIDER_NAME.trim());
+		}
+		pd.put("enumSex", EnumSex.toMap()); // 性别
+		page.setPd(pd);
+		List<PageData>	yhry = yhryService.dataCaseYhry(page);
+		mv.setViewName("gp/treatecaseimpl/choose_yhry_list");
+		mv.addObject("yhryList", yhry);
+		mv.addObject("pd", pd);
+		mv.addObject("QX",Jurisdiction.getHC());	//按钮权限
+		return mv;
+	}
+	/**
+	 * 选择医生列表
+	 * @param page
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/getChooseYhryList")
+	public ModelAndView getChooseYhryList(Page page) throws Exception{
+		logBefore(logger, Jurisdiction.getUsername()+"获取选择医生列表");
+		ModelAndView mv = this.getModelAndView();
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		String PROVIDER_NAME = pd.getString("PROVIDER_NAME");	//查询条件：医生姓名
+		if(null != PROVIDER_NAME && !"".equals(PROVIDER_NAME)){
+			pd.put("keywords", PROVIDER_NAME.trim());
+		}
+		pd.put("ORG_CODE", getCurUser().getOrgCode());	//机构编码
+		pd.put("enumSex", EnumSex.toMap()); // 性别
+		page.setPd(pd);
+		List<PageData>	yhry = yhryService.yhrylist(page);
+		mv.setViewName("gp/treatecaseimpl/choose_yhry_list");
+		mv.addObject("yhryList", yhry);
+		mv.addObject("pd", pd);
+		mv.addObject("QX",Jurisdiction.getHC());	//按钮权限
+		return mv;
+	}
+	
+}

@@ -1,0 +1,226 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%
+	String path = request.getContextPath();
+	String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
+%>
+
+<% 
+java.text.SimpleDateFormat formatter = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+java.util.Date currentTime = new java.util.Date();//得到当前系统时间
+
+String nowtime = formatter.format(currentTime); //将日期时间格式化 
+
+
+%>
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	<base href="<%=basePath%>">
+	<!-- 下拉框 -->
+	<link rel="stylesheet" href="static/ace/css/chosen.css" />
+	<!-- jsp文件头和头部 -->
+	<%@ include file="../../system/index/top.jsp"%>
+	<!-- 日期框 -->
+	<link rel="stylesheet" href="static/ace/css/datepicker.css" />
+	<!-- webuploader上传插件css -->
+	<link rel="stylesheet" type="text/css" href="plugins/webuploader/webuploader.css" />
+	<link rel="stylesheet" type="text/css" href="plugins/webuploader/style.css" />
+</head>
+<body class="no-skin">
+<!-- /section:basics/navbar.layout -->
+<div class="main-container" id="main-container">
+	<!-- /section:basics/sidebar -->
+	<div class="main-content">
+		<div class="main-content-inner">
+			<div class="page-content">
+				<div class="row">
+					<div class="col-xs-12">
+					<!-- 健康资讯 发布页面 -->
+					<form action="healthinformation/${msg }.do" name="Form" id="Form" method="post" enctype="multipart/form-data" >
+						<input type="hidden" name="ID" id="ID" value="${pd.ID}"/>
+						<div id="zhongxin" style="padding-top: 13px;">
+						<table id="table_report" class="table table-striped table-bordered table-hover">
+							<tr>
+									<td style="width:130px;text-align: right;padding-top: 13px;"><span style="color:red; font-size:14px">*</span>名称:</td>
+									<td><input type="text" name="MC" id="MC" value="${pd.MC}" maxlength="50" placeholder="名称"  title="名称" style="width:98%;"/></td>
+							</tr>
+							<tr>
+								<td style="width:130px;text-align: right;padding-top: 13px;">标题图片:</td>
+								<td><input type="file" name="FILE" id="FILE" value="" maxlength="255"  style="width:98%;"/></td>
+								
+							</tr>
+                          	<tr>
+								<td style="width:130px;text-align: right;padding-top: 13px;"><span style="color:red; font-size:14px">*</span>类型:</td>
+								<td>
+									<select class="form-control" id="TYPE" name="TYPE" style="width:98%;">
+										<option value="">请选择...</option>
+                                        <c:forEach items="${pd.TYPEList}" var="item">
+                                             <option value="${item.GUID}" <c:if test="${pd.TYPE == item.GUID}"> selected="selected" </c:if> >${item.NAME}</option>
+                                         </c:forEach>
+                                    </select>
+								</td>  
+							</tr>
+							<!-- 
+							<tr>
+								<div id="uploader">
+					                <div class="queueList">
+					                    <div id="dndArea" class="placeholder">
+					                        <div id="filePicker"></div>
+					                        <p>或将照片拖到这里，单次最多可选300张</p>
+					                    </div>
+					                </div>
+					                <div class="statusBar" style="display:none;">
+					                    <div class="progress">
+					                        <span class="text">0%</span>
+					                        <span class="percentage"></span>
+					                    </div><div class="info"></div>
+					                    <div class="btns">
+					                        <div id="filePicker2"></div><div class="uploadBtn">开始上传</div>
+					                    </div>
+					                </div>
+					            </div>
+							</tr>
+							 -->
+							<tr>
+									<td style="width:130px;text-align: right;padding-top: 13px;">内容：</td>
+									<td style="padding-top: 3px;" >
+										 <script id="editor"  name="REMARK" value="${pd.REMARK}" type="text/plain" style="width:643px;height:159px;"></script>
+									</td>
+								</tr>					
+							<tr>
+								<td style="width:130px;text-align: right;padding-top: 13px;">时间:</td>
+								<td><input name="SJ" id="SJ" value="${pd.SJ}" type="text" title="时间" style="width:98%;" readonly=false />
+							</tr>
+							<tr>
+								<td style="width:130px;text-align: right;padding-top: 13px;"><span style="color:red; font-size:14px">*</span>状态:</td>
+								<td>
+									<select class="form-control" id="STATE" name="STATE" style="width:98%;">
+                                        <c:forEach items="${pd.EnumStatus}" var="item">
+                                             <option value="${item.key}" <c:if test="${pd.STATE == item.key}"> selected="selected" </c:if> >${item.value}</option>
+                                         </c:forEach>
+                                    </select>
+								</td>  
+							</tr>
+							<tr>
+	                                <td style="width:130px;text-align: right;padding-top: 13px;">发布人:</td>
+									<td><input type="text" name="FBR" id="FBR" readonly="readonly" value="${pd.FBR}" maxlength="50" placeholder="发布人" title="发布人" style="width:98%;"/></td>
+							</tr>
+							<tr>
+	                                <td style="width:130px;text-align: right;padding-top: 13px;">来源:</td>
+									<td><input type="text" name="LY" id="LY" value="${pd.LY}" maxlength="50" placeholder="来源" title="来源" style="width:98%;"/></td>
+							</tr>
+							<!-- 
+							<tr>
+	                                <td style="width:130px;text-align: right;padding-top: 13px;">浏览量:</td>
+									<td><input type="text" name="LLL" id="LLL" value="${pd.LLL}" maxlength="50" placeholder="浏览量" title="浏览量" style="width:98%;"/></td>
+							</tr> -->
+							<tr>
+								<td style="text-align: center;" colspan="10">
+									<a class="btn btn-mini btn-primary" onclick="save();">确定</a>
+									<a class="btn btn-mini btn-danger" onclick="top.Dialog.close();">取消</a>
+								</td>
+							</tr>
+						</table>
+						</div>
+						<div id="zhongxin2" class="center" style="display:none"><br/><br/><br/><br/><br/><img src="static/images/jiazai.gif" /><br/><h4 class="lighter block green">提交中...</h4></div>
+					</form>
+					<div id="zhongxin2" class="center" style="display:none"><img src="static/images/jzx.gif" style="width: 50px;" /><br/><h4 class="lighter block green"></h4></div>
+					</div>
+					<!-- /.col -->
+				</div>
+				<!-- /.row -->
+			</div>
+			<!-- /.page-content -->
+		</div>
+	</div>
+	<!-- /.main-content -->
+</div>
+<!-- /.main-container -->
+
+
+	<!-- 页面底部js¨ -->
+	<%@ include file="../../system/index/foot.jsp"%>
+	<!-- 下拉框 -->
+	<script src="static/ace/js/chosen.jquery.js"></script>
+	<!-- 编辑框-->
+	<script type="text/javascript" charset="utf-8">window.UEDITOR_HOME_URL = "<%=path%>/plugins/ueditor/";</script>
+	<script type="text/javascript" charset="utf-8" src="plugins/ueditor/ueditor.config.js"></script>
+	<script type="text/javascript" charset="utf-8" src="plugins/ueditor/ueditor.all.js"></script>
+	<script type="text/javascript" src="static/js/myjs/fhsms.js"></script>
+	<!-- 编辑框-->
+	<script src="static/ace/js/chosen.jquery.js"></script>
+    <script src="static/ace/js/bootstrap.js"></script>
+    <script src="static/ace/js/bootbox.js"></script>
+	<!-- 日期框 -->
+	<script src="static/ace/js/date-time/bootstrap-datepicker.js"></script>
+	<!--提示框-->
+	<script type="text/javascript" src="static/js/jquery.tips.js"></script>
+	<!-- webuploader上传插件js -->
+   	<script type="text/javascript" src="plugins/webuploader/webuploader.js"></script>
+   	<script type="text/javascript" src="plugins/webuploader/upload.js"></script>
+		<script type="text/javascript">
+		$(top.hangge());
+		//保存
+		function save(){
+			var filename = $("#FILE").val();
+			if(filename!=''){
+				var extname =  filename.substring(filename.indexOf(".")+1,filename.length);
+				var sss = "BMP|bmp|JPG|jpg|JPEG|jpeg|PNG|png|GIF|gif";
+				if(sss.indexOf(extname)<0){
+					$("#FILE").tips({
+						side:3,
+			            msg:'请上传图片格式',
+			            bg:'#AE81FF',
+			            time:2
+			        }); 
+					return false;
+				}
+			}
+			if($("#MC").val()==""){
+				$("#MC").tips({
+					side:3,
+		            msg:'请输入名称',
+		            bg:'#AE81FF',
+		            time:2
+		        });
+				$("#MC").focus();
+			return false;
+			}
+			if($("#TYPE").val()==""){
+				$("#TYPE").tips({
+					side:3,
+		            msg:'请选择类型',
+		            bg:'#AE81FF',
+		            time:2
+		        });
+				$("#TYPE").focus();
+			return false;
+			}
+			if(getContentTxt()==""){
+				$("#editor").tips({
+					side:3,
+		            msg:'请输入内容',
+		            bg:'#AE81FF',
+		            time:2
+		        });
+				$("#REMARK").focus();
+			return false;
+			}
+			$("#Form").submit();
+			$("#zhongxin").hide();
+			$("#zhongxin2").show();
+		}
+		
+		$(function() {
+			//日期框
+			$('.date-picker').datepicker({autoclose: true,todayHighlight: true});
+			
+		});
+		
+		</script>
+</body>
+</html>

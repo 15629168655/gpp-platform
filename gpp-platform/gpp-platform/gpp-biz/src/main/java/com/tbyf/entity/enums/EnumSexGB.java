@@ -1,0 +1,46 @@
+package com.tbyf.entity.enums;
+
+import java.util.Map;
+import java.util.TreeMap;
+
+/**
+ * 性别---国标GB/T 2261.1-2003  0：未知的性别；1：男；2：女；9：未说明的性别
+ * Created by lizk on 2016/10/27.
+ */
+public enum EnumSexGB {
+
+	UNKNOWN(0,"未知的性别"),MAN(1,"男"),WOMAN(2,"女"),NOTEXPLAIN(9,"未说明的性别");
+
+    private Integer code;
+    private String name;
+
+    EnumSexGB(Integer code, String name) {
+        this.code = code;
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Integer getCode() {
+        return code;
+    }
+
+    public void setCode(Integer code) {
+        this.code = code;
+    }
+
+    public static Map<Integer, String> toMap() {
+        Map<Integer, String> enumDataMap = new TreeMap<Integer, String>();
+        for (EnumSexGB type : EnumSexGB.values()) {
+            enumDataMap.put(type.getCode(), type.getName());
+        }
+        return enumDataMap;
+    }
+    
+}

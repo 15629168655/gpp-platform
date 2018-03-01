@@ -1,0 +1,100 @@
+package com.tbyf.service.hm.shape.impl;
+
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
+
+import com.tbyf.dao.DaoSupport;
+import com.tbyf.plugin.Page;
+import com.tbyf.service.hm.shape.ShapeManager;
+import com.tbyf.util.PageData;
+/**
+ * 体型Service
+ * @author ad
+ *
+ */
+@Service("shapeService")
+public class ShapeService implements ShapeManager{
+
+	@Resource(name = "daoSupport")
+	private DaoSupport dao;
+	/**
+	 * app查询个人体型信息
+	 */
+	@Override
+	public List<PageData> queryPage(PageData pd) throws Exception {
+		return (List<PageData>)dao.findForList("ShapeMapper.queryPage", pd);
+	}
+	
+	/**显示
+	 * 
+	 */
+	@Override
+	public List<PageData> list(Page page) throws Exception {
+		// TODO Auto-generated method stub
+		return (List<PageData>)dao.findForList("ShapeMapper.datalistPage", page);
+	}
+
+	/**保存信息
+	 * 
+	 */
+	@Override
+	public void save(PageData pd) throws Exception {
+		dao.save("ShapeMapper.save", pd);
+		
+	}
+
+	/**
+	 *修改信息 
+	 */
+	@Override
+	public void edit(PageData pd) throws Exception {
+		dao.update("ShapeMapper.edit", pd);
+		
+	}
+
+	/**
+	 * 通过Id查询
+	 */
+	@Override
+	public PageData findById(PageData pd) throws Exception {
+		return (PageData) dao.findForObject("ShapeMapper.findById", pd);
+	}
+	
+	/**
+	 * 根据用户ID查询最近一次记录
+	 */
+	@Override
+	public PageData findLastByUserID(PageData pd) throws Exception {
+		return (PageData) dao.findForObject("ShapeMapper.findLastByUserID", pd);
+	}
+
+	/**
+	 * 删除
+	 */
+	@Override
+	public void delete(PageData pd) throws Exception {
+		dao.delete("ShapeMapper.delete", pd);
+		
+	}
+
+	/**
+	 * 批量删除
+	 */
+	@Override
+	public void delAll(String[] ids) throws Exception {
+		dao.update("ShapeMapper.deleteAll", ids);
+		
+	}
+	/**
+	 * app更新体型记录
+	 */
+	@Override
+	public void update(PageData pd) throws Exception {
+		dao.update("ShapeMapper.renew", pd);
+		
+	}
+	
+}

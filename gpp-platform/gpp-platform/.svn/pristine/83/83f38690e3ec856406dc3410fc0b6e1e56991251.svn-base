@@ -1,0 +1,320 @@
+package com.tbyf.controller.gp.treatecase;
+
+import java.sql.Blob;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.tbyf.controller.base.BaseController;
+import com.tbyf.entity.enums.EnumAgreement;
+import com.tbyf.entity.enums.EnumDisType;
+import com.tbyf.entity.enums.EnumDiseaseCode;
+import com.tbyf.entity.enums.EnumIndexState;
+import com.tbyf.entity.enums.EnumIsImprotantP;
+import com.tbyf.entity.enums.EnumIsSign;
+import com.tbyf.entity.enums.EnumTreatCaseState;
+import com.tbyf.plugin.Page;
+import com.tbyf.service.gp.jmxx.JmxxManager;
+import com.tbyf.service.gp.treatecase.TreateCaseManager;
+import com.tbyf.service.gp.treatecaseimpl.TreateCaseImplManager;
+import com.tbyf.util.AppUtil;
+import com.tbyf.util.Jurisdiction;
+import com.tbyf.util.PageData;
+import com.tbyf.util.Tools;
+
+
+/**治疗方案控制
+ * @author zanxc
+ * 创建日期2017年7月27日
+ */
+@Controller
+@RequestMapping(value="/treateCase")
+public class TreateCaseController extends BaseController{
+
+	String menuUrl = "treateCase/list.do"; //菜单地址(权限用)
+	@Resource(name="jmxxService")
+	private JmxxManager jmxxService;//居民信息
+	@Resource(name="treateCaseService")
+	private TreateCaseManager treateCaseService;//治疗方案
+	@Resource(name="treateCaseImplService")
+	private TreateCaseImplManager treateCaseImplService;//治疗执行情况
+	Integer eaD = EnumAgreement.DELETE.getCode();//枚举，删除状态
+	Integer eaE = EnumAgreement.EFFECTIVE.getCode();//枚举，有效状态
+	private PageData pdOfCaseRecord;
+	/**显示居民信息,点击某居民信息可以查看其治疗方案
+	 * @param page
+	 * @return
+	 */
+	@RequestMapping(value="/list")
+	public ModelAndView list(Page page)throws Exception{
+		ModelAndView mv = this.getModelAndView();
+		logBefore(logger, Jurisdiction.getUsername()+"显示重点人群");
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		pd.put("PROVIDER_ID", this.getCurrentUser().getProviderId());
+		pd.put("STATE", eaD);
+		pd.put("zdrq", EnumIsImprotantP.YES.getCode());//重点人群列表
+		pd.put("is_sign", EnumIsSign.YES.getCode());//是否签约
+		page.setPd(pd);
+		List<PageData>	jmxxList = jmxxService.listAlljmxx(page);//居民列表
+		mv.setViewName("gp/treatecase/jmxx_list");
+		mv.addObject("DISTYPE", EnumDisType.toMap());//治疗类型的枚举(健康医嘱，治疗医嘱)
+		mv.addObject("STATE", EnumTreatCaseState.toMap());//方案的状态
+		mv.addObject("RESIDENTTYPE", EnumDiseaseCode.toMap());//人群的类型
+		mv.addObject("jmxxList", jmxxList);
+		mv.addObject("pd", pd);
+		mv.addObject("QX",Jurisdiction.getHC());	//按钮权限
+		return mv;
+	}
+	/**
+	 * 显示治疗方案的数据
+	 * @param page
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/dataCase")
+	@ResponseBody
+	public Object dataCase(Page page)throws Exception{
+		logBefore(logger, Jurisdiction.getUsername()+"重点人群的治疗方案数据");
+		Map<String,Object> data = new HashMap<String, Object>();
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		pd.put("PROVIDER_ID", this.getCurrentUser().getProviderId());
+		pd.put("STATE", EnumTreatCaseState.DEL.getCode());//显示该重点人群没有删除的治疗方案
+		page.setPd(pd);
+		List<PageData>	list = treateCaseService.list(page);				//治疗方案列表
+		data.put("varList", list);
+		data.put("pd", pd);
+		return AppUtil.returnObject(new PageData(), data);
+	}
+	/**显示居民的治疗方案
+	 * @param page
+	 * @return
+	 */
+	@RequestMapping(value="/listCase")
+	public ModelAndView listDis(Page page)throws Exception{
+		logBefore(logger, Jurisdiction.getUsername()+"显示重点人群的治疗方案");
+		ModelAndView mv = this.getModelAndView();
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		pd.put("PROVIDER_ID", this.getCurrentUser().getProviderId());
+		mv.addObject("DISTYPE", EnumDisType.toMap());//治疗类型的枚举(健康医嘱，治疗医嘱)
+		mv.addObject("STATE", EnumTreatCaseState.toMap());//方案的状态
+		mv.addObject("RESIDENTTYPE", EnumDiseaseCode.toMap());//人群的类型
+		pd.put("STATE", EnumTreatCaseState.DEL.getCode());//显示该重点人群没有删除的治疗方案
+		page.setPd(pd);
+		List<PageData>	jmxxList = treateCaseService.list(page);				//治疗方案列表
+		mv.setViewName("gp/treatecase/treate_case_list");
+		mv.addObject("varList", jmxxList);
+		mv.addObject("pd", pd);
+		mv.addObject("QX",Jurisdiction.getHC());	//按钮权限
+		return mv;
+	}
+	/**
+	 * 保存
+	 */
+	@RequestMapping(value="/save")
+	public ModelAndView save() throws Exception{
+		logBefore(logger, Jurisdiction.getUsername()+"添加治疗方案");
+		if(!Jurisdiction.buttonJurisdiction(menuUrl, "add")){return null;} //校验权限
+		ModelAndView mv = this.getModelAndView();
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		pd.put("TREATE_ID", this.get32UUID());	
+		String nowDate = Tools.date2Str(new Date());
+		pd.put("CREAT_TIME",nowDate);		  //创建时间
+		pd.put("EDIT_TIME", nowDate);		//修改时间
+		pd.put("STATE", EnumIndexState.NORAML.getCode());//添加状态正常
+		pd.put("OPERATE_NAME", this.getCurUser().getUserName());
+		pd.put("PRESC_ID", 1);
+		treateCaseService.save(pd);
+		mv.addObject("msg","success");
+		mv.setViewName("save_result");
+		return mv;
+	}
+	
+	/**
+	 * 新增页面
+	 */
+	@RequestMapping(value="/add")
+	public ModelAndView add() throws Exception{
+		logBefore(logger, Jurisdiction.getUsername()+"添加治疗方案界面");
+		ModelAndView mv = this.getModelAndView();
+		PageData pd = new PageData();
+		mv.addObject("DISTYPE", EnumDisType.toMap());//治疗类型的枚举(健康医嘱，治疗医嘱)
+		mv.addObject("STATE", EnumTreatCaseState.toMap());//方案的状态
+		mv.addObject("RESIDENTTYPE", EnumDiseaseCode.toMap());//人群的类型
+		pd = this.getPageData();
+		mv.addObject("pd", pd);
+		mv.setViewName("gp/treatecase/treate_case_edit");
+		mv.addObject("msg", "save");
+		return mv;
+	}
+	/**
+	 * 修改
+	 */
+	@RequestMapping(value="/edit")
+	public ModelAndView edit() throws Exception{
+		logBefore(logger, Jurisdiction.getUsername()+"治疗方案修改");
+		if(!Jurisdiction.buttonJurisdiction(menuUrl, "edit")){return null;} //校验权限
+		ModelAndView mv = this.getModelAndView();
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		String nowDate = Tools.date2Str(new Date());
+		pd.put("EDIT_TIME", nowDate);		//修改时间
+		pd.put("STATE", EnumIndexState.NORAML.getCode());//添加状态正常
+		pd.put("OPERATE_NAME", this.getCurUser().getUserName());
+		pd.put("PRESC_ID", 1);
+		treateCaseService.edit(pd);
+		mv.addObject("msg","success");
+		mv.setViewName("save_result");
+		return mv;
+	}
+	
+	/**
+	 * 修改页面
+	 */
+	@RequestMapping(value="/update")
+	public ModelAndView update() throws Exception{
+		ModelAndView mv = this.getModelAndView();
+		logBefore(logger, Jurisdiction.getUsername()+"治疗方案的修改界面");
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		pd = treateCaseService.findById(pd);	//根据ID读取
+		PageData pdd = new PageData();
+		pdd.put("DISEASECODE_ID", pd.get("DISEASE_ID"));
+		mv.setViewName("gp/treatecase/treate_case_edit");
+		mv.addObject("pd", pd);
+		mv.addObject("msg", "edit");
+		mv.addObject("DISTYPE", EnumDisType.toMap());//治疗类型的枚举(健康医嘱，治疗医嘱)
+		mv.addObject("STATE", EnumTreatCaseState.toMap());//方案的状态
+		mv.addObject("RESIDENTTYPE", EnumDiseaseCode.toMap());//人群的类型
+		return mv;
+	}
+	/**
+	 * 显示方案明细(包括居民的基本信息、方案明细、处方明细)
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/showCaseInfo")
+	public ModelAndView showCaseInfo() throws Exception{
+		ModelAndView mv = this.getModelAndView();
+		logBefore(logger, Jurisdiction.getUsername()+"治疗方案的详情界面");
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		pd = treateCaseService.findById(pd);	//根据ID读取
+		mv.setViewName("gp/treatecase/show_case_info");
+		mv.addObject("pd", pd);
+		mv.addObject("DISTYPE", EnumDisType.toMap());//治疗类型的枚举(健康医嘱，治疗医嘱)
+		mv.addObject("STATE", EnumTreatCaseState.toMap());//方案的状态
+		mv.addObject("RESIDENTTYPE", EnumDiseaseCode.toMap());//人群的类型
+		return mv;
+	}
+	/**
+	 * 治疗方案明
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/caseInfo")
+	public ModelAndView caseInfo() throws Exception{
+		ModelAndView mv = this.getModelAndView();
+		logBefore(logger, Jurisdiction.getUsername()+"治疗方案的详情界面");
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		pd = treateCaseService.findById(pd);	//根据ID读取
+		pdOfCaseRecord = new PageData();
+		pdOfCaseRecord = treateCaseImplService.findByTreateId(pd);//方案的执行情况
+		if(null != pdOfCaseRecord) {
+			if(pdOfCaseRecord.containsKey("SUGGESTION")) {//执行方案建议的blob的格式转换
+				Object SUGGESTION = pdOfCaseRecord.get("SUGGESTION");
+				String suggestion = null;  
+		        byte[] inbyte=null;  
+		        if(SUGGESTION instanceof Blob){  
+		            Blob blob = (Blob) SUGGESTION;  
+		            if (blob != null) {  
+		                inbyte = blob.getBytes(1, (int) blob.length());  
+		            }  
+		            suggestion =new String (inbyte);  
+		        }
+		        pdOfCaseRecord.put("SUGGESTION", suggestion);
+			}
+			if(pdOfCaseRecord.containsKey("CONTENT")) {//执行方案内容的blob的格式转换
+		        Object CONTENT = pdOfCaseRecord.get("CONTENT");
+				String content = null;  
+		        byte[] inbytes=null;  
+		        if(CONTENT instanceof Blob){  
+		            Blob blob = (Blob) CONTENT;  
+		            if (blob != null) {  
+		                inbytes = blob.getBytes(1, (int) blob.length());  
+		            }  
+		            content =new String (inbytes);  
+		        }
+		        pdOfCaseRecord.put("CONTENT", content);
+			}
+		}
+		mv.setViewName("gp/treatecase/case_info");
+		mv.addObject("pd", pd);
+		mv.addObject("pdOfCaseRecord", pdOfCaseRecord);
+		mv.addObject("DISTYPE", EnumDisType.toMap());//治疗类型的枚举(健康医嘱，治疗医嘱)
+		mv.addObject("STATE", EnumTreatCaseState.toMap());//方案的状态
+		mv.addObject("RESIDENTTYPE", EnumDiseaseCode.toMap());//人群的类型
+		return mv;
+	}
+	/**删除
+	 * @param out
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/delete")
+	@ResponseBody
+	public Object delete()throws Exception{
+		logBefore(logger, Jurisdiction.getUsername()+"删除治疗方案");
+		Map<String,Object> map = new HashMap<String,Object>();
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		pd.put("STATE", EnumTreatCaseState.DEL.getCode());
+		String nowDate = Tools.date2Str(new Date());//删除的时间
+		pd.put("EDIT_TIME", nowDate);		//修改时间
+		treateCaseService.delete(pd);
+		map.put("msg", "SUCCESS");
+		return AppUtil.returnObject(new PageData(), map);
+		
+	}
+	
+	/**批量删除
+	 * @param out
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/deleteAll")
+	@ResponseBody
+	public Object deleteAll()throws Exception{
+		logBefore(logger, Jurisdiction.getUsername()+"批量删除治疗方案");
+		Map<String,Object> map = new HashMap<String,Object>();
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		String IDS=String.valueOf(pd.get("IDS"));
+		if(null!=IDS && !IDS.equals("")){
+        	String[] str = IDS.split(",");
+        	StringBuffer sb = new StringBuffer("(");
+        	for(String s:str){
+        		sb.append("'"+s+"',");
+        	}
+        	
+        	pd.put("IDS", sb.substring(0, sb.length()-1)+")");
+        }
+		String nowDate = Tools.date2Str(new Date());//删除的时间
+		pd.put("EDIT_TIME", nowDate);		//修改时间
+		pd.put("STATE", EnumTreatCaseState.DEL.getCode());
+		treateCaseService.delAll(pd);
+		map.put("msg", "SUCCESS");
+		return AppUtil.returnObject(new PageData(), map);
+		
+	}
+}

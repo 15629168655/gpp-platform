@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="SugarMapper">
+<!-- 表名 -->
+<!-- 个人体型表 -->
+	<sql id="tableName">
+		 TB_USER_SUGAR
+	</sql>
+	<!-- 字段 -->
+	<sql id="Field">
+		ID ,<!--居民体型记录表ID-->
+		USER_AGENT_ID,<!--居民关联的ID-->
+		TIME_CLASS,<!--时段（凌晨、早餐前、早餐后、午餐前、午餐后、晚餐前、晚餐后、睡前）-->
+		SUGAR_VALUE,<!--血糖值mmol/L-->
+		TEST_TIME ,<!--测试时间-->
+		CREAT_TIME <!--生成时间-->
+		
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+			#{ID, jdbcType=VARCHAR},	
+			#{USER_AGENT_ID, jdbcType=VARCHAR},	
+			#{TIME_CLASS, jdbcType=VARCHAR},	
+			#{SUGAR_VALUE, jdbcType=NUMERIC},
+			to_date(#{TEST_TIME},'yyyy-mm-dd HH24:mi:ss'),
+			to_date(#{CREAT_TIME},'yyyy-mm-dd HH24:mi:ss')
+	</sql>
+	<!-- app尿酸记录分页查询 -->
+	<select id="queryPage" parameterType="pd" resultType="pd">
+		select 
+			<include refid="Field"></include>
+		from 
+			(select <include refid="Field"></include>,ROWNUM AS rowno  from <include refid="tableName"></include>
+			where 1=1
+				<if test="testSTART != null and testSTART !=''">
+					and TEST_TIME &gt; to_date(#{testSTART},'yyyy-mm-dd')
+				</if>
+				<if test="testEND != null and testEND != ''">
+		            and TEST_TIME &lt;  to_date(#{testEND},'yyyy-mm-dd')
+		        </if>
+		        <if test="USER_AGENT_ID != null and USER_AGENT_ID !=''">
+		        	and USER_AGENT_ID=#{USER_AGENT_ID, jdbcType=VARCHAR}
+		        </if>
+			) t where t.rowno BETWEEN #{pageStart} and #{pageEnd}
+	</select>
+	<!-- 查询全部 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select * from
+		<include refid="tableName"></include>
+		where 1=1
+		<if test="pd.TIME_CLASS != null and pd.TIME_CLASS != ''"> <!-- 时间段-->
+			and TIME_CLASS = #{pd.TIME_CLASS, jdbcType=VARCHAR}
+		</if>
+		<if test="pd.SUGAR_VALUE != null and pd.SUGAR_VALUE != ''"><!-- 血糖值-->
+			and	SUGAR_VALUE = #{pd.SUGAR_VALUE, jdbcType=NUMERIC} 
+		</if>
+		<if test="pd.testSTART != null and pd.testSTART !=''">
+			and TEST_TIME &gt; to_date(#{pd.testSTART},'yyyy-mm-dd HH24:mi:ss')
+		</if>
+		<if test="pd.testEND != null and pd.testEND != ''">
+            and TEST_TIME &lt;  to_date(#{pd.testEND},'yyyy-mm-dd HH24:mi:ss')
+        </if>
+        	and USER_AGENT_ID=#{pd.USER_AGENT_ID, jdbcType=VARCHAR}
+	</select>
+	<!-- 查看详情 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+			<include refid="Field"></include>
+		from 
+			<include refid="tableName"></include>
+		where 
+			ID = #{ID,jdbcType=VARCHAR}
+	</select>
+	<!-- 编辑 -->
+	<update id="edit" parameterType="pd">
+		update
+			<include refid="tableName"></include>
+		set 
+			ID=#{ID, jdbcType=VARCHAR},	
+			USER_AGENT_ID=#{USER_AGENT_ID, jdbcType=VARCHAR},	
+			TIME_CLASS=#{TIME_CLASS, jdbcType=VARCHAR},	
+			SUGAR_VALUE=#{SUGAR_VALUE, jdbcType=NUMERIC},
+			TEST_TIME=to_date(#{TEST_TIME},'yyyy-mm-dd HH24:mi:ss'),
+			CREAT_TIME=to_date(#{CREAT_TIME},'yyyy-mm-dd HH24:mi:ss')
+		where
+			ID=#{ID, jdbcType=VARCHAR}
+	</update>
+	<!-- 删除 -->
+	<delete id="delete" parameterType="pd">
+		delete 
+		from
+			<include refid="tableName"></include>
+		where
+			ID=#{ID, jdbcType=VARCHAR}
+	</delete>
+	<!-- 批量删除 -->
+	<delete id="deleteAll" parameterType="String">
+		delete from
+		<include refid="tableName"></include>
+		where 
+			ID in
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                 #{item}
+		</foreach>
+	</delete>
+	<!-- 增加-->
+	<insert id="save" parameterType="pd">
+		insert into 
+	<include refid="tableName"></include>
+		(
+	<include refid="Field"></include>
+		) values (
+	<include refid="FieldValue"></include>
+		)
+	</insert>
+	<!-- app更新 -->
+	<update id="renew" parameterType="pd">
+		update
+			<include refid="tableName"></include>
+		set 
+			<if test="USER_AGENT_ID != null and USER_AGENT_ID != ''">
+				USER_AGENT_ID=#{USER_AGENT_ID, jdbcType=VARCHAR},
+			</if>
+			<if test="TIME_CLASS != null and TIME_CLASS != ''">
+				TIME_CLASS=#{TIME_CLASS, jdbcType=VARCHAR},	
+			</if>
+			<if test="SUGAR_VALUE != null and SUGAR_VALUE != ''">
+				SUGAR_VALUE=#{SUGAR_VALUE, jdbcType=NUMERIC},
+			</if>	
+			<if test="TEST_TIME != null and TEST_TIME != ''">
+				TEST_TIME=to_date(#{TEST_TIME},'yyyy-mm-dd HH24:mi:ss'),
+			</if>
+			<if test="CREAT_TIME != null and CREAT_TIME != ''">
+				CREAT_TIME=to_date(#{CREAT_TIME},'yyyy-mm-dd HH24:mi:ss'),
+			</if>
+				ID=#{ID, jdbcType=VARCHAR}
+		where
+			ID=#{ID, jdbcType=VARCHAR}
+	</update>	
+</mapper>

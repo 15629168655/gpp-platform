@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="TreateRecordMapper">
+	<!--治疗方案表-->
+	<sql id="tableName">
+		GPP_TREATE_RECORD
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		RECORD_ID,
+		CASE_ID,
+		FOLLOW_ID,
+		IMPLEMENT_TIME,
+		IMPL_NAME,
+		IMPL_ID
+	</sql>
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{RECORD_ID, jdbcType=VARCHAR},
+		#{CASE_ID, jdbcType=VARCHAR},
+		#{FOLLOW_ID, jdbcType=VARCHAR},
+		to_date(#{IMPLEMENT_TIME},'yyyy-mm-dd HH24:mi:ss'),
+		#{IMPL_NAME, jdbcType=VARCHAR},
+		#{IMPL_ID, jdbcType=VARCHAR}
+	</sql>
+	<!-- 查看详情 -->
+	<select id="findByCaseId" parameterType="page" resultType="pd">
+		select 
+			<include refid="Field"></include>
+		from 
+			<include refid="tableName"></include>
+		where 
+			CASE_ID = #{CASE_ID,jdbcType=VARCHAR}
+	</select>
+	<select id="findFinished"  parameterType="pd"  resultType="pd">
+		select
+			CASE_ID,
+		CASE_NAME,
+		RESIDENT_ID,
+		RESIDENT_NAME,
+		<if test="CASE_CONTENT != null and CASE_CONTENT != ''">
+			CASE_CONTENT,
+		</if>
+		TREATE_COUNT,
+		MODEL_ID,
+		MODEL_NAME,
+		DISEASE_NAME,
+		PEOPLE_TYPE,
+		INTERVAL_TIME,
+		INTERVAL_COMPANY,
+		PROVIDER_ID,
+		PROVIDER_NAME,
+		ORG_CODE,
+		TIME_ID,
+		ORG_NAME,
+		START_TIME,
+		REMIND_TIME,
+		IMPL_COUNT,
+		IMPL_EFFECT,
+		<if test="IMPL_SUGGESTION != null and IMPL_SUGGESTION != ''">
+			IMPL_SUGGESTION,
+		</if>
+		IMPL_STATE,
+		OPERATOR_ID,
+		OPERATOR_NAME,
+		CREATE_TIME,
+		EDIT_TIME
+		from
+		 GPP_TREATE_CASE where
+		 IMPL_STATE=#{IMPL_STATE,jdbcType=VARCHAR} and RESIDENT_ID = #{RESIDENT_ID,jdbcType=VARCHAR}
+	</select>
+	<insert id="save" parameterType="pd">
+		insert into 
+	<include refid="tableName"></include>
+	(<include refid="Field"></include>)
+            VALUES
+     (<include refid="FieldValue"></include>)
+	</insert>
+	<select id="dataRecord" parameterType="page" resultType="pd">
+		SELECT
+			GPP_TREATE_RECORD.*, GPP_TREATE_CASE.*
+		FROM
+			GPP_TREATE_RECORD 
+		LEFT JOIN  GPP_TREATE_CASE 
+		on
+			GPP_TREATE_RECORD.CASE_ID = GPP_TREATE_CASE.CASE_ID
+			<if test = "pd.ORG_NAME != null and pd.ORG_NAME != ''">
+				or ORG_NAME LIKE CONCAT(CONCAT('%', #{pd.ORG_NAME}),'%')
+			</if>
+			<if test="pd.PROVIDER_NAME != null and pd.PROVIDER_NAME !=''" >
+				or PROVIDER_NAME LIKE CONCAT(CONCAT('%', #{pd.PROVIDER_NAME}),'%')
+			</if>
+			<if test="pd.SUIT_PEOPLE != null and pd.SUIT_PEOPLE !=''" >
+				or SUIT_PEOPLE LIKE CONCAT(CONCAT('%', #{pd.SUIT_PEOPLE}),'%')
+			</if>
+			<if test="pd.DISEASE_NAME != null and pd.DISEASE_NAME!=''" >
+				or DISEASE_NAME LIKE CONCAT(CONCAT('%', #{pd.DISEASE_NAME}),'%')
+			</if>
+	</select>
+</mapper>

@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="AgreementMapper">
+	
+	<!--表名 -->
+	<sql id="tableName">
+		GPP_AGREEMENT_APPLY
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		ID,
+  		APPLICANT_ID,
+  		APPLICANT_NAME,
+  		APPLICANT_PHONE,
+  		STATUS,
+  		GMT_CREATED,
+  		GEN_PRACTITIONER_ID,
+  		GEN_PRACTITIONER_CODE,   
+  		GEN_PRACTITIONER_NAME,        
+  		GEN_PRACTITIONER_PHONE,
+  		AGREEMENT_ID,
+  		ORG_CODE,
+  		REGION_CODE,
+  		AUDITOR_ID,
+  		AUDITOR_NAME,
+  		GMT_AUDIT,
+  		AUDITOR_COMMENT,
+  		GMT_APPOINTMENT,
+  		SIGNED_TYPE
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{ID,jdbcType=VARCHAR},
+  		#{APPLICANT_ID,jdbcType=VARCHAR},
+  		#{APPLICANT_NAME,jdbcType=VARCHAR},      
+  		#{APPLICANT_PHONE,jdbcType=VARCHAR},
+  		#{STATUS,jdbcType=VARCHAR},
+  		to_date(#{GMT_CREATED,jdbcType=DATE},'YYYY-MM-DD HH24:MI:SS'),
+  		#{GEN_PRACTITIONER_ID,jdbcType=VARCHAR},
+  		#{GEN_PRACTITIONER_CODE,jdbcType=VARCHAR},
+  		#{GEN_PRACTITIONER_NAME,jdbcType=VARCHAR},
+  		#{GEN_PRACTITIONER_PHONE,jdbcType=VARCHAR},
+  		#{AGREEMENT_ID,jdbcType=VARCHAR},
+  		#{ORG_CODE,jdbcType=VARCHAR},
+  		#{REGION_CODE,jdbcType=VARCHAR},
+  		#{AUDITOR_ID,jdbcType=VARCHAR},
+  		#{AUDITOR_NAME,jdbcType=VARCHAR},
+  		to_date(#{GMT_AUDIT,jdbcType=DATE},'YYYY-MM-DD HH24:MI:SS'),
+  		#{AUDITOR_COMMENT,jdbcType=VARCHAR},
+  		to_date(#{GMT_APPOINTMENT,jdbcType=DATE},'YYYY-MM-DD HH24:MI:SS'),
+  		#{SIGNED_TYPE,jdbcType=VARCHAR}
+	</sql>
+	
+	<!-- 新增-->
+	<insert id="save" parameterType="pd">
+		insert into 
+	<include refid="tableName"></include>
+		(
+	<include refid="Field"></include>
+		) values (
+	<include refid="FieldValue"></include>
+		)
+	</insert>
+	
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+		update
+		<include refid="tableName"></include>
+		set 
+		APPLICANT_ID = #{APPLICANT_ID,jdbcType=VARCHAR},
+  		APPLICANT_NAME = #{APPLICANT_NAME,jdbcType=VARCHAR},   
+  		APPLICANT_PHONE = #{APPLICANT_PHONE,jdbcType=VARCHAR},
+  		STATUS = #{STATUS,jdbcType=VARCHAR},
+  		GMT_CREATED =to_date(#{GMT_CREATED,jdbcType=DATE},'YYYY-MM-DD HH24:MI:SS'),
+  		GEN_PRACTITIONER_ID = #{GEN_PRACTITIONER_ID,jdbcType=VARCHAR},
+  		GEN_PRACTITIONER_CODE = #{GEN_PRACTITIONER_CODE,jdbcType=VARCHAR},
+  		GEN_PRACTITIONER_NAME = #{GEN_PRACTITIONER_NAME,jdbcType=VARCHAR},
+  		GEN_PRACTITIONER_PHONE = #{GEN_PRACTITIONER_PHONE,jdbcType=VARCHAR},     
+  		AGREEMENT_ID = #{AGREEMENT_ID,jdbcType=VARCHAR},
+  		ORG_CODE = #{ORG_CODE,jdbcType=VARCHAR},
+  		REGION_CODE = #{REGION_CODE,jdbcType=VARCHAR},
+  		GMT_AUDIT = to_date(#{GMT_AUDIT,jdbcType=DATE},'YYYY-MM-DD HH24:MI:SS'),
+  		GMT_APPOINTMENT = to_date(#{GMT_APPOINTMENT,jdbcType=DATE},'YYYY-MM-DD HH24:MI:SS'),
+  		SIGNED_TYPE = #{SIGNED_TYPE,jdbcType=VARCHAR},
+  		AUDITOR_ID = #{AUDITOR_ID,jdbcType=VARCHAR},
+  		AUDITOR_NAME = #{AUDITOR_NAME,jdbcType=VARCHAR},
+  		AUDITOR_COMMENT =#{AUDITOR_COMMENT,jdbcType=VARCHAR}
+		where
+		ID = #{ID,jdbcType=VARCHAR}
+	</update>
+	
+	
+	
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include> 
+		where
+			ID = #{ID}
+	</select>
+	
+	<!-- 签约申请列表 -->
+	<select id="yslistPage" parameterType="page" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include>
+		where 1=1
+		<if test="pd.APPLICANT_ID != null and pd.APPLICANT_ID!= ''"><!-- 关键词检索 -->
+			and APPLICANT_ID = #{pd.APPLICANT_ID,jdbcType=VARCHAR}
+		</if>
+	</select>
+	
+	<!-- 签约审核列表 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include>
+		where 1= 1
+		<if test="pd.keywords != null and pd.keywords!= ''"><!-- 关键词检索 -->
+			and APPLICANT_NAME LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+		</if>
+		<if test="pd.createdStart!=null and pd.createdStart!=''"><!-- 登录时间检索 -->
+			and to_char(GMT_CREATED,'yyyymmdd') &gt;= to_char(to_date(#{pd.createdStart},'yyyy-MM-dd '),'yyyymmdd')
+		</if>
+		<if test="pd.createdEnd!=null and pd.createdEnd!=''"><!-- 登录时间检索   -->
+			and to_char(GMT_CREATED,'yyyymmdd') &lt;= to_char(to_date(#{pd.createdEnd},'yyyy-MM-dd '),'yyyymmdd')
+		</if>
+		<if test="pd.orgId != null and pd.orgId != ''"><!-- 机构检索   -->
+			and ORG_CODE = #{pd.orgId}
+		</if>
+		order by GMT_CREATED desc
+	</select>
+	
+	<!-- 删除   -->
+	<update id="delete" parameterType="pd">
+		update
+		<include refid="tableName"></include>
+		set 
+		STATUS = #{STATUS,jdbcType=VARCHAR}
+		where
+		ID = #{ID,jdbcType=VARCHAR}
+	</update>
+	
+</mapper>

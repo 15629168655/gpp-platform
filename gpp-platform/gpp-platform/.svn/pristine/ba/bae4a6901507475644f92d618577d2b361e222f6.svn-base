@@ -1,0 +1,41 @@
+package com.tbyf.entity.enums;
+
+import java.util.Map;
+import java.util.TreeMap;
+
+public enum EnumTreatCaseState {
+
+	ENABLE(0,"启用"),DEL(1,"删除"),COM(2,"完结");
+
+	private Integer code;
+	private String name;
+
+	EnumTreatCaseState(Integer code, String name) {
+		this.code = code;
+		this.name = name;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public Integer getCode() {
+		return code;
+	}
+
+	public void setCode(Integer code) {
+		this.code = code;
+	}
+
+	public static Map<Integer, String> toMap() {
+		Map<Integer, String> enumDataMap = new TreeMap<Integer, String>();
+		for (EnumTreatCaseState type : EnumTreatCaseState.values()) {
+			enumDataMap.put(type.getCode(), type.getName());
+		}
+		return enumDataMap;
+	}
+}

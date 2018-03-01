@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="IndexScoreMapper">
+	<!-- 评分等级表 -->
+	<sql id="tableName">
+		GPP_INDEX_SCORE
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		ID,
+		SCREENING_QUESTIONNAIRE_ID,
+		MOUNT_SCORE,
+		SCORE_RANK,
+		RANK_DISCRIBE,
+		RANGE_DOWN,
+		RANGE_UP,
+		SCORE_ORDER
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{ID, jdbcType=VARCHAR},
+		#{SCREENING_QUESTIONNAIRE_ID, jdbcType=VARCHAR},
+		#{MOUNT_SCORE, jdbcType=NUMERIC},
+		#{SCORE_RANK, jdbcType=NUMERIC},
+		#{RANK_DISCRIBE, jdbcType=VARCHAR},
+		#{RANGE_DOWN, jdbcType=NUMERIC},
+		#{RANGE_UP, jdbcType=NUMERIC},
+		#{SCORE_ORDER, jdbcType=NUMERIC}
+	</sql>
+	<!-- 通过问卷Id查询评分等级情况-->
+	<select id="findByScreeningQuesId" parameterType="pd" resultType="pd">
+		select 
+			<include refid="Field"></include>
+		from 
+			<include refid="tableName"></include>
+		where 
+			SCREENING_QUESTIONNAIRE_ID = #{ID,jdbcType=VARCHAR}
+	</select>
+	<!-- 给问卷添加评分等级-->
+	<insert id="save" parameterType="pd">
+		insert into 
+	<include refid="tableName"></include>
+		(
+	<include refid="Field"></include>
+		) values (
+	<include refid="FieldValue"></include>
+		)
+	</insert>
+	<delete id="deleteByScreeningQuesId" parameterType="pd">
+		delete
+		from
+	<include refid="tableName"></include>
+		where
+		SCREENING_QUESTIONNAIRE_ID = #{ID,jdbcType=VARCHAR}
+	</delete>
+
+</mapper>

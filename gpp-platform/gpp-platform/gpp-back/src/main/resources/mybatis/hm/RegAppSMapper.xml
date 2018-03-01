@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="RegAppSMapper">
+<!-- 表名 -->
+	<sql id="tableName">
+		"HM_REGAPPS"
+	</sql>
+	<!-- 字段 -->
+	<sql id="Field">
+		"GUID",
+		"HOSPCODE",
+		"DOCTORCODE",
+		"RECEPTIONS",
+		"RECEPTIONE",
+		"RECEPTIOND",
+		"SCHEDULING",
+		"ALLOTNUM"
+	</sql>
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{GUID,jdbcType=VARCHAR},
+		#{HOSPCODE,jdbcType=VARCHAR},
+		#{DOCTORCODE,jdbcType=VARCHAR},
+		to_date(#{RECEPTIONS},'yyyy-mm-dd HH24:mi:ss'),
+		to_date(#{RECEPTIONE},'yyyy-mm-dd HH24:mi:ss'),
+		to_date(#{RECEPTIOND},'yyyy-mm-dd'),
+		#{SCHEDULING,jdbcType=NUMERIC},
+		#{ALLOTNUM,jdbcType=NUMERIC}
+		
+	</sql>
+	
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from
+		<include refid="tableName"></include>
+		where
+		"GUID" = #{GUID}
+	</select>
+	
+	<!-- 条件查询 -->
+	<select id="list" parameterType="page" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include>
+		where 1=1
+		<!-- 姓名 
+		<if test="pd.NAME!=null and pd.NAME!=''">
+			and NAME LIKE CONCAT(CONCAT('%',#{pd.NAME}),'%')
+		</if> -->
+		and RECEPTIONE &gt; to_date(to_char(sysdate,'yyyy-MM-dd HH24:mi:ss'),'yyyy-mm-dd HH24:mi:ss') 
+		<!-- 医院编码 -->
+		<if test="pd.HOSPCODE != null and pd.HOSPCODE != ''">
+			and HOSPCODE = #{pd.HOSPCODE}
+		</if>	
+		<!-- 医生编码 -->
+		<if test="pd.DOCTORCODE != null and pd.DOCTORCODE != ''">
+			and DOCTORCODE = #{pd.DOCTORCODE}
+		</if>
+	
+		<if test="pd.reqAppDateStart != null and pd.reqAppDateStart !=''">
+			and RECEPTIOND &gt; to_date(#{pd.reqAppDateStart},'yyyy-mm-dd')
+		</if>
+		<if test="pd.reqAppDateEnd != null and pd.reqAppDateEnd != ''">
+            and RECEPTIOND &lt;  to_date(#{pd.reqAppDateEnd},'yyyy-mm-dd')
+        </if>
+		
+	</select>
+	<!-- 查询全部 -->
+	<select id="listAll" parameterType="page" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from
+		<include refid="tableName"></include>
+	</select>
+	<!--新增  -->
+	<insert id="save" parameterType="pd">
+		insert into
+		<include refid="tableName"></include>
+		(
+		<include refid="Field"></include>
+		) values (
+		<include refid="FieldValue"></include>
+		)
+	</insert>
+	<!-- 获得最大的GUID -->
+	<select id="getMaxGUID" parameterType="pd" resultType="pd">
+		select
+			max(cast(GUID as int)) as GUID
+		from 
+			<include refid="tableName"></include>
+	</select>
+	<update id="update" parameterType="pd" >
+		update
+		<include refid="tableName"></include>
+			set 
+				"GUID"=#{GUID,jdbcType=VARCHAR},
+				"HOSPCODE"=#{HOSPCODE,jdbcType=VARCHAR},
+				"DOCTORCODE"=#{DOCTORCODE,jdbcType=VARCHAR},
+				"RECEPTIONS"=to_date(#{RECEPTIONS},'yyyy-mm-dd HH24:mi:ss'),
+				"RECEPTIONE"=to_date(#{RECEPTIONE},'yyyy-mm-dd HH24:mi:ss'),
+				"RECEPTIOND"=to_date(#{RECEPTIOND},'yyyy-mm-dd HH24:mi:ss'),
+				"SCHEDULING"=#{SCHEDULING,jdbcType=NUMERIC},
+				"ALLOTNUM"=#{ALLOTNUM,jdbcType=NUMERIC}
+			where 
+				"GUID" = #{GUID,jdbcType=VARCHAR}
+	</update>
+	<select id="reSubmit" parameterType="pd" resultType="pd">
+		select
+			<include refid="Field"></include>
+		from
+			<include refid="tableName"></include>
+		where
+				"HOSPCODE"=#{HOSPCODE,jdbcType=VARCHAR}
+				and "DOCTORCODE"=#{DOCTORCODE,jdbcType=VARCHAR}
+				and "RECEPTIONS"=to_date(#{RECEPTIONS},'yyyy-mm-dd HH24:mi:ss')
+				and "RECEPTIONE"=to_date(#{RECEPTIONE},'yyyy-mm-dd HH24:mi:ss')
+				and "RECEPTIOND"=to_date(#{RECEPTIOND},'yyyy-mm-dd HH24:mi:ss') 
+	</select>
+</mapper>
